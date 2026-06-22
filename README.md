@@ -9,18 +9,6 @@ O **SYNGE** é uma plataforma robusta e unificada de gestão escolar voltada par
 
 A plataforma automatiza processos críticos divididos em três pilares principais: **Pedagógico** (diário de classe, chamada online e motor flexível de notas), **Administrativo** (controle de anos letivos, matrículas e repositório de documentos) e **Financeiro** (faturamento automatizado, regras de descontos familiares e controle ativo de inadimplência).
 
----
-
-**## 📺 Vídeo de Demonstração e Explicação
-Clique na imagem abaixo para assistir ao vídeo explicativo detalhando o funcionamento da plataforma, a arquitetura técnica e os critérios de avaliação atendidos:
-
-<p align="center">
-  <a href="INSIRA_O_LINK_DO_SEU_VIDEO_AQUI">
-    <img src="https://img.youtube.com/vi/INSIRA_O_ID_DO_VIDEO_AQUI/0.jpg" alt="Assista ao Vídeo do SYNGE" width="600">
-  </a>
-</p>
-
-> 💡 *Nota: Caso o link acima não funcione, você também pode acessar o vídeo diretamente através deste [Link Alternativo](INSIRA_O_LINK_DO_SEU_VIDEO_AQUI).*
 
 ---**## 📺 Vídeo de Demonstração e Explicação
 Clique na imagem abaixo para assistir ao vídeo explicativo detalhando o funcionamento da plataforma, a arquitetura técnica e os critérios de avaliação atendidos:
