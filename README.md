@@ -1,7 +1,7 @@
 # SYNGE — Plataforma Inteligente de Gestão Escolar (Multi-Tenant)
 
 <p align="center">
-  <img src="image_9cc6a5.jpg" alt="SYNGE Logo" width="200"/>
+  <img src="logo" alt="SYNGE Logo" width="200"/>
 </p>
 
 ## 📌 Apresentação do Projeto
@@ -60,16 +60,4 @@ O desenvolvimento foi distribuído de maneira incremental e monitorado estritame
 * **FASE 5 (01 a 03 de Julho) — Engenharia Avançada:** Implementação do motor de cálculo de médias usando o padrão Strategy e criação de testes de cobertura automatizados.
 * **FASE 6 (04 a 06 de Julho) — Homologação e Entrega Final:** Escrita do documento `COMPONENTS.md` para auditoria de reuso de componentes pelo professor, varredura de logs do sistema e Deploy final na nuvem para avaliação da banca.
 
----
 
-## 🚀 Como Executar o Projeto Localmente
-
-### Pré-requisitos
-* Java JDK 17 ou superior instalado.
-* Docker e Docker Compose instalados e rodando na máquina.
-
-### Passo a Passo
-1. Clone o repositório para a sua máquina local:
-   ```bash
-   git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
-   cd SEU_REPOSITORIO
