@@ -8,6 +8,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "🚀 Synge no ar!";
-    }
+        return "🚀 Synge no ar!!! Aguarde as atualizações!!";
+}
 }
