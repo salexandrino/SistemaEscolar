@@ -13,7 +13,7 @@ public class SecurityConfig {
 
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ping").permitAll()
+                        .requestMatchers("/", "/ping").permitAll() // 👈 Adicionei a "/" aqui para liberar o acesso público
                         .anyRequest().authenticated()
                 )
                 .build();
