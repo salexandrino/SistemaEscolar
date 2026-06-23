@@ -7,7 +7,7 @@
 ## 📌 Apresentação do Projeto
 O **SYNGE** é uma plataforma robusta e unificada de gestão escolar voltada para instituições de ensino básico (do Ensino Infantil ao Médio). Desenvolvido sob a arquitetura *Multi-Tenant*, o sistema isola de forma estrita e segura os dados de múltiplas escolas clientes utilizando uma única infraestrutura de software e banco de dados. 
 
-A plataforma automatiza processos críticos divididos em três pilares principais: **Pedagógico** (diário de classe, chamada online e motor flexível de notas), **Administrativo** (controle de anos letivos, matrículas e repositório de documentos) e **Financeiro** (faturamento automatizado, regras de descontos familiares e controle ativo de inadimplência).
+A plataforma automatiza processos críticos divididos em 3 pilares principais: **Acadêmico** (diário de classe, chamada online e motor flexível de notas), **Administrativo** (controle de anos letivos, matrículas e repositório de documentos) e **Financeiro** (faturamento automatizado, regras de descontos familiares e controle ativo de inadimplência).
 
 
 ---**## 📺 Vídeo de Demonstração e Explicação
