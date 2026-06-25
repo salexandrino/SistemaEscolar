@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="sidebarFragment" class="bg-primary border-right" id="sidebar-wrapper">
+    <div class="sidebar-heading text-white py-4 px-4">SYNGE</div>
+    <div class="list-group list-group-flush">
+        <!-- Gestão Acadêmica -->
+        <a href="#academicoSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-graduation-cap me-2"></i> Gestão Acadêmica
+        </a>
+        <div class="collapse list-group-item-action bg-primary" id="academicoSubmenu">
+            <a th:href="@{/academico/anos-letivos}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Anos Letivos</a>
+            <a th:href="@{/academico/turmas}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Turmas/Séries</a>
+            <a th:href="@{/academico/alunos}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Alunos</a>
+            <a th:href="@{/academico/notas}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Notas</a>
+        </div>
+
+        <!-- Gestão Financeira -->
+        <a href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-dollar-sign me-2"></i> Gestão Financeira
+        </a>
+        <div class="collapse list-group-item-action bg-primary" id="financeiroSubmenu">
+            <a th:href="@{/financeiro/mensalidades}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Mensalidades</a>
+            <a th:href="@{/financeiro/taxas}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Taxas Avulsas</a>
+            <a th:href="@{/financeiro/fluxo-caixa}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Fluxo de Caixa</a>
+        </div>
+
+        <!-- Administração -->
+        <a href="#administracaoSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
+            <i class="fas fa-cogs me-2"></i> Administração
+        </a>
+        <div class="collapse list-group-item-action bg-primary" id="administracaoSubmenu">
+            <a th:href="@{/admin/usuarios}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Cadastro de Usuários</a>
+            <a th:href="@{/admin/configuracoes}" class="list-group-item list-group-item-action bg-primary text-white ps-5">Configurações</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

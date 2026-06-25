@@ -1,4 +1,4 @@
-package br.com.synge.controller;
+package br.com.synge.seguranca.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,5 +9,5 @@ public class HomeController {
     @GetMapping("/")
     public String home() {
         return "🚀 Synge no ar!!! Aguarde as atualizações!!";
-}
+    }
 }

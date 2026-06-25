@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SYNGE - Login</title>
+    <th:block th:replace="~{layouts/master :: headContent}"></th:block>
+</head>
+<body>
+<div th:replace="~{layouts/master :: layout(
+    ~{::title},
+    ~{::section},
+    ~{::headContent},
+    ~{::bodyScripts}
+)}">
+    <section>
+        <div class="container-fluid d-flex align-items-center justify-content-center min-vh-100 bg-light-green">
+            <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4 text-primary">Login SYNGE</h3>
+
+                    <!-- Error Alert Fragment -->
+                    <div th:replace="~{fragments/modals :: errorBanner(${errorMessage})}" th:if="${errorMessage}"></div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label for="cpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control cpf-mask" id="cpf" name="cpf" placeholder="000.000.000-00" required autofocus>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="********" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <th:block th:fragment="bodyScripts">
+        <!-- Any specific scripts for the login page -->
+    </th:block>
+</div>
+</body>
+</html>

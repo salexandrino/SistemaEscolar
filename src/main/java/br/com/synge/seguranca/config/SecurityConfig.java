@@ -1,4 +1,4 @@
-package br.com.synge.config;
+package br.com.synge.seguranca.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
