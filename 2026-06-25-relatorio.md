@@ -5,9 +5,9 @@
 | **Data** | 2026-06-25 |
 | **Repositório** | https://github.com/aps-poo-ufpb/eq14 |
 | **Aplicação** | https://aps-eq14.aps.rodrigor.com |
-| **Período de atividade** | 2026-06-23 → 2026-06-23 |
-| **Total de commits** (sem merges) | 1 |
-| **Integrantes** |  |
+| **Período de atividade** | 2026-06-23 → 2026-06-25 |
+| **Total de commits** (sem merges, branch main) | 2 |
+| **Integrantes** | Mirela Ronze Felipe Dos Santos (@mirelaronze), Sthefanny Lara Silva Alexandrino (@sthefannyLara-blip) |
 
 ---
 
@@ -59,9 +59,30 @@
 
 ### Resumo
 
-| Usuário | Commits | % commits | Linhas adicionadas | Linhas no código atual | % código atual |
-|---------|---------|-----------|-------------------|----------------------|----------------|
-| *(sem login GitHub)* | 1 | 100% | — | — | — |
+| Usuário | Commits (main) | Commits (GitHub API) | Linhas adicionadas | Linhas no código atual | % código atual |
+|---------|---------------|---------------------|-------------------|----------------------|----------------|
+| Mirela Ronze Felipe Dos Santos (@mirelaronze) | 0 | **0** | 0 | 0 | 0% |
+| Sthefanny Lara Silva Alexandrino (@sthefannyLara-blip) | 0 | **3** | 0 | 0 | 0% |
+| *(sem login GitHub)* | 2 | 100% | — | — | — |
+
+### Contribuição por Camada
+
+| Camada | Total linhas | Mirela Ronze Felipe Dos Santos (@mirelaronze) | Sthefanny Lara Silva Alexandrino (@sthefannyLara-blip) |
+|--------|-------------|---------|---------|
+| Controller | 33 | 0% | 0% |
+| Service | 13 | 0% | 0% |
+
+---
+
+## 5. Contribuição por Funcionalidade
+
+Baseado em `git blame` nos arquivos de controller e service.
+
+| Arquivo | Total linhas | Mirela Ronze Felipe Dos Santos (@mirelaronze) | Sthefanny Lara Silva Alexandrino (@sthefannyLara-blip) |
+|---------|-------------|---------|---------|
+| `PingController.java` | 20 | 0% | 0% |
+| `SyngeApplication.java` | 13 | 0% | 0% |
+| `HomeController.java` | 13 | 0% | 0% |
 
 ---
 
