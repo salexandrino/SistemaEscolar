@@ -1,7 +1,5 @@
 package br.com.synge.academico.services;
 
-import br.com.synge.academico.models.Aluno;
-import br.com.synge.academico.repositories.AlunoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
