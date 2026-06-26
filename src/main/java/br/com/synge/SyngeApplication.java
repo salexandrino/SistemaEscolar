@@ -1,13 +1,24 @@
 package br.com.synge;
 
+import io.javalin.Javalin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
 public class SyngeApplication {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(SyngeApplication.class);
+
     public static void main(String[] args) {
-        SpringApplication.run(SyngeApplication.class, args);
+
+        logger.info("Iniciando SYNGE...");
+
+        Javalin app = Javalin.create();
+
+        app.get("/ping", ctx -> ctx.result("pong"));
+
+        app.start(7000);
+
+        logger.info("Servidor iniciado na porta 7000.");
     }
 }
