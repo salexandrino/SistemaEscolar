@@ -1,7 +1,7 @@
 # SYNGE — Plataforma Inteligente de Gestão Escolar (Multi-Tenant)
 
 <p align="center">
-  <img src="logo" alt="SYNGE Logo" width="200"/>
+  <img src="logo.jpeg" alt="SYNGE Logo" width="200"/>
 </p>
 
 ## 📌 Apresentação do Projeto
