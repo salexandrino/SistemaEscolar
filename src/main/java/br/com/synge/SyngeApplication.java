@@ -16,22 +16,22 @@ public class SyngeApplication {
 
         logger.info("Iniciando SYNGE...");
 
-        Javalin app = Javalin.create();
-
-        app.get("/", ctx ->
-                ctx.result("🚀 Synge no ar!!! Faltam 3 dias!!")
+        int port = Integer.parseInt(
+                System.getenv().getOrDefault("PORT", "8080")
         );
 
-        app.get("/ping", ctx -> {
-            ctx.json(Map.of(
-                    "status", "ok",
-                    "service", "eq14",
-                    "timestamp", Instant.now().toString()
-            ));
-        });
+        Javalin app = Javalin.create();
 
-        app.start(7000);
+        app.get("/", ctx -> ctx.result("SYNGE está no ar!"));
 
-        logger.info("Servidor iniciado na porta 7000.");
+        app.get("/ping", ctx -> ctx.json(Map.of(
+                "status", "ok",
+                "service", "eq14",
+                "timestamp", Instant.now().toString()
+        )));
+
+        app.start(port);
+
+        logger.info("Servidor iniciado na porta {}", port);
     }
 }
