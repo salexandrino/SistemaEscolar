@@ -22,13 +22,17 @@ public class SyngeApplication {
 
         Javalin app = Javalin.create();
 
-        app.get("/", ctx -> ctx.result("SYNGE está no ar!"));
+        app.get("/", ctx ->
+                ctx.result("SYNGE está no ar!")
+        );
 
-        app.get("/ping", ctx -> ctx.json(Map.of(
-                "status", "ok",
-                "service", "eq14",
-                "timestamp", Instant.now().toString()
-        )));
+        app.get("/ping", ctx ->
+                ctx.json(Map.of(
+                        "status", "ok",
+                        "service", "eq14",
+                        "timestamp", Instant.now().toString()
+                ))
+        );
 
         app.start(port);
 
