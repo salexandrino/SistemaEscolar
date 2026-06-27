@@ -11,7 +11,7 @@
         <file>logs/synge.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/synge.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>logs/synge.%d{yyyy- MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
