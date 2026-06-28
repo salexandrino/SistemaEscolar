@@ -1,4 +1,4 @@
-package br.com.synge.config;
+package br.com.synge.seguranca.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

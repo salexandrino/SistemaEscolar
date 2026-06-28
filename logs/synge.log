@@ -1,2 +1,1055 @@
-2026-06-27 00:36:53.834 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
-2026-06-27 09:30:59.270 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:00:22.322 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:00:22.793 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:00:22.797 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:00:22.916 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:00:22.937 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@6ccdb29f{/,null,AVAILABLE}
+2026-06-28 00:00:23.046 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@461ad730{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:00:23.066 [main] INFO  org.eclipse.jetty.server.Server - Started Server@2ca26d77{STARTING}[11.0.25,sto=0] @3610ms
+2026-06-28 00:00:23.066 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:00:23.068 [main] INFO  io.javalin.Javalin - Javalin started in 474ms \o/
+2026-06-28 00:00:23.109 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:00:23.121 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:00:23.151 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:00:23.151 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:13:44.134 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:13:44.620 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:13:44.624 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:13:44.808 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:13:44.827 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@130e116b{/,null,AVAILABLE}
+2026-06-28 00:13:44.917 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@4f49f6af{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:13:44.931 [main] INFO  org.eclipse.jetty.server.Server - Started Server@3f1d2e23{STARTING}[11.0.25,sto=0] @3399ms
+2026-06-28 00:13:44.932 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:13:44.932 [main] INFO  io.javalin.Javalin - Javalin started in 573ms \o/
+2026-06-28 00:13:44.964 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:13:44.975 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:13:45.000 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:13:45.000 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:17:49.107 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:17:49.501 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:17:49.505 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:17:49.609 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:17:49.631 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:17:49.709 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:17:49.727 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1438ms
+2026-06-28 00:17:49.727 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:17:49.731 [main] INFO  io.javalin.Javalin - Javalin started in 395ms \o/
+2026-06-28 00:17:49.768 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:17:49.779 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:17:49.805 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:17:49.806 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:26:13.817 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:26:14.232 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:26:14.238 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:26:14.364 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:26:14.383 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:26:14.479 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:26:14.494 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1509ms
+2026-06-28 00:26:14.494 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:26:14.496 [main] INFO  io.javalin.Javalin - Javalin started in 461ms \o/
+2026-06-28 00:26:14.527 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:26:14.539 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:26:14.566 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:26:14.567 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:28:35.096 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:28:35.480 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:28:35.484 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:28:35.598 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:28:35.617 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:28:35.709 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:28:35.727 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1612ms
+2026-06-28 00:28:35.727 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:28:35.728 [main] INFO  io.javalin.Javalin - Javalin started in 412ms \o/
+2026-06-28 00:28:35.762 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:28:35.773 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:28:35.792 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:28:35.793 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:30:33.444 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:30:33.826 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:30:33.830 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:30:33.937 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:30:33.954 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:30:34.030 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:30:34.050 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1316ms
+2026-06-28 00:30:34.051 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:30:34.053 [main] INFO  io.javalin.Javalin - Javalin started in 389ms \o/
+2026-06-28 00:30:34.088 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:30:34.101 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:30:34.121 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:30:34.122 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:31:33.545 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:31:33.918 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:31:33.923 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:31:34.030 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:31:34.050 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:31:34.144 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:31:34.163 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1559ms
+2026-06-28 00:31:34.163 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:31:34.165 [main] INFO  io.javalin.Javalin - Javalin started in 424ms \o/
+2026-06-28 00:31:34.196 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:31:34.208 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:31:34.225 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:31:34.226 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 00:32:21.712 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 00:32:22.098 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 00:32:22.101 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 00:32:22.210 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 00:32:22.228 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 00:32:22.308 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 00:32:22.326 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1473ms
+2026-06-28 00:32:22.327 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 00:32:22.329 [main] INFO  io.javalin.Javalin - Javalin started in 379ms \o/
+2026-06-28 00:32:22.368 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 00:32:22.380 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 00:32:22.403 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 00:32:22.404 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:02:20.433 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:02:20.829 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:02:20.832 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:02:20.942 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:02:20.962 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:02:21.051 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:02:21.071 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1407ms
+2026-06-28 01:02:21.072 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:02:21.073 [main] INFO  io.javalin.Javalin - Javalin started in 415ms \o/
+2026-06-28 01:02:21.105 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:02:21.114 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:02:21.137 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:02:21.138 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:02:25.220 [JettyServerThreadPool-31] ERROR org.thymeleaf.TemplateEngine - [THYMELEAF][JettyServerThreadPool-31] Exception processing template "home": An error happened during template parsing (template: "templates/home.html")
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:02:25.226 [JettyServerThreadPool-31] WARN  io.javalin.Javalin - Uncaught exception
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:06:44.641 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:06:45.003 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:06:45.008 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:06:45.135 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:06:45.155 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:06:45.251 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:06:45.266 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1405ms
+2026-06-28 01:06:45.266 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:06:45.267 [main] INFO  io.javalin.Javalin - Javalin started in 441ms \o/
+2026-06-28 01:06:45.298 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:06:45.308 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:06:45.327 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:06:45.327 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:06:47.622 [JettyServerThreadPool-31] ERROR org.thymeleaf.TemplateEngine - [THYMELEAF][JettyServerThreadPool-31] Exception processing template "home": An error happened during template parsing (template: "templates/home.html")
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:06:47.630 [JettyServerThreadPool-31] WARN  io.javalin.Javalin - Uncaught exception
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:07:25.932 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:07:26.323 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:07:26.325 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:07:26.430 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:07:26.450 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:07:26.528 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:07:26.546 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1399ms
+2026-06-28 01:07:26.546 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:07:26.549 [main] INFO  io.javalin.Javalin - Javalin started in 389ms \o/
+2026-06-28 01:07:26.583 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:07:26.592 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:07:26.618 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:07:26.620 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:07:29.133 [JettyServerThreadPool-31] ERROR org.thymeleaf.TemplateEngine - [THYMELEAF][JettyServerThreadPool-31] Exception processing template "home": An error happened during template parsing (template: "templates/home.html")
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:07:29.139 [JettyServerThreadPool-31] WARN  io.javalin.Javalin - Uncaught exception
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateProcessingException: Link base "/images/about-synge.png" cannot be context relative (/...) unless the context used for executing the engine implements the org.thymeleaf.context.IWebContext interface (template: "fragments/about" - line 36, col 22)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.computeContextPath(StandardLinkBuilder.java:514)
+	at org.thymeleaf.linkbuilder.StandardLinkBuilder.buildLink(StandardLinkBuilder.java:126)
+	at org.thymeleaf.context.AbstractEngineContext.buildLink(AbstractEngineContext.java:167)
+	at org.thymeleaf.standard.expression.LinkExpression.executeLinkExpression(LinkExpression.java:292)
+	at org.thymeleaf.standard.expression.SimpleExpression.executeSimple(SimpleExpression.java:85)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:109)
+	at org.thymeleaf.standard.expression.Expression.execute(Expression.java:138)
+	at org.thymeleaf.standard.processor.AbstractStandardExpressionAttributeTagProcessor.doProcess(AbstractStandardExpressionAttributeTagProcessor.java:144)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleStandaloneElement(ProcessorTemplateHandler.java:918)
+	at org.thymeleaf.engine.StandaloneElementTag.beHandled(StandaloneElementTag.java:228)
+	at org.thymeleaf.engine.Model.process(Model.java:282)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1587)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+2026-06-28 01:08:44.229 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:08:44.612 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:08:44.616 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:08:44.728 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:08:44.749 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:08:44.839 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:08:44.857 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1508ms
+2026-06-28 01:08:44.858 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:08:44.862 [main] INFO  io.javalin.Javalin - Javalin started in 410ms \o/
+2026-06-28 01:08:44.899 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:08:44.910 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:08:44.931 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:08:44.931 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:08:47.366 [JettyServerThreadPool-31] ERROR org.thymeleaf.TemplateEngine - [THYMELEAF][JettyServerThreadPool-31] Exception processing template "home": An error happened during template parsing (template: "templates/home.html")
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: An error happened during template parsing (template: "templates/fragments/about.html" - line 18, col 14)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/fragments/about.html" - line 18, col 14)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:235)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseStandalone(TemplateManager.java:302)
+	at org.thymeleaf.standard.expression.FragmentExpression.resolveExecutedFragmentExpression(FragmentExpression.java:567)
+	at org.thymeleaf.standard.processor.AbstractStandardFragmentInsertionTagProcessor.computeFragment(AbstractStandardFragmentInsertionTagProcessor.java:419)
+	at org.thymeleaf.standard.processor.AbstractStandardFragmentInsertionTagProcessor.doProcess(AbstractStandardFragmentInsertionTagProcessor.java:115)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1314)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+Caused by: java.io.FileNotFoundException: ClassLoader resource "templates/fragments/about.html" could not be resolved
+	at org.thymeleaf.templateresource.ClassLoaderTemplateResource.reader(ClassLoaderTemplateResource.java:130)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:223)
+	... 63 common frames omitted
+2026-06-28 01:08:47.376 [JettyServerThreadPool-31] WARN  io.javalin.Javalin - Uncaught exception
+org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/home.html")
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:241)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseAndProcess(TemplateManager.java:666)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1103)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1064)
+	at org.thymeleaf.TemplateEngine.process(TemplateEngine.java:1053)
+	at br.com.synge.SyngeApplication.lambda$main$2(SyngeApplication.java:39)
+	at io.javalin.router.Endpoint.handle(Endpoint.kt:52)
+	at io.javalin.router.ParsedEndpoint.handle(ParsedEndpoint.kt:15)
+	at io.javalin.http.servlet.DefaultTasks.HTTP$lambda$11$lambda$9$lambda$8(DefaultTasks.kt:55)
+	at io.javalin.http.servlet.JavalinServlet.handleTask(JavalinServlet.kt:99)
+	at io.javalin.http.servlet.JavalinServlet.handleSync(JavalinServlet.kt:64)
+	at io.javalin.http.servlet.JavalinServlet.handle(JavalinServlet.kt:50)
+	at io.javalin.http.servlet.JavalinServlet.service(JavalinServlet.kt:30)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at io.javalin.jetty.JavalinJettyServlet.service(JavalinJettyServlet.kt:52)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:529)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1580)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1553)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel$RequestDispatchable.dispatch(HttpChannel.java:1598)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:753)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:501)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:287)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.attoparser.ParseException: An error happened during template parsing (template: "templates/fragments/about.html" - line 18, col 14)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:393)
+	at org.attoparser.MarkupParser.parse(MarkupParser.java:257)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:230)
+	... 42 common frames omitted
+Caused by: org.thymeleaf.exceptions.TemplateInputException: An error happened during template parsing (template: "templates/fragments/about.html" - line 18, col 14)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:235)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parseStandalone(AbstractMarkupTemplateParser.java:100)
+	at org.thymeleaf.engine.TemplateManager.parseStandalone(TemplateManager.java:302)
+	at org.thymeleaf.standard.expression.FragmentExpression.resolveExecutedFragmentExpression(FragmentExpression.java:567)
+	at org.thymeleaf.standard.processor.AbstractStandardFragmentInsertionTagProcessor.computeFragment(AbstractStandardFragmentInsertionTagProcessor.java:419)
+	at org.thymeleaf.standard.processor.AbstractStandardFragmentInsertionTagProcessor.doProcess(AbstractStandardFragmentInsertionTagProcessor.java:115)
+	at org.thymeleaf.processor.element.AbstractAttributeTagProcessor.doProcess(AbstractAttributeTagProcessor.java:74)
+	at org.thymeleaf.processor.element.AbstractElementTagProcessor.process(AbstractElementTagProcessor.java:95)
+	at org.thymeleaf.util.ProcessorConfigurationUtils$ElementTagProcessorWrapper.process(ProcessorConfigurationUtils.java:633)
+	at org.thymeleaf.engine.ProcessorTemplateHandler.handleOpenElement(ProcessorTemplateHandler.java:1314)
+	at org.thymeleaf.engine.TemplateHandlerAdapterMarkupHandler.handleOpenElementEnd(TemplateHandlerAdapterMarkupHandler.java:304)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler$InlineMarkupAdapterPreProcessorHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:278)
+	at org.thymeleaf.standard.inline.OutputExpressionInlinePreProcessorHandler.handleOpenElementEnd(OutputExpressionInlinePreProcessorHandler.java:186)
+	at org.thymeleaf.templateparser.markup.InlinedOutputExpressionMarkupHandler.handleOpenElementEnd(InlinedOutputExpressionMarkupHandler.java:124)
+	at org.attoparser.HtmlElement.handleOpenElementEnd(HtmlElement.java:109)
+	at org.attoparser.HtmlMarkupHandler.handleOpenElementEnd(HtmlMarkupHandler.java:297)
+	at org.attoparser.MarkupEventProcessorHandler.handleOpenElementEnd(MarkupEventProcessorHandler.java:402)
+	at org.attoparser.ParsingElementMarkupUtil.parseOpenElement(ParsingElementMarkupUtil.java:159)
+	at org.attoparser.MarkupParser.parseBuffer(MarkupParser.java:710)
+	at org.attoparser.MarkupParser.parseDocument(MarkupParser.java:301)
+	... 44 common frames omitted
+Caused by: java.io.FileNotFoundException: ClassLoader resource "templates/fragments/about.html" could not be resolved
+	at org.thymeleaf.templateresource.ClassLoaderTemplateResource.reader(ClassLoaderTemplateResource.java:130)
+	at org.thymeleaf.templateparser.markup.AbstractMarkupTemplateParser.parse(AbstractMarkupTemplateParser.java:223)
+	... 63 common frames omitted
+2026-06-28 01:23:58.942 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:23:59.348 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:23:59.352 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:23:59.464 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:23:59.484 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:23:59.599 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:23:59.614 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1555ms
+2026-06-28 01:23:59.614 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:23:59.616 [main] INFO  io.javalin.Javalin - Javalin started in 437ms \o/
+2026-06-28 01:23:59.650 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:23:59.664 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:23:59.736 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:23:59.737 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:35:39.933 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:35:40.408 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:35:40.412 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:35:40.558 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:35:40.582 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:35:40.685 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:35:40.702 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1543ms
+2026-06-28 01:35:40.702 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:35:40.704 [main] INFO  io.javalin.Javalin - Javalin started in 517ms \o/
+2026-06-28 01:35:40.740 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:35:40.754 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:35:40.783 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:35:40.783 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:37:35.827 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:37:36.245 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:37:36.249 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:37:36.363 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:37:36.381 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:37:36.477 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:37:36.494 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1466ms
+2026-06-28 01:37:36.495 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:37:36.497 [main] INFO  io.javalin.Javalin - Javalin started in 480ms \o/
+2026-06-28 01:37:36.530 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:37:36.542 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:37:36.561 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:37:36.561 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:42:24.942 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:42:25.350 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:42:25.353 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:42:25.475 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:42:25.494 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:42:25.603 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:42:25.624 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1509ms
+2026-06-28 01:42:25.625 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:42:25.629 [main] INFO  io.javalin.Javalin - Javalin started in 474ms \o/
+2026-06-28 01:42:25.673 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:42:25.686 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:42:25.719 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:42:25.719 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:48:58.621 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:48:59.076 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:48:59.081 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:48:59.210 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:48:59.232 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:48:59.338 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:48:59.357 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1700ms
+2026-06-28 01:48:59.357 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:48:59.359 [main] INFO  io.javalin.Javalin - Javalin started in 494ms \o/
+2026-06-28 01:48:59.399 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:48:59.410 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:48:59.450 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:48:59.451 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 01:52:38.433 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 01:52:38.859 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 01:52:38.863 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 01:52:38.988 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 01:52:39.010 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 01:52:39.119 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 01:52:39.136 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1583ms
+2026-06-28 01:52:39.136 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 01:52:39.138 [main] INFO  io.javalin.Javalin - Javalin started in 469ms \o/
+2026-06-28 01:52:39.181 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 01:52:39.197 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 01:52:39.220 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 01:52:39.221 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 02:07:40.375 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 02:07:40.973 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 02:07:40.978 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 02:07:41.116 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 02:07:41.142 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 02:07:41.302 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 02:07:41.321 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @2070ms
+2026-06-28 02:07:41.321 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 02:07:41.323 [main] INFO  io.javalin.Javalin - Javalin started in 547ms \o/
+2026-06-28 02:07:41.366 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 02:07:41.380 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 02:07:41.410 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 02:07:41.411 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 02:08:54.695 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 02:08:55.134 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 02:08:55.138 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 02:08:55.274 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 02:08:55.293 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 02:08:55.396 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 02:08:55.413 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1588ms
+2026-06-28 02:08:55.413 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 02:08:55.416 [main] INFO  io.javalin.Javalin - Javalin started in 457ms \o/
+2026-06-28 02:08:55.453 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 02:08:55.465 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 02:08:55.486 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 02:08:55.486 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-28 02:13:08.371 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-28 02:13:08.802 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-28 02:13:08.808 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-28 02:13:08.964 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-28 02:13:08.990 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1c93f6e1{/,null,AVAILABLE}
+2026-06-28 02:13:09.104 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@311bf055{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-28 02:13:09.121 [main] INFO  org.eclipse.jetty.server.Server - Started Server@4ef74c30{STARTING}[11.0.25,sto=0] @1579ms
+2026-06-28 02:13:09.122 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-28 02:13:09.124 [main] INFO  io.javalin.Javalin - Javalin started in 509ms \o/
+2026-06-28 02:13:09.158 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Mirela/IdeaProjects/eq14/target/classes/public/'
+2026-06-28 02:13:09.170 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-28 02:13:09.192 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 370 days old. Consider checking for a newer version.).
+2026-06-28 02:13:09.194 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080

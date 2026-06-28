@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SYNGE - Gestão Escolar Inteligente para rotinas acadêmicas, financeiras e administrativas.">
+    <title>SYNGE - Gestão Escolar Inteligente</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="${'/css/home.css'}">
+</head>
+<body>
+<nav th:replace="~{fragments/navbar :: landingNavbar}"></nav>
+<main>
+    <section th:replace="~{fragments/hero :: landingHero}"></section>
+
+    <section id="recursos" class="section-padding">
+        <div class="container">
+            <div class="section-heading mx-auto text-center">
+                <span class="eyebrow">Recursos</span>
+                <h2>Tudo que sua escola precisa em um só lugar</h2>
+                <p>Uma plataforma integrada para simplificar a operação diária e dar mais previsibilidade à gestão.</p>
+            </div>
+            <div class="row g-4 d-flex flex-wrap justify-content-center">
+                <div class="col-md-6 col-xl-4" th:each="resource : ${resources}">
+                    <article class="feature-card h-100">
+                        <div class="icon-box"><i th:class="'bi ' + ${resource.icon}"></i></div>
+                        <h3 th:text="${resource.title}">Gestão Acadêmica</h3>
+                        <ul class="list-unstyled feature-list">
+                            <li th:each="item : ${resource.items}">
+                                <i class="bi bi-check2-circle"></i>
+                                <span th:text="${item}">Alunos</span>
+                            </li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="modulos" class="section-padding section-muted">
+        <div class="container">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-end">
+                <div class="section-heading">
+                    <span class="eyebrow">Módulos</span>
+                    <h2>Controle por área, visão integrada da escola</h2>
+                </div>
+                <p class="section-note">Cada módulo trabalha de forma independente, mas compartilha dados em uma experiência única.</p>
+            </div>
+
+            <div class="row g-4 mt-3">
+                <div class="col-md-6 col-lg-4" th:each="module : ${modules}">
+                    <article class="module-card h-100">
+                        <i th:class="'bi module-icon ' + ${module.icon}"></i>
+                        <h3 th:text="${module.title}">Acadêmico</h3>
+                        <p th:text="${module.description}">Descrição do módulo.</p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section> <section id="beneficios" class="section-padding">
+    <div class="container">
+        <div class="section-heading mx-auto text-center">
+            <span class="eyebrow">Benefícios</span>
+            <h2>Mais eficiência em cada etapa da gestão</h2>
+            <p>Uma rotina conectada reduz ruídos, acelera decisões e dá mais controle para a equipe.</p>
+        </div>
+        <div class="timeline mt-5">
+            <div class="timeline-item" th:each="benefit, iter : ${benefits}">
+                <span class="timeline-number" th:text="${iter.count}">1</span>
+                <h3 th:text="${benefit}">Centralização de Dados</h3>
+            </div>
+        </div>
+    </div>
+</section> <section id="planos" class="section-padding">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+                <div class="section-heading">
+                    <span class="eyebrow">Planos</span>
+                    <h2>Planos para escolas em diferentes fases</h2>
+                    <p>Comece com os módulos essenciais e expanda conforme sua operação cresce.</p>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    <div class="col-md-6" th:each="plan : ${plans}">
+                        <article class="plan-card h-100" th:classappend="${plan.featured} ? ' plan-featured' : ''">
+                            <h3 th:text="${plan.name}">Plano Gestão</h3>
+                            <p th:text="${plan.description}">Descrição do plano.</p>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <section class="section-padding section-muted">
+        <div class="container">
+            <div class="section-heading mx-auto text-center">
+                <span class="eyebrow">Depoimentos</span>
+                <h2>Gestores que simplificaram a rotina escolar</h2>
+            </div>
+            <div class="row g-4 mt-4">
+                <div class="col-md-4" th:each="testimonial : ${testimonials}">
+                    <article class="testimonial-card h-100">
+                        <img th:src="${testimonial.photo}" th:alt="${testimonial.name}" width="64" height="64">
+                        <p th:text="${testimonial.comment}">Comentário do cliente.</p>
+                        <h3 th:text="${testimonial.name}">Nome</h3>
+                        <span th:text="${testimonial.role}">Cargo</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="final-cta">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <h2>Transforme a gestão da sua escola hoje mesmo.</h2>
+                </div>
+                <div class="col-lg-5 d-flex gap-3 justify-content-lg-end flex-wrap">
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments/footer :: landingFooter}"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="${'/js/home.js'}"></script>
+<div th:replace="~{fragments/sobre-modal :: sobreModal}"></div>
+<div th:replace="~{fragments/equipe-modal :: equipeModal}"></div>
+
+</body>
+</body>
+</html>
+
+

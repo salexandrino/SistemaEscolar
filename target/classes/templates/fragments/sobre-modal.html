@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="sobreModal">
+    <div class="modal fade" id="sobreModal" tabindex="-1" aria-labelledby="sobreModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content" style="background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--soft-shadow);">
+
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4 p-md-5">
+                    <div class="row align-items-center g-5">
+
+                        <div class="col-lg-6">
+                            <span class="eyebrow">Sobre</span>
+                            <h2 class="fw-bold mt-2 mb-4" style="color: var(--green-dark); font-size: 2.3rem;">Sobre o SYNGE</h2>
+
+                            <p class="mb-3" style="color: var(--muted); line-height: 1.7; font-size: 1.08rem;">
+                                O SYNGE nasceu com o propósito de transformar a gestão escolar, unindo tecnologia, inteligência e simplicidade.
+                            </p>
+                            <p class="mb-5" style="color: var(--muted); line-height: 1.7; font-size: 1.08rem;">
+                                A plataforma foi desenvolvida para atender escolas de todos os tamanhos, oferecendo ferramentas completas para gestão acadêmica, financeira e administrativa.
+                            </p>
+
+                            <div class="row pt-4 border-top" style="border-color: var(--line) !important;">
+                                <div class="col-4">
+                                    <strong class="d-block" style="color: var(--green); font-size: 1.9rem; font-weight: 850;">+500</strong>
+                                    <span style="color: var(--muted); font-size: 0.9rem; font-weight: 650;">Escolas</span>
+                                </div>
+                                <div class="col-4 border-start border-end" style="border-color: var(--line) !important;">
+                                    <strong class="d-block text-center" style="color: var(--green); font-size: 1.9rem; font-weight: 850;">+50.000</strong>
+                                    <span class="d-block text-center" style="color: var(--muted); font-size: 0.9rem; font-weight: 650;">Usuários</span>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <strong class="d-block" style="color: var(--green); font-size: 1.9rem; font-weight: 850;">98,9%</strong>
+                                    <span style="color: var(--muted); font-size: 0.9rem; font-weight: 650;">Disponibilidade</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="rounded-4 overflow-hidden" style="border: 1px solid var(--line); box-shadow: var(--soft-shadow);">
+                                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80"
+                                     alt="Estudantes usando o SYNGE"
+                                     class="img-fluid d-block"
+                                     style="width: 100%; max-height: 380px; object-fit: cover;">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</html>
