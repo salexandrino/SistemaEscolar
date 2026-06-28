@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="landingHero" id="inicio" class="hero-section">
+    <div class="container">
+        <div class="row align-items-center g-5 position-relative">
+            <div class="col-lg-6">
+                <div class="announcement" th:if="${showAnnouncement}">
+                    <i class="bi bi-stars"></i>
+                    <span>Plataforma Completa de Gestão Escolar</span>
+                </div>
+                <h1 style="font-size: 3.5rem !important;">A gestão da sua escola com mais inteligência e eficácia.</h1>
+                <p class="hero-subtitle">
+                    O SYNGE reúne todas as ferramentas que sua escola precisa para uma gestão acadêmica, financeira e administrativa totalmente ágil, integrada e segura!
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-video btn-lg" th:href="${'/video'}">
+                        <i class="bi bi-play-circle"></i>
+                        Assistir Vídeo
+                    </a>
+                </div>
+                <div class="d-flex flex-row align-items-center justify-content-start gap-4 w-100" style="margin-top: 1.5rem;">
+                    <span style="white-space: nowrap;"><i class="bi bi-shield-check" style="color: var(--green);"></i> 100% Seguro</span>
+                    <span style="white-space: nowrap;"><i class="bi bi-headset" style="color: var(--green);"></i> Suporte Especializado</span>
+                    <span style="white-space: nowrap;"><i class="bi bi-arrow-repeat" style="color: var(--green);"></i> Atualizações Constantes</span>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-lg-n5">
+                <div class="tilt-container js-tilt-trigger">
+                    <img class="img-fluid w-100 tilt-image" th:src="${'/images/computador.png'}" alt="Plataforma SYNGE no Computador" style="max-height: 580px; object-fit: contain; transform: translateY(-40px);">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
