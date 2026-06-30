@@ -6,9 +6,10 @@ import java.util.UUID;
 public class RecuperacaoSenha {
     private UUID id;
     private UUID usuarioId;
+    private UUID tenantId; // Novo campo
     private String codigo;
-    private LocalDateTime expiracao;
-    private boolean utilizado;
+    private LocalDateTime expiraEm; // Renomeado de 'expiracao'
+    private boolean usado; // Renomeado de 'utilizado'
     private LocalDateTime criadoEm;
 
     public RecuperacaoSenha() {
@@ -30,6 +31,14 @@ public class RecuperacaoSenha {
         this.usuarioId = usuarioId;
     }
 
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
+    }
+
     public String getCodigo() {
         return codigo;
     }
@@ -38,20 +47,39 @@ public class RecuperacaoSenha {
         this.codigo = codigo;
     }
 
+// Compatibilidade com o Repository
+
     public LocalDateTime getExpiracao() {
-        return expiracao;
+        return expiraEm;
     }
 
     public void setExpiracao(LocalDateTime expiracao) {
-        this.expiracao = expiracao;
+        this.expiraEm = expiracao;
     }
 
     public boolean isUtilizado() {
-        return utilizado;
+        return usado;
     }
 
     public void setUtilizado(boolean utilizado) {
-        this.utilizado = utilizado;
+        this.usado = utilizado;
+    }
+
+
+    public LocalDateTime getExpiraEm() {
+        return expiraEm;
+    }
+
+    public void setExpiraEm(LocalDateTime expiraEm) {
+        this.expiraEm = expiraEm;
+    }
+
+    public boolean isUsado() {
+        return usado;
+    }
+
+    public void setUsado(boolean usado) {
+        this.usado = usado;
     }
 
     public LocalDateTime getCriadoEm() {

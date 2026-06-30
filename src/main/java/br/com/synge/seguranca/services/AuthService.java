@@ -2,6 +2,7 @@ package br.com.synge.seguranca.services;
 
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.seguranca.exceptions.*;
+import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.EscolaRepository;
@@ -113,13 +114,13 @@ public class AuthService {
         }
 
         // Perfil
-        if (usuario.getPerfil() == Perfil.SUPER_ADMIN || usuario.getPerfil() == Perfil.ALUNO) {
+        if (usuario.getPerfil() == Perfil.SUPER_ADMIN ) {
             throw new AuthorizationException("Não é permitido cadastrar usuários com o perfil " + usuario.getPerfil().name() + " via este endpoint.");
         }
 
         // Escola
         Optional<Escola> escola = escolaRepository.findById(usuario.getEscolaId());
-        if (escola.isEmpty() || !escola.get().isAtiva()) {
+        if (escola.isEmpty() || !"ATIVA".equals(escola.get().getStatus())) {
             throw new NotFoundException("Escola não encontrada ou inativa.");
         }
 

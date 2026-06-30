@@ -7,14 +7,14 @@ import java.util.UUID;
 public class AuthUser {
     private UUID userId;
     private UUID tenantId;
-    private UUID escolaId; // Novo campo
+    private UUID escolaId; // Já existe, apenas confirmando
     private Perfil perfil;
     private String cpf;
 
-    public AuthUser(UUID userId, UUID tenantId, Perfil perfil, String cpf) {
+    public AuthUser(UUID userId, UUID tenantId, Perfil perfil, String cpf) { // Construtor atualizado
         this.userId = userId;
         this.tenantId = tenantId;
-        this.escolaId = tenantId; // escolaId é o mesmo que tenantId
+        this.escolaId = escolaId;
         this.perfil = perfil;
         this.cpf = cpf;
     }

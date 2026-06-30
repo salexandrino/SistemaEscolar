@@ -1,0 +1,285 @@
+2026-06-29 00:12:23.971 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:12:24.500 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:12:24.502 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:12:24.552 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:12:24.566 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@38604b81{/,null,AVAILABLE}
+2026-06-29 00:12:24.636 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@4f49f6af{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:12:24.639 [main] INFO  org.eclipse.jetty.server.Server - Started Server@638ef7ed{STARTING}[11.0.25,sto=0] @1092ms
+2026-06-29 00:12:24.639 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:12:24.639 [main] INFO  io.javalin.Javalin - Javalin started in 238ms \o/
+2026-06-29 00:12:24.658 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:12:24.663 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:12:24.673 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:12:24.674 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:12:30.175 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:12:30.342 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:12:30.344 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:12:30.377 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:12:30.387 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@3eb81efb{/,null,AVAILABLE}
+2026-06-29 00:12:30.421 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@6cb107fd{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:12:30.424 [main] INFO  org.eclipse.jetty.server.Server - Started Server@446a1e84{STARTING}[11.0.25,sto=0] @1278ms
+2026-06-29 00:12:30.425 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:12:30.425 [main] INFO  io.javalin.Javalin - Javalin started in 144ms \o/
+2026-06-29 00:12:30.439 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:12:30.443 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:12:30.452 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:12:30.452 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:15:45.422 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:15:45.573 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:15:45.575 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:15:45.610 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:15:45.618 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@5170bcf4{/,null,AVAILABLE}
+2026-06-29 00:15:45.652 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@2de56eb2{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:15:45.655 [main] INFO  org.eclipse.jetty.server.Server - Started Server@57db2b13{STARTING}[11.0.25,sto=0] @1146ms
+2026-06-29 00:15:45.655 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:15:45.655 [main] INFO  io.javalin.Javalin - Javalin started in 145ms \o/
+2026-06-29 00:15:45.669 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:15:45.674 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:15:45.683 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:15:45.684 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:19:34.595 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:19:34.761 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:19:34.764 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:19:34.804 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:19:34.817 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1f75a668{/,null,AVAILABLE}
+2026-06-29 00:19:34.862 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@43f02ef2{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:19:34.865 [main] INFO  org.eclipse.jetty.server.Server - Started Server@28cda624{STARTING}[11.0.25,sto=0] @621ms
+2026-06-29 00:19:34.866 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:19:34.866 [main] INFO  io.javalin.Javalin - Javalin started in 178ms \o/
+2026-06-29 00:19:34.882 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:19:34.889 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:19:34.901 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:19:34.901 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:19:40.576 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:19:40.735 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:19:40.737 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:19:40.774 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:19:40.786 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@df6620a{/,null,AVAILABLE}
+2026-06-29 00:19:40.826 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@5745ca0e{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:19:40.829 [main] INFO  org.eclipse.jetty.server.Server - Started Server@5c86a017{STARTING}[11.0.25,sto=0] @687ms
+2026-06-29 00:19:40.829 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:19:40.829 [main] INFO  io.javalin.Javalin - Javalin started in 158ms \o/
+2026-06-29 00:19:40.845 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:19:40.850 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:19:40.859 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:19:40.859 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:19:55.580 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:19:55.742 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:19:55.744 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:19:55.779 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:19:55.788 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@1a72a540{/,null,AVAILABLE}
+2026-06-29 00:19:55.828 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@3cce5371{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:19:55.831 [main] INFO  org.eclipse.jetty.server.Server - Started Server@5276d6ee{STARTING}[11.0.25,sto=0] @634ms
+2026-06-29 00:19:55.831 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:19:55.831 [main] INFO  io.javalin.Javalin - Javalin started in 157ms \o/
+2026-06-29 00:19:55.846 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:19:55.851 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:19:55.864 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:19:55.864 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:24:11.616 [main] ERROR br.com.synge.config.FlywayConfig - Erro de SQL ao obter conexão para Flyway: DataSource não inicializado. Chame DatabaseConfig.init() primeiro.
+java.sql.SQLException: DataSource não inicializado. Chame DatabaseConfig.init() primeiro.
+	at br.com.synge.config.DatabaseConfig.getConnection(DatabaseConfig.java:45)
+	at br.com.synge.config.FlywayConfig.migrate(FlywayConfig.java:20)
+	at br.com.synge.SyngeApplication.main(SyngeApplication.java:23)
+2026-06-29 00:25:42.585 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 00:25:42.784 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@169e6180
+2026-06-29 00:25:42.786 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 00:25:42.786 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 00:25:42.830 [main] ERROR br.com.synge.config.FlywayConfig - Erro ao aplicar Flyway migrations: No database found to handle jdbc:postgresql://localhost:5432/synge
+org.flywaydb.core.api.FlywayException: No database found to handle jdbc:postgresql://localhost:5432/synge
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:158)
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:96)
+	at org.flywaydb.core.api.configuration.ClassicConfiguration.setDataSource(ClassicConfiguration.java:1109)
+	at org.flywaydb.core.api.configuration.FluentConfiguration.dataSource(FluentConfiguration.java:631)
+	at br.com.synge.config.FlywayConfig.migrate(FlywayConfig.java:26)
+	at br.com.synge.SyngeApplication.main(SyngeApplication.java:24)
+2026-06-29 00:26:25.140 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:26:25.161 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 00:26:25.319 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@618425b5
+2026-06-29 00:26:25.320 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 00:26:25.320 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 00:26:25.350 [main] ERROR br.com.synge.config.FlywayConfig - Erro ao aplicar Flyway migrations: No database found to handle jdbc:postgresql://localhost:5432/synge
+org.flywaydb.core.api.FlywayException: No database found to handle jdbc:postgresql://localhost:5432/synge
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:158)
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:96)
+	at org.flywaydb.core.api.configuration.ClassicConfiguration.setDataSource(ClassicConfiguration.java:1109)
+	at org.flywaydb.core.api.configuration.FluentConfiguration.dataSource(FluentConfiguration.java:631)
+	at br.com.synge.config.FlywayConfig.migrate(FlywayConfig.java:26)
+	at br.com.synge.SyngeApplication.main(SyngeApplication.java:28)
+2026-06-29 00:31:01.849 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:31:01.869 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 00:31:02.027 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6cd28fa7
+2026-06-29 00:31:02.028 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 00:31:02.028 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 00:31:02.059 [main] ERROR br.com.synge.config.FlywayConfig - Erro ao aplicar Flyway migrations: No database found to handle jdbc:postgresql://localhost:5432/synge
+org.flywaydb.core.api.FlywayException: No database found to handle jdbc:postgresql://localhost:5432/synge
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:158)
+	at org.flywaydb.core.internal.jdbc.DriverDataSource.<init>(DriverDataSource.java:96)
+	at org.flywaydb.core.api.configuration.ClassicConfiguration.setDataSource(ClassicConfiguration.java:1109)
+	at org.flywaydb.core.api.configuration.FluentConfiguration.dataSource(FluentConfiguration.java:631)
+	at br.com.synge.config.FlywayConfig.migrate(FlywayConfig.java:26)
+	at br.com.synge.SyngeApplication.main(SyngeApplication.java:30)
+2026-06-29 00:31:02.234 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:31:02.236 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:31:02.281 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:31:02.293 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@192d74fb{/,null,AVAILABLE}
+2026-06-29 00:31:02.317 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@2ceb80a1{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:31:02.320 [main] INFO  org.eclipse.jetty.server.Server - Started Server@3b0c9195{STARTING}[11.0.25,sto=0] @818ms
+2026-06-29 00:31:02.320 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:31:02.320 [main] INFO  io.javalin.Javalin - Javalin started in 154ms \o/
+2026-06-29 00:31:02.338 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:31:02.346 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:31:02.355 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:31:02.355 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 00:36:25.508 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 00:36:25.530 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 00:36:25.715 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4229bb3f
+2026-06-29 00:36:25.717 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 00:36:25.717 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 00:36:26.116 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/synge (PostgreSQL 18.4)
+2026-06-29 00:36:26.131 [main] WARN  o.f.c.i.database.base.Database - Flyway upgrade recommended: PostgreSQL 18.4 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+2026-06-29 00:36:26.154 [main] INFO  o.f.c.i.s.JdbcTableSchemaHistory - Schema history table "public"."flyway_schema_history" does not exist yet
+2026-06-29 00:36:26.157 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.017s)
+2026-06-29 00:36:26.169 [main] INFO  o.f.c.i.s.JdbcTableSchemaHistory - Creating Schema History table "public"."flyway_schema_history" ...
+2026-06-29 00:36:26.293 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": << Empty Schema >>
+2026-06-29 00:36:26.301 [main] INFO  o.f.core.internal.command.DbMigrate - Migrating schema "public" to version "1 - initial schema"
+2026-06-29 00:36:26.384 [main] INFO  o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "public", now at version v1 (execution time 00:00.067s)
+2026-06-29 00:36:26.387 [main] INFO  br.com.synge.config.FlywayConfig - Flyway migrations aplicadas com sucesso.
+2026-06-29 00:36:26.559 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 00:36:26.562 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 00:36:26.601 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 00:36:26.610 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@6ad5923a{/,null,AVAILABLE}
+2026-06-29 00:36:26.636 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@1bdbf9be{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 00:36:26.638 [main] INFO  org.eclipse.jetty.server.Server - Started Server@1fd386c3{STARTING}[11.0.25,sto=0] @1663ms
+2026-06-29 00:36:26.638 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 00:36:26.639 [main] INFO  io.javalin.Javalin - Javalin started in 149ms \o/
+2026-06-29 00:36:26.652 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 00:36:26.657 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 00:36:26.665 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 00:36:26.665 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 10:45:28.809 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 10:45:28.838 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 10:45:29.105 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3e27aa33
+2026-06-29 10:45:29.106 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 10:45:29.107 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 10:45:29.462 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/synge (PostgreSQL 18.4)
+2026-06-29 10:45:29.480 [main] WARN  o.f.c.i.database.base.Database - Flyway upgrade recommended: PostgreSQL 18.4 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+2026-06-29 10:45:29.537 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.043s)
+2026-06-29 10:45:29.599 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-06-29 10:45:29.603 [main] INFO  o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-06-29 10:45:29.608 [main] INFO  br.com.synge.config.FlywayConfig - Flyway migrations aplicadas com sucesso.
+2026-06-29 10:45:29.833 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 10:45:29.835 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 10:45:29.874 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 10:45:29.884 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@7c211fd0{/,null,AVAILABLE}
+2026-06-29 10:45:29.906 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@cd7f1ae{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 10:45:29.908 [main] INFO  org.eclipse.jetty.server.Server - Started Server@76adb233{STARTING}[11.0.25,sto=0] @1572ms
+2026-06-29 10:45:29.908 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 10:45:29.908 [main] INFO  io.javalin.Javalin - Javalin started in 168ms \o/
+2026-06-29 10:45:29.924 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 10:45:29.927 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 10:45:29.936 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 10:45:29.936 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080
+2026-06-29 10:45:49.661 [main] INFO  br.com.synge.SyngeApplication - Iniciando SYNGE...
+2026-06-29 10:45:49.718 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-06-29 10:45:50.056 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@20ccf40b
+2026-06-29 10:45:50.059 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-06-29 10:45:50.059 [main] INFO  br.com.synge.config.DatabaseConfig - HikariCP DataSource inicializado.
+2026-06-29 10:45:50.462 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/synge (PostgreSQL 18.4)
+2026-06-29 10:45:50.477 [main] WARN  o.f.c.i.database.base.Database - Flyway upgrade recommended: PostgreSQL 18.4 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 16.
+2026-06-29 10:45:50.518 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.028s)
+2026-06-29 10:45:50.590 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-06-29 10:45:50.593 [main] INFO  o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-06-29 10:45:50.598 [main] INFO  br.com.synge.config.FlywayConfig - Flyway migrations aplicadas com sucesso.
+2026-06-29 10:45:50.760 [main] INFO  io.javalin.Javalin - Starting Javalin ...
+2026-06-29 10:45:50.762 [main] INFO  org.eclipse.jetty.server.Server - jetty-11.0.25; built: 2025-03-13T00:15:57.301Z; git: a2e9fae3ad8320f2a713d4fa29bba356a99d1295; jvm 21.0.11+10-LTS
+2026-06-29 10:45:50.793 [main] INFO  o.e.j.s.s.DefaultSessionIdManager - Session workerName=node0
+2026-06-29 10:45:50.801 [main] INFO  o.e.j.server.handler.ContextHandler - Started o.e.j.s.ServletContextHandler@203dd56b{/,null,AVAILABLE}
+2026-06-29 10:45:50.820 [main] INFO  o.e.jetty.server.AbstractConnector - Started ServerConnector@742d4e15{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
+2026-06-29 10:45:50.822 [main] INFO  org.eclipse.jetty.server.Server - Started Server@2a3a299{STARTING}[11.0.25,sto=0] @1659ms
+2026-06-29 10:45:50.822 [main] INFO  io.javalin.Javalin - 
+       __                  ___           _____
+      / /___ __   ______ _/ (_)___      / ___/
+ __  / / __ `/ | / / __ `/ / / __ \    / __ \
+/ /_/ / /_/ /| |/ / /_/ / / / / / /   / /_/ /
+\____/\__,_/ |___/\__,_/_/_/_/ /_/    \____/
+
+       https://javalin.io/documentation
+
+2026-06-29 10:45:50.822 [main] INFO  io.javalin.Javalin - Javalin started in 127ms \o/
+2026-06-29 10:45:50.833 [main] INFO  io.javalin.Javalin - Static file handler added: StaticFileConfig(hostedPath=/, directory=/public, location=CLASSPATH, precompress=false, aliasCheck=null, headers={Cache-Control=max-age=0}, skipFileFunction=Function1<jakarta.servlet.http.HttpServletRequest, java.lang.Boolean>, mimeTypes={}, roles=[]). File system location: 'file:///C:/Users/Pichau/IdeaProjects/eq14/target/classes/public/'
+2026-06-29 10:45:50.837 [main] INFO  io.javalin.Javalin - Listening on http://localhost:8080/
+2026-06-29 10:45:50.843 [main] INFO  io.javalin.Javalin - You are running Javalin 6.7.0 (released June 22, 2025. Your Javalin version is 371 days old. Consider checking for a newer version.).
+2026-06-29 10:45:50.843 [main] INFO  br.com.synge.SyngeApplication - Servidor iniciado na porta 8080

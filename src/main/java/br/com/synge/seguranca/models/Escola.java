@@ -6,17 +6,19 @@ import java.util.UUID;
 public class Escola {
     private UUID id;
     private String nome;
-    private boolean ativa;
+    private String cnpj; // Novo campo
+    private String status; // Novo campo: ATIVA, INATIVA, ARQUIVADA
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
     public Escola() {
     }
 
-    public Escola(UUID id, String nome, boolean ativa, LocalDateTime criadoEm, LocalDateTime atualizadoEm) {
+    public Escola(UUID id, String nome, String cnpj, String status, LocalDateTime criadoEm, LocalDateTime atualizadoEm) {
         this.id = id;
         this.nome = nome;
-        this.ativa = ativa;
+        this.cnpj = cnpj;
+        this.status = status;
         this.criadoEm = criadoEm;
         this.atualizadoEm = atualizadoEm;
     }
@@ -37,12 +39,20 @@ public class Escola {
         this.nome = nome;
     }
 
-    public boolean isAtiva() {
-        return ativa;
+    public String getCnpj() {
+        return cnpj;
     }
 
-    public void setAtiva(boolean ativa) {
-        this.ativa = ativa;
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getCriadoEm() {

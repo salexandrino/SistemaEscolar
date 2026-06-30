@@ -6,31 +6,39 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Usuario {
+
     private UUID id;
     private UUID tenantId;
-    private UUID escolaId; // Alias para tenantId
+    private UUID escolaId;
 
     private String nomeCompleto;
     private String email;
     private String cpf;
     private String telefone;
     private String senhaHash;
+    private String confirmacaoSenha;
 
     private Perfil perfil;
-    private boolean ativo;
-    private boolean bloqueado; // Novo campo
+
+    // Usuário aprovado para acessar o sistema
+    private boolean aprovado;
+
+    // Controle de bloqueio
+    private LocalDateTime bloqueadoAte;
     private int tentativasLogin;
+
+    // Datas
     private LocalDateTime ultimoLogin;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
+    // Recuperação de senha
     private String resetPasswordToken;
     private LocalDateTime resetPasswordExpiresAt;
 
     public Usuario() {
     }
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }
@@ -45,7 +53,6 @@ public class Usuario {
 
     public void setTenantId(UUID tenantId) {
         this.tenantId = tenantId;
-        this.escolaId = tenantId;
     }
 
     public UUID getEscolaId() {
@@ -54,7 +61,6 @@ public class Usuario {
 
     public void setEscolaId(UUID escolaId) {
         this.escolaId = escolaId;
-        this.tenantId = escolaId;
     }
 
     public String getNomeCompleto() {
@@ -105,20 +111,66 @@ public class Usuario {
         this.perfil = perfil;
     }
 
+    public String getConfirmacaoSenha() {
+        return confirmacaoSenha;
+    }
+
+    public void setConfirmacaoSenha(String confirmacaoSenha) {
+        this.confirmacaoSenha = confirmacaoSenha;
+    }
+
+    /* ==========================================================
+       APROVAÇÃO
+       ========================================================== */
+
+    public boolean isAprovado() {
+        return aprovado;
+    }
+
+    public void setAprovado(boolean aprovado) {
+        this.aprovado = aprovado;
+    }
+
+    /*
+     * Métodos mantidos por compatibilidade com o Repository
+     */
+
     public boolean isAtivo() {
-        return ativo;
+        return aprovado;
     }
 
     public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
+        this.aprovado = ativo;
+    }
+
+    /* ==========================================================
+       BLOQUEIO
+       ========================================================== */
+
+    public LocalDateTime getBloqueadoAte() {
+        return bloqueadoAte;
+    }
+
+    public void setBloqueadoAte(LocalDateTime bloqueadoAte) {
+        this.bloqueadoAte = bloqueadoAte;
     }
 
     public boolean isBloqueado() {
-        return bloqueado;
+        return bloqueadoAte != null &&
+                bloqueadoAte.isAfter(LocalDateTime.now());
     }
 
+    /**
+     * Compatibilidade com o Repository.
+     * Se false -> desbloqueia.
+     * Se true -> bloqueia por tempo indeterminado.
+     */
     public void setBloqueado(boolean bloqueado) {
-        this.bloqueado = bloqueado;
+        if (bloqueado) {
+            this.bloqueadoAte = LocalDateTime.MAX;
+        } else {
+            this.bloqueadoAte = null;
+        }
     }
 
     public int getTentativasLogin() {
@@ -128,6 +180,10 @@ public class Usuario {
     public void setTentativasLogin(int tentativasLogin) {
         this.tentativasLogin = tentativasLogin;
     }
+
+    /* ==========================================================
+       DATAS
+       ========================================================== */
 
     public LocalDateTime getUltimoLogin() {
         return ultimoLogin;
@@ -153,6 +209,10 @@ public class Usuario {
         this.atualizadoEm = atualizadoEm;
     }
 
+    /* ==========================================================
+       RECUPERAÇÃO DE SENHA
+       ========================================================== */
+
     public String getResetPasswordToken() {
         return resetPasswordToken;
     }
@@ -169,10 +229,29 @@ public class Usuario {
         this.resetPasswordExpiresAt = resetPasswordExpiresAt;
     }
 
+    /* ==========================================================
+       LOGS
+       ========================================================== */
+
     public String getCpfMascarado() {
         if (cpf == null || cpf.length() < 11) {
-            return cpf;
+            return "***";
         }
-        return "***." + cpf.substring(4, 7) + "." + cpf.substring(8, 11) + "-**";
+
+        return "***." + cpf.substring(3, 6) + ".***-**";
+    }
+
+    public String getEmailMascarado() {
+        if (email == null || !email.contains("@")) {
+            return "***";
+        }
+
+        String[] partes = email.split("@");
+
+        if (partes[0].length() <= 2) {
+            return "***@" + partes[1];
+        }
+
+        return partes[0].substring(0, 2) + "***@" + partes[1];
     }
 }

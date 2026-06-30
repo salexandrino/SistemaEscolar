@@ -23,4 +23,8 @@ public class PasswordService {
         }
         return BCrypt.checkpw(senha, hash);
     }
+
+    public boolean verificar(String senha, String senhaHash) {
+        return BCrypt.checkpw(senha, senhaHash);
+    }
 }

@@ -33,7 +33,6 @@ public class AuthorizationMiddleware implements Handler {
 
         // SUPER_ADMIN tem acesso total, ignora outras permissões
         if (authUser.getPerfil().name().equals("SUPER_ADMIN")) {
-            ctx.next();
             return;
         }
 
@@ -50,6 +49,5 @@ public class AuthorizationMiddleware implements Handler {
         // Multi-Tenant: A validação do tenantId para dados específicos é responsabilidade do Service/Repository.
         // Este middleware garante que o usuário está autenticado e tem o perfil certo.
 
-        ctx.next();
     }
 }

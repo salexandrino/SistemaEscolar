@@ -40,6 +40,5 @@ public class AuthMiddleware implements Handler {
             }
         }
 
-        ctx.next(); // Continua a cadeia de handlers
     }
 }

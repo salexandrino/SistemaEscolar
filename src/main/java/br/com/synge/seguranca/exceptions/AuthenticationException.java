@@ -2,20 +2,13 @@ package br.com.synge.seguranca.exceptions;
 
 import io.javalin.http.HttpStatus;
 
-public class AuthenticationException extends RuntimeException {
-    private final HttpStatus status;
+public class AuthenticationException extends ApiException {
 
     public AuthenticationException(String message) {
-        super(message);
-        this.status = HttpStatus.UNAUTHORIZED; // 401
+        super(message, HttpStatus.UNAUTHORIZED);
     }
 
     public AuthenticationException(String message, HttpStatus status) {
-        super(message);
-        this.status = status;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
+        super(message, status);
     }
 }
