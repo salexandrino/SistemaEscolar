@@ -2,6 +2,12 @@
     --color-primary: #004B1C; /* Verde Escuro */
     --color-accent: #0DB04B; /* Verde Intermediário */
     --color-bg-light: #E5F5E5; /* Verde Claro Menta */
+    
+    /* Tons adicionais de verde */
+    --color-green-light: #90EE90; /* Verde Claro */
+    --color-green-lime: #32CD32; /* Verde Limão */
+    --color-green-forest: #228B22; /* Verde Floresta */
+    --color-green-sea: #2E8B57; /* Verde Mar */
 
     /* Cores de texto */
     --text-color-dark: #333;
@@ -65,4 +71,42 @@ body {
     background-color: #f8d7da; /* Light red */
     color: #721c24; /* Dark red */
     border-color: #f5c6cb; /* Red border */
+}
+
+/* Nova classe para cabeçalhos com cor de destaque */
+.bg-accent-header {
+    background-color: var(--color-accent) !important;
+    color: var(--text-color-light) !important;
+}
+
+/* Tons de verde adicionais */
+.bg-green-light {
+    background-color: var(--color-green-light) !important;
+}
+
+.bg-green-lime {
+    background-color: var(--color-green-lime) !important;
+    color: var(--text-color-light) !important;
+}
+
+.bg-green-forest {
+    background-color: var(--color-green-forest) !important;
+    color: var(--text-color-light) !important;
+}
+
+.bg-green-sea {
+    background-color: var(--color-green-sea) !important;
+    color: var(--text-color-light) !important;
+}
+
+.text-green {
+    color: var(--color-accent) !important;
+}
+
+.text-green-primary {
+    color: var(--color-primary) !important;
+}
+
+.border-green {
+    border-color: var(--color-accent) !important;
 }

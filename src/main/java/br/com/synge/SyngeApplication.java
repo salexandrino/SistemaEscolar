@@ -1,5 +1,7 @@
 package br.com.synge;
 
+import br.com.synge.config.DatabaseConfig;
+import br.com.synge.config.FlywayConfig;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.slf4j.Logger;
@@ -19,7 +21,16 @@ public class SyngeApplication {
 
     public static void main(String[] args) {
 
+
         logger.info("Iniciando SYNGE...");
+
+        try {
+            DatabaseConfig.init();
+            System.out.println("Banco inicializado!");
+            FlywayConfig.migrate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         int port = Integer.parseInt(
                 System.getenv().getOrDefault("PORT", "8080")
