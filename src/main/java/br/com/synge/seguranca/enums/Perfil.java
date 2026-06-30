@@ -9,14 +9,14 @@ public enum Perfil {
 
     // Método para verificar se o perfil tem acesso a um determinado recurso/permissão
     public boolean hasPermission(String permission) {
-        // Lógica de permissões aqui. Pode ser um switch, um mapa, ou uma enumeração de permissões.
-        // Por enquanto, um placeholder.
+        // Esta lógica é um placeholder e deve ser expandida com um sistema de permissões mais granular
+        // Exemplo: permission pode ser "ACADEMICO_VIEW", "FINANCEIRO_EDIT", "USUARIO_CREATE"
         return switch (this) {
             case SUPER_ADMIN -> true; // Acesso total
-            case GESTOR -> !permission.startsWith("SUPER_ADMIN_"); // Exemplo: Gestor não acessa coisas de SUPER_ADMIN
-            case SECRETARIA -> permission.startsWith("ACADEMICO_") || permission.startsWith("ALUNO_");
-            case PROFESSOR -> permission.startsWith("TURMA_") || permission.startsWith("ALUNO_") || permission.startsWith("NOTA_") || permission.startsWith("FREQUENCIA_");
-            case FINANCEIRO -> permission.startsWith("PAGAMENTO_") || permission.startsWith("MENSALIDADE_") || permission.startsWith("RELATORIO_FINANCEIRO_");
+            case GESTOR -> !permission.startsWith("SUPER_ADMIN_"); // Gestor não acessa funcionalidades de SUPER_ADMIN
+            case SECRETARIA -> permission.startsWith("ACADEMICO_") || permission.startsWith("ALUNO_") || permission.startsWith("TURMA_");
+            case PROFESSOR -> permission.startsWith("PROFESSOR_") || permission.startsWith("NOTA_") || permission.startsWith("FREQUENCIA_");
+            case FINANCEIRO -> permission.startsWith("FINANCEIRO_") || permission.startsWith("PAGAMENTO_") || permission.startsWith("MENSALIDADE_");
             default -> false;
         };
     }

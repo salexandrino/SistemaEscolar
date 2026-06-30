@@ -18,7 +18,7 @@ public class EscolaRepository {
     private static final Logger logger = LoggerFactory.getLogger(EscolaRepository.class);
 
     public Optional<Escola> findById(UUID id) {
-        String sql = "SELECT id, nome, cnpj, ativo, data_cadastro FROM escolas WHERE id = ?";
+        String sql = "SELECT id, nome, ativa, criado_em, atualizado_em FROM escola WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setObject(1, id);
@@ -34,7 +34,7 @@ public class EscolaRepository {
     }
 
     public Optional<Escola> findByCnpj(String cnpj) {
-        String sql = "SELECT id, nome, cnpj, ativo, data_cadastro FROM escolas WHERE cnpj = ?";
+        String sql = "SELECT id, nome, ativa, criado_em, atualizado_em FROM escola WHERE cnpj = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cnpj);
@@ -50,37 +50,40 @@ public class EscolaRepository {
     }
 
     public void save(Escola escola) {
-        String sql = "INSERT INTO escolas (id, nome, cnpj, ativo, data_cadastro) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO escola (id, nome, ativa, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             escola.setId(UUID.randomUUID());
-            escola.setDataCadastro(LocalDateTime.now());
-            escola.setAtivo(true);
+            escola.setCriadoEm(LocalDateTime.now());
+            escola.setAtualizadoEm(LocalDateTime.now());
+            escola.setAtiva(true);
 
             stmt.setObject(1, escola.getId());
             stmt.setString(2, escola.getNome());
-            stmt.setString(3, escola.getCnpj());
-            stmt.setBoolean(4, escola.getAtivo());
-            stmt.setObject(5, escola.getDataCadastro());
+            stmt.setBoolean(3, escola.isAtiva());
+            stmt.setObject(4, escola.getCriadoEm());
+            stmt.setObject(5, escola.getAtualizadoEm());
             stmt.executeUpdate();
             logger.info("Escola salva: {}", escola.getNome());
         } catch (SQLException e) {
             logger.error("Erro ao salvar escola {}: {}", escola.getNome(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao salvar escola no banco de dados.", e);
         }
     }
 
     public void update(Escola escola) {
-        String sql = "UPDATE escolas SET nome = ?, cnpj = ?, ativo = ? WHERE id = ?";
+        String sql = "UPDATE escola SET nome = ?, ativa = ?, atualizado_em = ? WHERE id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, escola.getNome());
-            stmt.setString(2, escola.getCnpj());
-            stmt.setBoolean(3, escola.getAtivo());
+            stmt.setBoolean(2, escola.isAtiva());
+            stmt.setObject(3, LocalDateTime.now());
             stmt.setObject(4, escola.getId());
             stmt.executeUpdate();
             logger.info("Escola atualizada: {}", escola.getNome());
         } catch (SQLException e) {
             logger.error("Erro ao atualizar escola {}: {}", escola.getNome(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar escola no banco de dados.", e);
         }
     }
 
@@ -88,9 +91,9 @@ public class EscolaRepository {
         Escola escola = new Escola();
         escola.setId(rs.getObject("id", UUID.class));
         escola.setNome(rs.getString("nome"));
-        escola.setCnpj(rs.getString("cnpj"));
-        escola.setAtivo(rs.getBoolean("ativo"));
-        escola.setDataCadastro(rs.getObject("data_cadastro", LocalDateTime.class));
+        escola.setAtiva(rs.getBoolean("ativa"));
+        escola.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
+        escola.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
         return escola;
     }
 }

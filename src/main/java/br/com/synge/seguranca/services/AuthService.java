@@ -1,9 +1,10 @@
 package br.com.synge.seguranca.services;
 
 import br.com.synge.seguranca.enums.Perfil;
-import br.com.synge.seguranca.exceptions.AuthenticationException;
-import br.com.synge.seguranca.models.AuthUser;
+import br.com.synge.seguranca.exceptions.*;
+import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.models.Usuario;
+import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.utils.ValidationUtil;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -12,19 +13,23 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UsuarioRepository usuarioRepository;
+    private final EscolaRepository escolaRepository; // Novo
     private final PasswordService passwordService;
     private final JwtService jwtService;
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
+    private final Random random = new Random();
 
-    public AuthService(UsuarioRepository usuarioRepository, PasswordService passwordService, JwtService jwtService) {
+    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
+        this.escolaRepository = escolaRepository;
         this.passwordService = passwordService;
         this.jwtService = jwtService;
 
@@ -34,10 +39,8 @@ public class AuthService {
     }
 
     public String autenticar(String cpf, String senha) {
-        // 1. Validar formato do CPF
         ValidationUtil.validateCpf(cpf);
 
-        // 2. Buscar usuário por CPF
         Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpf);
         if (optionalUsuario.isEmpty()) {
             logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
@@ -46,21 +49,25 @@ public class AuthService {
 
         Usuario usuario = optionalUsuario.get();
 
-        // 3. Verificar bloqueio de conta
-        if (usuario.getBloqueadoAte() != null && usuario.getBloqueadoAte().isAfter(LocalDateTime.now())) {
-            logger.warn("Tentativa de login em conta bloqueada para CPF: {}", usuario.getCpfMascarado());
-            throw new AuthenticationException("Sua conta está bloqueada até " + usuario.getBloqueadoAte().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + ".");
+        if (!usuario.isAtivo()) { // Verifica se o usuário está ativo
+            logger.warn("Tentativa de login de usuário inativo/pendente: {}", usuario.getCpfMascarado());
+            throw new AuthenticationException("Sua conta ainda não foi aprovada pelo Gestor.");
         }
 
-        // 4. Verificar senha
-        if (!passwordService.verificar(senha, usuario.getSenha())) {
+        if (usuario.isBloqueado()) { // Verifica se o usuário está bloqueado
+            logger.warn("Tentativa de login em conta bloqueada para CPF: {}", usuario.getCpfMascarado());
+            throw new AuthenticationException("Sua conta está bloqueada. Entre em contato com o administrador.");
+        }
+
+        if (!passwordService.verificar(senha, usuario.getSenhaHash())) {
             registrarTentativaLoginFalha(usuario);
             logger.warn("Tentativa de login com senha inválida para CPF: {}", usuario.getCpfMascarado());
             throw new AuthenticationException("CPF ou senha inválidos.");
         }
 
-        // 5. Login bem-sucedido: Resetar tentativas e gerar JWT
         resetarTentativasLogin(usuario);
+        usuario.setUltimoLogin(LocalDateTime.now()); // Atualiza último login
+        usuarioRepository.update(usuario); // Persiste a atualização do último login
         logger.info("Login bem-sucedido para usuário ID: {}", usuario.getId());
         return jwtService.gerarToken(usuario.getId(), usuario.getTenantId(), usuario.getPerfil(), usuario.getCpf());
     }
@@ -68,35 +75,144 @@ public class AuthService {
     private void registrarTentativaLoginFalha(Usuario usuario) {
         usuario.setTentativasLogin(usuario.getTentativasLogin() + 1);
         if (usuario.getTentativasLogin() >= maxLoginAttempts) {
-            usuario.setBloqueadoAte(LocalDateTime.now().plusMinutes(lockoutDurationMinutes));
+            usuario.setBloqueado(true); // Marca como bloqueado
+            // usuario.setBloqueadoAte(LocalDateTime.now().plusMinutes(lockoutDurationMinutes)); // Se quiser bloqueio temporário
             logger.warn("Conta bloqueada para CPF: {}", usuario.getCpfMascarado());
         }
         usuarioRepository.update(usuario);
     }
 
     private void resetarTentativasLogin(Usuario usuario) {
-        if (usuario.getTentativasLogin() > 0 || usuario.getBloqueadoAte() != null) {
+        if (usuario.getTentativasLogin() > 0 || usuario.isBloqueado()) {
             usuario.setTentativasLogin(0);
-            usuario.setBloqueadoAte(null);
+            usuario.setBloqueado(false);
+            // usuario.setBloqueadoAte(null);
             usuarioRepository.update(usuario);
         }
     }
 
-    // Método para criar um usuário inicial (ex: SUPER_ADMIN)
-    public void criarUsuarioInicial(UUID tenantId, String nome, String cpf, String senha, Perfil perfil) {
-        if (usuarioRepository.findByCpf(cpf).isEmpty()) {
-            Usuario usuario = new Usuario();
-            usuario.setTenantId(tenantId);
-            usuario.setNome(nome);
-            usuario.setCpf(cpf);
-            usuario.setSenha(passwordService.gerarHash(senha)); // Hash da senha
-            usuario.setPerfil(perfil);
-            usuario.setTentativasLogin(0);
-            usuario.setAtivo(true); // Adicionar campo ativo ao modelo Usuario se necessário
-            usuarioRepository.save(usuario);
-            logger.info("Usuário inicial {} criado com sucesso para tenantId: {}", usuario.getCpfMascarado(), tenantId);
-        } else {
-            logger.info("Usuário inicial {} já existe.", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
+    public void register(Usuario usuario) {
+        // Validações
+        ValidationUtil.validateNomeCompleto(usuario.getNomeCompleto());
+        ValidationUtil.validateEmail(usuario.getEmail());
+        ValidationUtil.validateCpf(usuario.getCpf());
+        ValidationUtil.validateTelefone(usuario.getTelefone());
+        ValidationUtil.validatePasswordComplexity(usuario.getSenhaHash()); // SenhaHash é a senha pura aqui
+
+        if (!usuario.getSenhaHash().equals(usuario.getConfirmacaoSenha())) { // Assumindo que o DTO tem confirmacaoSenha
+            throw new ValidationException("Senha e confirmação de senha não conferem.");
         }
+
+        if (usuarioRepository.existsByCpf(usuario.getCpf())) {
+            logger.warn("Tentativa de registro com CPF duplicado: {}", usuario.getCpfMascarado());
+            throw new ConflictException("CPF já cadastrado.");
+        }
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+            logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmail());
+            throw new ConflictException("E-mail já cadastrado.");
+        }
+
+        // Perfil
+        if (usuario.getPerfil() == Perfil.SUPER_ADMIN || usuario.getPerfil() == Perfil.ALUNO) {
+            throw new AuthorizationException("Não é permitido cadastrar usuários com o perfil " + usuario.getPerfil().name() + " via este endpoint.");
+        }
+
+        // Escola
+        Optional<Escola> escola = escolaRepository.findById(usuario.getEscolaId());
+        if (escola.isEmpty() || !escola.get().isAtiva()) {
+            throw new NotFoundException("Escola não encontrada ou inativa.");
+        }
+
+        // Criptografar senha
+        usuario.setSenhaHash(passwordService.hash(usuario.getSenhaHash())); // Agora senhaHash é o hash
+
+        // Status inicial
+        usuario.setAtivo(false); // PENDENTE_APROVACAO
+        usuario.setBloqueado(false);
+        usuario.setTentativasLogin(0);
+        usuario.setCriadoEm(LocalDateTime.now());
+        usuario.setAtualizadoEm(LocalDateTime.now());
+
+        usuarioRepository.save(usuario);
+        logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
+    }
+
+    public void approveUser(UUID userId, UUID tenantId, AuthUser approver) {
+        // 1. Verificar se o aprovador tem permissão (GESTOR)
+        if (approver.getPerfil() != Perfil.GESTOR) {
+            logger.warn("Tentativa de aprovação de usuário por perfil não autorizado: {}", approver.getPerfil());
+            throw new AuthorizationException("Somente Gestores podem aprovar usuários.");
+        }
+
+        // 2. Buscar usuário a ser aprovado
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByIdAndTenantId(userId, tenantId);
+        if (optionalUsuario.isEmpty()) {
+            throw new NotFoundException("Usuário não encontrado ou não pertence à sua escola.");
+        }
+        Usuario usuario = optionalUsuario.get();
+
+        // 3. Verificar se o usuário já está ativo
+        if (usuario.isAtivo()) {
+            throw new BusinessException("Usuário já está ativo.");
+        }
+
+        // 4. Aprovar usuário
+        usuarioRepository.approve(userId, tenantId);
+        logger.info("Usuário ID {} aprovado por Gestor {} (Tenant {}).", userId, approver.getCpf(), tenantId);
+    }
+
+    public void forgotPassword(String email) {
+        ValidationUtil.validateEmail(email);
+
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            String recoveryCode = String.format("%06d", random.nextInt(999999));
+            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(15);
+
+            usuario.setResetPasswordToken(recoveryCode);
+            usuario.setResetPasswordExpiresAt(expiresAt);
+
+            try {
+                usuarioRepository.update(usuario);
+                logger.info("Código de recuperação gerado para usuário {}. Código: {}", usuario.getEmail(), recoveryCode);
+                System.out.println("CÓDIGO DE RECUPERAÇÃO PARA " + usuario.getEmail() + ": " + recoveryCode);
+            } catch (Exception e) {
+                logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
+                throw new InternalServerException("Erro interno ao gerar código de recuperação.");
+            }
+        } else {
+            logger.warn("Tentativa de recuperação de senha para e-mail não existente: {}", email);
+        }
+    }
+
+    public void resetPassword(String email, String codigo, String novaSenha, String confirmacaoSenha) {
+        ValidationUtil.validateEmail(email);
+        ValidationUtil.validatePasswordComplexity(novaSenha);
+
+        if (!novaSenha.equals(confirmacaoSenha)) {
+            throw new ValidationException("Nova senha e confirmação de senha não conferem.");
+        }
+
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+        if (optionalUsuario.isEmpty()) {
+            throw new NotFoundException("Usuário não encontrado."); // Mensagem genérica para segurança
+        }
+
+        Usuario usuario = optionalUsuario.get();
+
+        if (usuario.getResetPasswordToken() == null || !usuario.getResetPasswordToken().equals(codigo)) {
+            throw new ValidationException("Código de recuperação inválido.");
+        }
+        if (usuario.getResetPasswordExpiresAt() == null || usuario.getResetPasswordExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Código de recuperação expirado.");
+        }
+
+        // Atualiza a senha e limpa o token de recuperação
+        String newPasswordHash = passwordService.hash(novaSenha);
+        usuarioRepository.updatePassword(usuario.getId(), usuario.getTenantId(), newPasswordHash);
+
+        logger.info("Senha do usuário {} redefinida com sucesso.", usuario.getEmail());
     }
 }

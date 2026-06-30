@@ -31,7 +31,7 @@ public class AuthMiddleware implements Handler {
             if (authUser != null) {
                 AuthUserContext.setAuthUser(authUser);
                 ctx.attribute("currentUser", authUser); // Disponibiliza para templates e outros handlers
-                logger.debug("Usuário autenticado no contexto: userId={}, tenantId={}, perfil={}", authUser.getUserId(), authUser.getTenantId(), authUser.getPerfil());
+                logger.debug("Usuário autenticado no contexto: userId={}, tenantId={}, escolaId={}, perfil={}", authUser.getUserId(), authUser.getTenantId(), authUser.getEscolaId(), authUser.getPerfil());
             } else {
                 // Token inválido ou expirado
                 logger.warn("Token JWT inválido ou expirado. Redirecionando para login.");
@@ -40,5 +40,6 @@ public class AuthMiddleware implements Handler {
             }
         }
 
+        ctx.next(); // Continua a cadeia de handlers
     }
 }

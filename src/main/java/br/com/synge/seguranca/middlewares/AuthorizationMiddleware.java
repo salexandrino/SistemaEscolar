@@ -33,6 +33,7 @@ public class AuthorizationMiddleware implements Handler {
 
         // SUPER_ADMIN tem acesso total, ignora outras permissões
         if (authUser.getPerfil().name().equals("SUPER_ADMIN")) {
+            ctx.next();
             return;
         }
 
@@ -46,13 +47,9 @@ public class AuthorizationMiddleware implements Handler {
             throw new AuthorizationException("Acesso negado. Você não tem permissão para acessar este recurso.");
         }
 
-        // Multi-Tenant: Garante que o tenantId da requisição (se aplicável) corresponde ao do usuário
-        // Isso é uma validação genérica. Em Controllers específicos, você fará a validação do tenantId
-        // para os recursos que estão sendo acessados/modificados.
-        // Por exemplo, se um path param é um ID de recurso, o Service deve garantir que esse recurso
-        // pertence ao tenantId do AuthUserContext.
+        // Multi-Tenant: A validação do tenantId para dados específicos é responsabilidade do Service/Repository.
         // Este middleware garante que o usuário está autenticado e tem o perfil certo.
-        // A validação do tenantId para dados específicos é responsabilidade do Service/Repository.
 
+        ctx.next();
     }
 }

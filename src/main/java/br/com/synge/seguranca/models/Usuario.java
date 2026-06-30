@@ -7,39 +7,27 @@ import java.util.UUID;
 
 public class Usuario {
     private UUID id;
-    private UUID tenantId; // OBRIGATÓRIO para Multi-Tenant
+    private UUID tenantId;
+    private UUID escolaId; // Alias para tenantId
 
-    private String nome;
-    private Integer idade;
+    private String nomeCompleto;
+    private String email;
     private String cpf;
-    private String senha; // Hash BCrypt
+    private String telefone;
+    private String senhaHash;
 
     private Perfil perfil;
-    private Boolean ativo;
-
-    private Integer tentativasLogin;
-    private LocalDateTime bloqueadoAte;
-
+    private boolean ativo;
+    private boolean bloqueado; // Novo campo
+    private int tentativasLogin;
+    private LocalDateTime ultimoLogin;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
-    // Construtor vazio
-    public Usuario() {
-    }
+    private String resetPasswordToken;
+    private LocalDateTime resetPasswordExpiresAt;
 
-    // Construtor completo (pode ser ajustado conforme a necessidade)
-    public Usuario(UUID id, UUID tenantId, String nome, Integer idade, String cpf, String senha, Perfil perfil, Integer tentativasLogin, LocalDateTime bloqueadoAte, LocalDateTime criadoEm, LocalDateTime atualizadoEm) {
-        this.id = id;
-        this.tenantId = tenantId;
-        this.nome = nome;
-        this.idade = idade;
-        this.cpf = cpf;
-        this.senha = senha;
-        this.perfil = perfil;
-        this.tentativasLogin = tentativasLogin;
-        this.bloqueadoAte = bloqueadoAte;
-        this.criadoEm = criadoEm;
-        this.atualizadoEm = atualizadoEm;
+    public Usuario() {
     }
 
     // Getters e Setters
@@ -57,22 +45,32 @@ public class Usuario {
 
     public void setTenantId(UUID tenantId) {
         this.tenantId = tenantId;
+        this.escolaId = tenantId;
     }
 
-    public String getNome() {
-        return nome;
+    public UUID getEscolaId() {
+        return escolaId;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setEscolaId(UUID escolaId) {
+        this.escolaId = escolaId;
+        this.tenantId = escolaId;
     }
 
-    public Integer getIdade() {
-        return idade;
+    public String getNomeCompleto() {
+        return nomeCompleto;
     }
 
-    public void setIdade(Integer idade) {
-        this.idade = idade;
+    public void setNomeCompleto(String nomeCompleto) {
+        this.nomeCompleto = nomeCompleto;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getCpf() {
@@ -83,12 +81,20 @@ public class Usuario {
         this.cpf = cpf;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getTelefone() {
+        return telefone;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getSenhaHash() {
+        return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        this.senhaHash = senhaHash;
     }
 
     public Perfil getPerfil() {
@@ -99,20 +105,36 @@ public class Usuario {
         this.perfil = perfil;
     }
 
-    public Integer getTentativasLogin() {
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public boolean isBloqueado() {
+        return bloqueado;
+    }
+
+    public void setBloqueado(boolean bloqueado) {
+        this.bloqueado = bloqueado;
+    }
+
+    public int getTentativasLogin() {
         return tentativasLogin;
     }
 
-    public void setTentativasLogin(Integer tentativasLogin) {
+    public void setTentativasLogin(int tentativasLogin) {
         this.tentativasLogin = tentativasLogin;
     }
 
-    public LocalDateTime getBloqueadoAte() {
-        return bloqueadoAte;
+    public LocalDateTime getUltimoLogin() {
+        return ultimoLogin;
     }
 
-    public void setBloqueadoAte(LocalDateTime bloqueadoAte) {
-        this.bloqueadoAte = bloqueadoAte;
+    public void setUltimoLogin(LocalDateTime ultimoLogin) {
+        this.ultimoLogin = ultimoLogin;
     }
 
     public LocalDateTime getCriadoEm() {
@@ -131,19 +153,26 @@ public class Usuario {
         this.atualizadoEm = atualizadoEm;
     }
 
-    // Método para mascarar CPF para logs
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
+    public LocalDateTime getResetPasswordExpiresAt() {
+        return resetPasswordExpiresAt;
+    }
+
+    public void setResetPasswordExpiresAt(LocalDateTime resetPasswordExpiresAt) {
+        this.resetPasswordExpiresAt = resetPasswordExpiresAt;
+    }
+
     public String getCpfMascarado() {
         if (cpf == null || cpf.length() < 11) {
             return cpf;
         }
         return "***." + cpf.substring(4, 7) + "." + cpf.substring(8, 11) + "-**";
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
     }
 }

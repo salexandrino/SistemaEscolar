@@ -7,12 +7,34 @@ import java.util.regex.Pattern;
 public class ValidationUtil {
 
     private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^\\(\\d{2}\\)\\d{5}-\\d{4}$"); // (99)99999-9999
+
+    public static void validateNomeCompleto(String nomeCompleto) {
+        if (nomeCompleto == null || nomeCompleto.trim().length() < 5 || nomeCompleto.trim().length() > 120) {
+            throw new ValidationException("Nome completo deve ter entre 5 e 120 caracteres e não pode ser vazio.");
+        }
+    }
+
+    public static void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new ValidationException("O e-mail não pode estar em branco.");
+        }
+        if (email.length() > 150) {
+            throw new ValidationException("O e-mail deve ter no máximo 150 caracteres.");
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new ValidationException("Formato de e-mail inválido.");
+        }
+    }
 
     public static void validateCpf(String cpf) {
-        if (cpf == null || !CPF_PATTERN.matcher(cpf).matches()) {
+        if (cpf == null || cpf.isBlank()) {
+            throw new ValidationException("O CPF não pode estar em branco.");
+        }
+        if (!CPF_PATTERN.matcher(cpf).matches()) {
             throw new ValidationException("CPF deve estar no formato 000.000.000-00.");
         }
-        // Adicionar lógica de validação matemática do CPF aqui, se necessário
         if (!isValidCpfMath(cpf)) {
             throw new ValidationException("CPF inválido.");
         }
@@ -53,8 +75,16 @@ public class ValidationUtil {
         return d2 == numbers[10];
     }
 
+    public static void validateTelefone(String telefone) {
+        if (telefone == null || telefone.isBlank()) {
+            throw new ValidationException("O telefone não pode estar em branco.");
+        }
+        if (!PHONE_PATTERN.matcher(telefone).matches()) {
+            throw new ValidationException("Formato de telefone inválido. Use (99)99999-9999.");
+        }
+    }
+
     public static void validatePasswordComplexity(String password) {
-        // Regras de senha: mínimo 8, máximo 64, uma maiúscula, uma minúscula, um número, um caractere especial.
         if (password == null || password.length() < 8 || password.length() > 64) {
             throw new ValidationException("A senha deve ter entre 8 e 64 caracteres.");
         }
@@ -70,5 +100,13 @@ public class ValidationUtil {
         if (!password.matches(".*[!@#$%^&*()-_=+\\|\\[{\\]};:'\",<.>/?].*")) {
             throw new ValidationException("A senha deve conter pelo menos um caractere especial.");
         }
+    }
+
+    public static boolean isValidEmail(String email) {
+        return email != null && EMAIL_PATTERN.matcher(email).matches();
+    }
+
+    public static String extractNumbers(String text) {
+        return text != null ? text.replaceAll("\\D", "") : "";
     }
 }

@@ -6,19 +6,19 @@ import java.util.UUID;
 public class Escola {
     private UUID id;
     private String nome;
-    private String cnpj;
-    private Boolean ativo;
-    private LocalDateTime dataCadastro;
+    private boolean ativa;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 
     public Escola() {
     }
 
-    public Escola(UUID id, String nome, String cnpj, Boolean ativo, LocalDateTime dataCadastro) {
+    public Escola(UUID id, String nome, boolean ativa, LocalDateTime criadoEm, LocalDateTime atualizadoEm) {
         this.id = id;
         this.nome = nome;
-        this.cnpj = cnpj;
-        this.ativo = ativo;
-        this.dataCadastro = dataCadastro;
+        this.ativa = ativa;
+        this.criadoEm = criadoEm;
+        this.atualizadoEm = atualizadoEm;
     }
 
     public UUID getId() {
@@ -37,27 +37,27 @@ public class Escola {
         this.nome = nome;
     }
 
-    public String getCnpj() {
-        return cnpj;
+    public boolean isAtiva() {
+        return ativa;
     }
 
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
+    public void setAtiva(boolean ativa) {
+        this.ativa = ativa;
     }
 
-    public Boolean getAtivo() {
-        return ativo;
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
     }
 
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
     }
 
-    public LocalDateTime getDataCadastro() {
-        return dataCadastro;
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
     }
 
-    public void setDataCadastro(LocalDateTime dataCadastro) {
-        this.dataCadastro = dataCadastro;
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 }

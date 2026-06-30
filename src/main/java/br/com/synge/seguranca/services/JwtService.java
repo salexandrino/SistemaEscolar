@@ -45,6 +45,7 @@ public class JwtService {
         String token = Jwts.builder()
                 .claim("userId", userId.toString())
                 .claim("tenantId", tenantId.toString())
+                .claim("escolaId", tenantId.toString()) // Adiciona escolaId ao token
                 .claim("perfil", perfil.name())
                 .claim("cpf", cpf)
                 .setIssuedAt(Date.from(now))
@@ -68,8 +69,6 @@ public class JwtService {
         }
     }
 
-
-
     public AuthUser extrairAuthUser(String token) {
         Jws<Claims> jws = validarToken(token);
         if (jws == null) {
@@ -79,6 +78,7 @@ public class JwtService {
         try {
             UUID userId = UUID.fromString(claims.get("userId", String.class));
             UUID tenantId = UUID.fromString(claims.get("tenantId", String.class));
+            UUID escolaId = UUID.fromString(claims.get("escolaId", String.class)); // Extrai escolaId
             Perfil perfil = Perfil.valueOf(claims.get("perfil", String.class));
             String cpf = claims.get("cpf", String.class);
             return new AuthUser(userId, tenantId, perfil, cpf);

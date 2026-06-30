@@ -7,12 +7,14 @@ import java.util.UUID;
 public class AuthUser {
     private UUID userId;
     private UUID tenantId;
+    private UUID escolaId; // Novo campo
     private Perfil perfil;
     private String cpf;
 
     public AuthUser(UUID userId, UUID tenantId, Perfil perfil, String cpf) {
         this.userId = userId;
         this.tenantId = tenantId;
+        this.escolaId = tenantId; // escolaId é o mesmo que tenantId
         this.perfil = perfil;
         this.cpf = cpf;
     }
@@ -23,6 +25,10 @@ public class AuthUser {
 
     public UUID getTenantId() {
         return tenantId;
+    }
+
+    public UUID getEscolaId() {
+        return escolaId;
     }
 
     public Perfil getPerfil() {
