@@ -566,3 +566,92 @@ button,
     border-color: var(--green);
     transform: translateY(-3px);
 }
+/* ==========================
+   LOGIN SYNGE
+========================== */
+
+
+.login-container {
+
+    background: var(--white);
+
+}
+
+
+
+.login-panel-left {
+
+    background: var(--green-dark);
+
+}
+
+
+
+.login-panel-left i,
+.login-panel-left h1 {
+
+    color: white;
+
+}
+
+
+
+.login-panel-left p {
+
+    color: #E5F5E5;
+
+}
+
+
+
+.login-form-wrapper {
+
+    max-width: 520px;
+
+}
+
+
+
+.login-form-wrapper .form-control {
+
+    background: var(--gray-light);
+
+    border-color: var(--line);
+
+    color: var(--text);
+
+}
+
+
+
+.login-form-wrapper .btn-outline-success {
+
+    border-color: var(--green);
+
+    color: var(--green-dark);
+
+}
+
+
+
+.login-form-wrapper .btn-outline-success:hover {
+
+    background: var(--green);
+
+    color: white;
+
+}
+/* Logo da tela de login */
+
+.login-logo {
+
+    width: 500px;
+    height: auto;
+
+}
+.login-slogan {
+
+    margin-top: 10px;
+    max-width: 300px;
+
+}

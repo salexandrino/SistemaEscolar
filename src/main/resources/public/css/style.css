@@ -66,3 +66,56 @@ body {
     color: #721c24; /* Dark red */
     border-color: #f5c6cb; /* Red border */
 }
+/* LOGIN */
+
+.login-container{
+
+    background:var(--white);
+
+}
+
+
+
+.login-panel-left{
+
+    background:#004B1C;
+
+    color:white;
+
+}
+
+
+
+.login-panel-left i{
+
+    color:white;
+
+}
+
+
+
+.login-panel-right{
+
+    background:var(--surface);
+
+}
+
+
+
+.login-panel-right .form-control{
+
+    background:var(--gray-light);
+
+    border-color:var(--line);
+
+    color:var(--text);
+
+}
+
+
+
+.login-panel-right label{
+
+    color:var(--text);
+
+}
