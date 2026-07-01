@@ -68,13 +68,13 @@
                     <span th:text="${errorMessage}">Erro ao cadastrar.</span>
                 </div>
 
-                <form th:action="${'/auth/register'}" method="POST" class="needs-validation" novalidate>
+                <form id="cadastroForm" th:action="${'/auth/register'}" method="POST" class="needs-validation" novalidate>
 
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label for="nome" class="form-label fw-bold">Nome Completo <span class="text-danger">*</span></label>
                             <input type="text" class="form-control rounded-2" id="nome" name="nome" placeholder="Digite seu nome completo" minlength="5" maxlength="120" required autofocus>
-                            <div class="form-text mt-1" style="font-size: 0.70rem;">Mínimo 5 e máximo 120 caracteres.</div>
+                            <div class="form-text mt-1" style="font-size: 0.70rem;">Mínimo 5 e maximum 120 caracteres.</div>
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label fw-bold">E-mail <span class="text-danger">*</span></label>
@@ -99,20 +99,21 @@
                             <label for="perfil" class="form-label fw-bold">Perfil <span class="text-danger">*</span></label>
                             <select class="form-select rounded-2" id="perfil" name="perfil" required>
                                 <option value="" selected disabled>Selecione seu perfil</option>
-                                <option value="SUPER_ADMIN">Super Admin</option>
                                 <option value="GESTOR">Gestor</option>
                                 <option value="SECRETARIA">Secretaria</option>
                                 <option value="PROFESSOR">Professor</option>
                                 <option value="FINANCEIRO">Financeiro</option>
-                                <option value="RESPONSAVEL">Responsável</option>
-                                <option value="ALUNO">Aluno</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label for="escola" class="form-label fw-bold">Escola <span class="text-danger">*</span></label>
-                            <select class="form-select rounded-2" id="escola" name="escola" required>
+                            <div th:if="${escolas == null or #lists.isEmpty(escolas)}" class="alert alert-warning small py-2 mb-2">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Nenhuma escola disponível no momento. Entre em contato com o suporte.
+                            </div>
+                            <select class="form-select rounded-2" id="escola" name="escola" required th:disabled="${escolas == null or #lists.isEmpty(escolas)}">
                                 <option value="" selected disabled>Selecione a escola</option>
-                                <option value="1">Escola Padrão</option>
+                                <option th:each="escola : ${escolas}" th:value="${escola.id}" th:text="${escola.nome}"></option>
                             </select>
                         </div>
                     </div>
@@ -120,9 +121,9 @@
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label for="senha" class="form-label fw-bold">Senha <span class="text-danger">*</span></label>
-                            <div class="input-group mb-2">
+                            <div class="input-group mb-2" style="cursor: pointer;">
                                 <input type="password" class="form-control rounded-start-2 border-end-0" id="senha" name="senha" placeholder="Digite uma senha" required>
-                                <span class="input-group-text bg-white border-start-0 rounded-end-2"><i class="bi bi-eye"></i></span>
+                                <span class="input-group-text bg-white border-start-0 rounded-end-2" onclick="toggleSenha('senha', 'olhoSenha')"><i class="bi bi-eye-slash" id="olhoSenha"></i></span>
                             </div>
 
                             <div class="row password-rule mt-2 g-1">
@@ -143,9 +144,9 @@
 
                         <div class="col-md-6">
                             <label for="confirmarSenha" class="form-label fw-bold">Confirmar Senha <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="input-group" style="cursor: pointer;">
                                 <input type="password" class="form-control rounded-start-2 border-end-0" id="confirmarSenha" name="confirmarSenha" placeholder="Confirme sua senha" required>
-                                <span class="input-group-text bg-white border-start-0 rounded-end-2"><i class="bi bi-eye"></i></span>
+                                <span class="input-group-text bg-white border-start-0 rounded-end-2" onclick="toggleSenha('confirmarSenha', 'olhoConfirmar')"><i class="bi bi-eye-slash" id="olhoConfirmar"></i></span>
                             </div>
                             <div class="invalid-feedback mt-1 fw-medium" id="senhaError">
                                 <i class="bi bi-exclamation-circle me-1"></i> As senhas não coincidem.
@@ -153,7 +154,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3 rounded-2 shadow-sm" style="background-color: #1a7332; border-color: #1a7332;">
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-2 mb-3 rounded-2" th:disabled="${escolas == null or #lists.isEmpty(escolas)}">
                         <i class="bi bi-person-plus-fill me-2"></i> Cadastrar
                     </button>
 
@@ -191,9 +192,85 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Função para mostrar alertas dinâmicos com Bootstrap
+    function mostrarAlerta(mensagem, tipo) {
+        // Remove alerta anterior se existir
+        const alertaAnterior = document.getElementById('alertaCadastro');
+        if (alertaAnterior) {
+            alertaAnterior.remove();
+        }
+
+        // Define ícone e classe de cor
+        const icone = tipo === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+        const classe = `alert alert-${tipo} border-0 rounded-2 small py-2 mb-3`;
+
+        // Cria novo alerta
+        const alerta = document.createElement('div');
+        alerta.id = 'alertaCadastro';
+        alerta.className = classe;
+        alerta.role = 'alert';
+        alerta.innerHTML = `<i class="bi ${icone} me-2"></i><span>${mensagem}</span>`;
+
+        // Insere antes do formulário
+        const form = document.getElementById('cadastroForm');
+        form.parentNode.insertBefore(alerta, form);
+
+        // Scroll suave para o alerta
+        alerta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Validação de senha em tempo real
+    function validarSenhaEmTempoReal() {
+        const senhaInput = document.getElementById('senha');
+        const senha = senhaInput.value;
+
+        // Regras de validação
+        const regras = [
+            {
+                regex: /.{8,64}/,
+                seletor: 'div:nth-child(1)',
+                descricao: 'Mínimo 8 caracteres'
+            },
+            {
+                regex: /\d/,
+                seletor: 'div:nth-child(2)',
+                descricao: 'Número'
+            },
+            {
+                regex: /[A-Z]/,
+                seletor: 'div:nth-child(3)',
+                descricao: 'Letra maiúscula'
+            },
+            {
+                regex: /[!@#$%^&*()\-_=+\|[\]{};:\'",<.>/?]/,
+                seletor: 'div:nth-child(4)',
+                descricao: 'Caractere especial'
+            }
+        ];
+
+        const passwordRuleContainer = document.querySelector('.password-rule');
+
+        regras.forEach(regra => {
+            const elemento = passwordRuleContainer.querySelector(regra.seletor);
+            const ícone = elemento.querySelector('i');
+            const satisfeita = regra.regex.test(senha);
+
+            if (satisfeita) {
+                // Coloca checkmark e adiciona classe de sucesso
+                ícone.className = 'bi bi-check-circle-fill me-1 text-success';
+                elemento.classList.add('text-success');
+            } else {
+                // Volta para círculo vazio
+                ícone.className = 'bi bi-circle me-1';
+                elemento.classList.remove('text-success');
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const cpfInput = document.getElementById('cpf');
         const telInput = document.getElementById('telefone');
+        const senhaInput = document.getElementById('senha');
 
         if (cpfInput) {
             cpfInput.addEventListener('input', (e) => {
@@ -217,30 +294,100 @@
                 e.target.value = formatted;
             });
         }
+
+        // Listener para validação de senha em tempo real
+        if (senhaInput) {
+            senhaInput.addEventListener('input', validarSenhaEmTempoReal);
+        }
     });
 
     (() => {
         'use strict'
         const forms = document.querySelectorAll('.needs-validation')
         Array.from(forms).forEach(form => {
-            form.addEventListener('submit', event => {
+            form.addEventListener('submit', async event => {
+                event.preventDefault(); // Impede o recarregamento padrão
+                event.stopPropagation();
+
                 const senha = document.getElementById('senha').value;
                 const confirmarSenha = document.getElementById('confirmarSenha').value;
 
                 if (senha !== confirmarSenha) {
                     document.getElementById('confirmarSenha').setCustomValidity('As senhas não conferem.');
+                    form.classList.add('was-validated');
+                    return;
                 } else {
                     document.getElementById('confirmarSenha').setCustomValidity('');
                 }
 
                 if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
                 }
+
+                // Se o HTML/JS local validou tudo, criamos o objeto para o Back-end
+                const dadosCadastro = {
+                    nomeCompleto: document.getElementById('nome').value,
+                    email: document.getElementById('email').value,
+                    cpf: document.getElementById('cpf').value,
+                    telefone: document.getElementById('telefone').value,
+                    perfil: document.getElementById('perfil').value,
+                    escolaId: document.getElementById('escola').value,
+                    senha: senha,
+                    confirmacaoSenha: confirmarSenha
+                };
+
+                try {
+                    // Faz a requisição real para o seu AuthController.register
+                    const response = await fetch('/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dadosCadastro)
+                    });
+
+                    if (response.ok) {
+                        mostrarAlerta("Cadastro realizado com sucesso! Você será redirecionado para o login.", 'success');
+                        setTimeout(() => {
+                            window.location.href = "/login";
+                        }, 1800);
+                    } else {
+                        const erro = await response.json();
+                        mostrarAlerta(erro.message || "Verifique os dados informados.", 'danger');
+                    }
+                } catch (error) {
+                    console.error("Erro na conexão:", error);
+                    mostrarAlerta("Não foi possível conectar ao servidor. Tente novamente mais tarde.", 'danger');
+                }
+
                 form.classList.add('was-validated');
             }, false)
         })
     })();
+</script>
+<script>
+    function toggleSenha(inputId, iconeId) {
+        const input = document.getElementById(inputId);
+        const icone = document.getElementById(iconeId);
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icone.classList.remove('bi-eye-slash');
+            icone.classList.add('bi-eye');
+
+            // Esconde a senha de novo automaticamente após 3 segundos
+            setTimeout(() => {
+                input.type = 'password';
+                icone.classList.remove('bi-eye');
+                icone.classList.add('bi-eye-slash');
+            }, 3000);
+        } else {
+            input.type = 'password';
+            icone.classList.remove('bi-eye');
+            icone.classList.add('bi-eye-slash');
+        }
+    }
 </script>
 </body>
 </html>

@@ -27,6 +27,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por CPF {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
     }
@@ -43,6 +44,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por email {}: {}", email, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
     }
@@ -59,6 +61,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
     }
@@ -76,6 +79,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por ID {} e TenantId {}: {}", id, tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
     }
@@ -92,6 +96,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao verificar existência de CPF {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), e.getMessage(), e);
+            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
         return false;
     }
@@ -108,6 +113,7 @@ public class UsuarioRepository {
             }
         } catch (SQLException e) {
             logger.error("Erro ao verificar existência de email {}: {}", email, e.getMessage(), e);
+            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
         return false;
     }

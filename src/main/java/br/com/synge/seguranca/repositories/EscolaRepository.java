@@ -10,12 +10,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class EscolaRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaRepository.class);
+
+    public List<Escola> findAllAtivas() {
+        String sql = "SELECT id, nome, cnpj, status, criado_em, atualizado_em FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
+        List<Escola> escolas = new ArrayList<>();
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    escolas.add(mapResultSetToEscola(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Erro ao listar escolas ativas: {}", e.getMessage(), e);
+            throw new RuntimeException("Erro ao listar escolas no banco de dados.", e);
+        }
+
+        return escolas;
+    }
 
     public Optional<Escola> findById(UUID id) {
         String sql = "SELECT id, nome, cnpj, status, criado_em, atualizado_em FROM escola WHERE id = ?";
@@ -33,8 +56,8 @@ public class EscolaRepository {
 
         } catch (SQLException e) {
             logger.error("Erro ao buscar escola por ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar escola no banco de dados.", e);
         }
-
         return Optional.empty();
     }
 
@@ -54,8 +77,8 @@ public class EscolaRepository {
 
         } catch (SQLException e) {
             logger.error("Erro ao buscar escola por CNPJ {}: {}", cnpj, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar escola no banco de dados.", e);
         }
-
         return Optional.empty();
     }
 

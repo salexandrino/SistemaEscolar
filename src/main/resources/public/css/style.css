@@ -165,4 +165,48 @@ body {
 .border-green {
     border-color: var(--color-accent) !important;
 }
+/* ==========================================================================
+   COMPONENTES GLOBAIS: CAMPOS DE SENHA COM OLHO INTERNO (REUSÁVEL)
+   ========================================================================== */
 
+/* 1. Remove o olhinho nativo/automático dos navegadores para evitar duplicação */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+/* 2. Container do campo de senha para permitir o alinhamento absoluto do ícone */
+.senha-container {
+    position: relative;
+    width: 100%;
+}
+
+/* 3. Garante que o texto digitado não fique por baixo do ícone do olho */
+.senha-container .form-control {
+    padding-right: 2.75rem !important;
+}
+
+/* 4. Estilização do botão invisível do olho, posicionado perfeitamente à direita */
+.senha-icone-olho {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 10;
+    border: none;
+    background: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* 5. Efeito sutil de hover ao passar o mouse no olhinho */
+.senha-icone-olho:hover {
+    color: #1a7332;
+}
