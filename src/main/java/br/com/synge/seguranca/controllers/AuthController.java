@@ -160,6 +160,10 @@ public class AuthController {
         }
     }
 
+    public void showForgotPasswordPage(Context ctx) {
+        ctx.render("auth/esqueci-senha.html");
+    }
+
     public void resetPassword(Context ctx) {
         try {
             ResetPasswordDTO resetPasswordDTO = ctx.bodyAsClass(ResetPasswordDTO.class);

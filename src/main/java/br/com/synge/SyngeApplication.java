@@ -77,21 +77,24 @@ public class SyngeApplication {
             ctx.html(templateEngine.process("auth/login", context));
         });
 
+        app.get("/cadastro", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            ctx.html(templateEngine.process("auth/cadastro", context));
+        });
 
-// ROTAS DA AUTENTICAÇÃO
-        app.post("/auth/login", authController::login);
+        // RECUPERAR SENHA (abrir a tela via Thymeleaf mapeada para /esqueci-senha)
+        app.get("/esqueci-senha", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            ctx.html(templateEngine.process("auth/esqueci-senha", context));
+        });
 
-        app.post("/auth/register", authController::register);
-
-        app.post("/auth/logout", authController::logout);
-
+        // ROTAS DA AUTENTICAÇÃO (Processamentos POST/PATCH)
         app.post("/auth/forgot-password", authController::forgotPassword);
-
+        app.post("/auth/login", authController::login);
+        app.post("/auth/register", authController::register);
+        app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
-
         app.patch("/users/{id}/approve", authController::approveUser);
-
-
 // PING
         app.get("/ping", ctx ->
                 ctx.json(Map.of(
