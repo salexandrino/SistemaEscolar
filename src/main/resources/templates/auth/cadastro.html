@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNGE - Criar Conta</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="${'/css/style.css'}">
+    <link rel="stylesheet" th:href="${'/css/home.css'}">
+
+    <style>
+        .form-label {
+            color: #333;
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+        .form-control, .form-select {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.75rem;
+            border-color: #dee2e6;
+        }
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+        .text-danger { color: #dc3545 !important; }
+        .password-rule { font-size: 0.75rem; color: #6c757d; }
+        /* Garante que o painel direito permita rolagem se a tela for pequena */
+        .right-panel-scroll {
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+    </style>
+</head>
+
+<body class="login-container bg-light">
+<div class="container-fluid p-0">
+    <div class="row g-0 min-vh-100">
+
+        <div class="col-md-5 d-none d-md-flex flex-column justify-content-center text-center p-5 login-panel-left" style="background-color: #004B1C; position: sticky; top: 0; height: 100vh;">
+            <div class="d-flex flex-column align-items-center">
+                <img th:src="${'/images/logo.png'}" alt="SYNGE Logo" class="img-fluid mb-4" style="max-width: 65%; height: auto;">
+
+                <p class="lead fw-medium px-4 mt-2" style="color: rgba(255,255,255,0.9); font-size: 1.15rem; line-height: 1.6;">
+                    "Crie sua conta e experimente a plataforma definitiva para gestão de escolas."
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-7 d-flex flex-column p-4 p-md-5 bg-white right-panel-scroll">
+            <div class="mx-auto w-100 my-auto" style="max-width: 650px;">
+
+                <div class="d-flex align-items-center mb-4 pb-2">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-person-fill text-success fs-3"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0" style="color: #1a1a1a;">Criar Conta</h3>
+                        <p class="text-muted small mb-0">Preencha seus dados para solicitar acesso ao sistema.</p>
+                    </div>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger border-0 rounded-2 small py-2 mb-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}">Erro ao cadastrar.</span>
+                </div>
+
+                <form th:action="${'/auth/register'}" method="POST" class="needs-validation" novalidate>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="nome" class="form-label fw-bold">Nome Completo <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2" id="nome" name="nome" placeholder="Digite seu nome completo" minlength="5" maxlength="120" required autofocus>
+                            <div class="form-text mt-1" style="font-size: 0.70rem;">Mínimo 5 e máximo 120 caracteres.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-bold">E-mail <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control rounded-2" id="email" name="email" placeholder="nome@escola.com" maxlength="150" required>
+                            <div class="form-text mt-1" style="font-size: 0.70rem;">Máximo 150 caracteres.</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="cpf" class="form-label fw-bold">CPF <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control rounded-2" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefone" class="form-label fw-bold">Telefone <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control rounded-2" id="telefone" name="telefone" placeholder="(99) 99999-9999" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="perfil" class="form-label fw-bold">Perfil <span class="text-danger">*</span></label>
+                            <select class="form-select rounded-2" id="perfil" name="perfil" required>
+                                <option value="" selected disabled>Selecione seu perfil</option>
+                                <option value="SUPER_ADMIN">Super Admin</option>
+                                <option value="GESTOR">Gestor</option>
+                                <option value="SECRETARIA">Secretaria</option>
+                                <option value="PROFESSOR">Professor</option>
+                                <option value="FINANCEIRO">Financeiro</option>
+                                <option value="RESPONSAVEL">Responsável</option>
+                                <option value="ALUNO">Aluno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="escola" class="form-label fw-bold">Escola <span class="text-danger">*</span></label>
+                            <select class="form-select rounded-2" id="escola" name="escola" required>
+                                <option value="" selected disabled>Selecione a escola</option>
+                                <option value="1">Escola Padrão</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="senha" class="form-label fw-bold">Senha <span class="text-danger">*</span></label>
+                            <div class="input-group mb-2">
+                                <input type="password" class="form-control rounded-start-2 border-end-0" id="senha" name="senha" placeholder="Digite uma senha" required>
+                                <span class="input-group-text bg-white border-start-0 rounded-end-2"><i class="bi bi-eye"></i></span>
+                            </div>
+
+                            <div class="row password-rule mt-2 g-1">
+                                <div class="col-6 d-flex align-items-center">
+                                    <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Mínimo 8 caracteres
+                                </div>
+                                <div class="col-6 d-flex align-items-center">
+                                    <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Número
+                                </div>
+                                <div class="col-6 d-flex align-items-center">
+                                    <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Letra maiúscula
+                                </div>
+                                <div class="col-6 d-flex align-items-center">
+                                    <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Caractere especial
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="confirmarSenha" class="form-label fw-bold">Confirmar Senha <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="password" class="form-control rounded-start-2 border-end-0" id="confirmarSenha" name="confirmarSenha" placeholder="Confirme sua senha" required>
+                                <span class="input-group-text bg-white border-start-0 rounded-end-2"><i class="bi bi-eye"></i></span>
+                            </div>
+                            <div class="invalid-feedback mt-1 fw-medium" id="senhaError">
+                                <i class="bi bi-exclamation-circle me-1"></i> As senhas não coincidem.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3 rounded-2 shadow-sm" style="background-color: #1a7332; border-color: #1a7332;">
+                        <i class="bi bi-person-plus-fill me-2"></i> Cadastrar
+                    </button>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <hr class="flex-grow-1">
+                        <span class="mx-3 text-muted small">ou</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <a th:href="${'/login'}" class="btn btn-outline-secondary w-100 fw-bold py-2 mb-4 rounded-2">
+                        <i class="bi bi-arrow-left me-2"></i> Voltar para Login
+                    </a>
+
+                    <div class="alert alert-success d-flex align-items-center mb-4 rounded-2" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;">
+                        <div class="bg-success rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 28px; height: 28px; min-width: 28px;">
+                            <i class="bi bi-check text-white fs-5"></i>
+                        </div>
+                        <span class="small" style="line-height: 1.4;">
+                            Seu cadastro será analisado pelo Gestor da escola.<br>
+                            Após aprovação, você poderá acessar o sistema.
+                        </span>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cpfInput = document.getElementById('cpf');
+        const telInput = document.getElementById('telefone');
+
+        if (cpfInput) {
+            cpfInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                let formatted = '';
+                if (value.length > 0) formatted = value.substring(0, 3);
+                if (value.length > 3) formatted += '.' + value.substring(3, 6);
+                if (value.length > 6) formatted += '.' + value.substring(6, 9);
+                if (value.length > 9) formatted += '-' + value.substring(9, 11);
+                e.target.value = formatted;
+            });
+        }
+
+        if (telInput) {
+            telInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                let formatted = '';
+                if (value.length > 0) formatted = '(' + value.substring(0, 2);
+                if (value.length > 2) formatted += ') ' + value.substring(2, 7);
+                if (value.length > 7) formatted += '-' + value.substring(7, 11);
+                e.target.value = formatted;
+            });
+        }
+    });
+
+    (() => {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                const senha = document.getElementById('senha').value;
+                const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+                if (senha !== confirmarSenha) {
+                    document.getElementById('confirmarSenha').setCustomValidity('As senhas não conferem.');
+                } else {
+                    document.getElementById('confirmarSenha').setCustomValidity('');
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false)
+        })
+    })();
+</script>
+</body>
+</html>
