@@ -1,3 +1,10 @@
 
 .idea/
 *.iml
+# Pastas de compilação do Java
+target/
+*.class
+
+# Pastas de Logs do sistema
+logs/
+*.log

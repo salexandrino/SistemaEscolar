@@ -1,7 +1,13 @@
 package br.com.synge;
 
+import br.com.synge.seguranca.repositories.UsuarioRepository;
+import br.com.synge.seguranca.repositories.EscolaRepository;
+import br.com.synge.seguranca.services.PasswordService;
+import br.com.synge.seguranca.services.JwtService;
 import br.com.synge.config.DatabaseConfig;
 import br.com.synge.config.FlywayConfig;
+import br.com.synge.seguranca.controllers.AuthController;
+import br.com.synge.seguranca.services.AuthService;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.slf4j.Logger;
@@ -37,19 +43,56 @@ public class SyngeApplication {
         );
 
         TemplateEngine templateEngine = createTemplateEngine();
+        UsuarioRepository usuarioRepository = new UsuarioRepository();
+        EscolaRepository escolaRepository = new EscolaRepository();
+
+        PasswordService passwordService = new PasswordService();
+        JwtService jwtService = new JwtService();
+
+        AuthService authService = new AuthService(
+                usuarioRepository,
+                escolaRepository,
+                passwordService,
+                jwtService
+        );
+
+        AuthController authController = new AuthController(authService);
 
         Javalin app = Javalin.create(config -> config.staticFiles.add(staticFiles -> {
             staticFiles.hostedPath = "/";
             staticFiles.directory = "/public";
             staticFiles.location = Location.CLASSPATH;
         }));
-
+        // HOME
         app.get("/", ctx -> {
             Context context = new Context(ctx.req().getLocale());
             context.setVariables(homeModel());
             ctx.html(templateEngine.process("home", context));
         });
 
+
+// LOGIN (abrir a tela)
+        app.get("/login", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            ctx.html(templateEngine.process("auth/login", context));
+        });
+
+
+// ROTAS DA AUTENTICAÇÃO
+        app.post("/auth/login", authController::login);
+
+        app.post("/auth/register", authController::register);
+
+        app.post("/auth/logout", authController::logout);
+
+        app.post("/auth/forgot-password", authController::forgotPassword);
+
+        app.post("/auth/reset-password", authController::resetPassword);
+
+        app.patch("/users/{id}/approve", authController::approveUser);
+
+
+// PING
         app.get("/ping", ctx ->
                 ctx.json(Map.of(
                         "status", "ok",
@@ -57,6 +100,7 @@ public class SyngeApplication {
                         "timestamp", Instant.now().toString()
                 ))
         );
+
 
         app.start(port);
 
