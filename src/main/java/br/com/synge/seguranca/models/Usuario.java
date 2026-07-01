@@ -242,16 +242,20 @@ public class Usuario {
     }
 
     public String getEmailMascarado() {
-        if (email == null || !email.contains("@")) {
+
+        if (email == null || email.isBlank()) {
+            return "";
+        }
+
+        int arroba = email.indexOf("@");
+
+        if (arroba <= 1) {
             return "***";
         }
 
-        String[] partes = email.split("@");
-
-        if (partes[0].length() <= 2) {
-            return "***@" + partes[1];
-        }
-
-        return partes[0].substring(0, 2) + "***@" + partes[1];
+        return email.substring(0,1)
+                + "***"
+                + email.substring(arroba);
     }
+
 }

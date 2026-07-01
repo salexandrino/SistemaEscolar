@@ -112,9 +112,7 @@ public class UsuarioRepository {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao verificar existência de email {}: {}", email, e.getMessage(), e);
-            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
-        }
+            logger.error("Erro ao buscar usuário por email.", e);        }
         return false;
     }
 

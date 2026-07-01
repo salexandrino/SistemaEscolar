@@ -93,14 +93,17 @@ public class AuthService {
     }
 
     public void register(Usuario usuario) {
-        // Validações
+
+        usuario.setNomeCompleto(usuario.getNomeCompleto().trim());
+        usuario.setEmail(usuario.getEmail().trim().toLowerCase());
+        usuario.setCpf(usuario.getCpf().trim());
+        usuario.setTelefone(usuario.getTelefone().trim());
+
         ValidationUtil.validateNomeCompleto(usuario.getNomeCompleto());
         ValidationUtil.validateEmail(usuario.getEmail());
         ValidationUtil.validateCpf(usuario.getCpf());
-        ValidationUtil.validateTelefone(usuario.getTelefone());
-        ValidationUtil.validatePasswordComplexity(usuario.getSenhaHash()); // SenhaHash é a senha pura aqui
 
-        if (!usuario.getSenhaHash().equals(usuario.getConfirmacaoSenha())) { // Assumindo que o DTO tem confirmacaoSenha
+        if (!usuario.getSenhaHash().equals(usuario.getConfirmacaoSenha())) {
             throw new ValidationException("Senha e confirmação de senha não conferem.");
         }
 
@@ -108,8 +111,9 @@ public class AuthService {
             logger.warn("Tentativa de registro com CPF duplicado: {}", usuario.getCpfMascarado());
             throw new ConflictException("CPF já cadastrado.");
         }
+
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmail());
+            logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmailMascarado());
             throw new ConflictException("E-mail já cadastrado.");
         }
 
@@ -119,6 +123,9 @@ public class AuthService {
         }
 
         // Escola
+        if (usuario.getEscolaId() == null) {
+            throw new ValidationException("Escola é obrigatória.");
+        }
         Optional<Escola> escola = escolaRepository.findById(usuario.getEscolaId());
         if (escola.isEmpty() || !"ATIVA".equals(escola.get().getStatus())) {
             throw new NotFoundException("Escola não encontrada ou inativa.");
