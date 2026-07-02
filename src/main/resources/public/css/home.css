@@ -11,17 +11,6 @@
     --soft-shadow: 0 16px 44px rgba(0, 75, 28, 0.12);
 }
 
-[data-theme="dark"] {
-    --white: #07120B;
-    --gray-light: #101A13;
-    --green-light: #102719;
-    --text: #F3FAF4;
-    --muted: #B7C8BC;
-    --line: #264532;
-    --surface: #111F16;
-    --soft-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
-    --green-dark: #7CE6A0;
-}
 
 html {
     scroll-behavior: smooth;
@@ -49,9 +38,6 @@ button,
     padding: 0.85rem 0;
 }
 
-[data-theme="dark"] .landing-navbar {
-    background: rgba(7, 18, 11, 0.94);
-}
 
 .navbar-brand {
     align-items: center;
@@ -62,9 +48,6 @@ button,
     letter-spacing: 0;
 }
 
-[data-theme="dark"] .navbar-brand {
-    color: var(--white);
-}
 
 .brand-mark {
     align-items: center;
@@ -170,10 +153,6 @@ button,
     margin: 1.05rem 0 1.35rem;
 }
 
-[data-theme="dark"] .hero-section h1,
-[data-theme="dark"] .section-heading h2 {
-    color: var(--white);
-}
 
 .hero-subtitle,
 .section-heading p,
@@ -401,9 +380,6 @@ button,
     text-transform: uppercase;
 }
 
-[data-theme="dark"] .plan-badge {
-    color: #7CE6A0;
-}
 
 .testimonial-card img {
     border-radius: 999px;
@@ -548,9 +524,6 @@ button,
     /* Sombra realista projetada estritamente no formato recortado do PNG */
     filter: drop-shadow(15px 20px 15px rgba(0, 0, 0, 0.15)) !important;
 }
-[data-theme="dark"] .btn-close {
-    filter: invert(1) grayscale(1) brightness(2); /* Deixa o ícone de fechar branco no dark mode */
-}
 .profile-card .btn-outline-success {
     width: 35px;
     height: 35px;
@@ -644,10 +617,13 @@ button,
 /* Logo da tela de login */
 
 .login-logo {
-
-    width: 500px;
+    max-width: 65%;
     height: auto;
+}
 
+.login-slogan {
+    margin-top: 0px;
+    max-width: 300px;
 }
 .login-slogan {
 

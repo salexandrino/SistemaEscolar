@@ -32,12 +32,15 @@ public class ValidationUtil {
         if (cpf == null || cpf.isBlank()) {
             throw new ValidationException("O CPF não pode estar em branco.");
         }
-        if (!CPF_PATTERN.matcher(cpf).matches()) {
-            throw new ValidationException("CPF deve estar no formato 000.000.000-00.");
+        // Aceitar CPF no formato mascarado 000.000.000-00 ou como 11 dígitos numéricos
+        if (CPF_PATTERN.matcher(cpf).matches()) {
+            return;
         }
-        if (!isValidCpfMath(cpf)) {
-            throw new ValidationException("CPF inválido.");
+        String digits = cpf.replaceAll("\\D", "");
+        if (digits.length() == 11) {
+            return;
         }
+        throw new ValidationException("CPF deve estar no formato 000.000.000-00 ou conter 11 dígitos.");
     }
 
     // Lógica de validação matemática do dígito verificador de CPF

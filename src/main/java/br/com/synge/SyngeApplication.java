@@ -28,7 +28,6 @@ public class SyngeApplication {
 
     public static void main(String[] args) {
 
-
         logger.info("Iniciando SYNGE...");
 
         try {
@@ -64,6 +63,10 @@ public class SyngeApplication {
             staticFiles.directory = "/public";
             staticFiles.location = Location.CLASSPATH;
         }));
+
+        // Registra middleware de autenticação (popula AuthUserContext quando há JWT válido)
+        app.before(new br.com.synge.seguranca.middlewares.AuthMiddleware(jwtService));
+
         // HOME
         app.get("/", ctx -> {
             Context context = new Context(ctx.req().getLocale());
@@ -71,10 +74,14 @@ public class SyngeApplication {
             ctx.html(templateEngine.process("home", context));
         });
 
-
-// LOGIN (abrir a tela)
+        // LOGIN (abrir a tela) - lê mensagem de erro da sessão e a repassa ao template como 'error'
         app.get("/login", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            String errorMessage = ctx.sessionAttribute("errorMessage");
+            if (errorMessage != null && !errorMessage.isBlank()) {
+                context.setVariable("error", errorMessage);
+                ctx.sessionAttribute("errorMessage", null); // limpa após leitura
+            }
             ctx.html(templateEngine.process("auth/login", context));
         });
 
@@ -98,7 +105,27 @@ public class SyngeApplication {
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
         app.patch("/users/{id}/approve", authController::approveUser);
-// PING
+
+        // Rota protegida para testar autenticação: retorna dados do usuário autenticado
+        app.get("/area-logada", ctx -> {
+            try {
+                br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+                if (currentUser == null) {
+                    throw new br.com.synge.seguranca.exceptions.AuthenticationException("Usuário não autenticado.");
+                }
+                ctx.json(Map.of(
+                        "userId", currentUser.getUserId(),
+                        "tenantId", currentUser.getTenantId(),
+                        "perfil", currentUser.getPerfil(),
+                        "cpf", currentUser.getCpf()
+                ));
+            } catch (br.com.synge.seguranca.exceptions.AuthenticationException e) {
+                ctx.status(e.getStatus());
+                ctx.json(Map.of("message", e.getMessage()));
+            }
+        });
+
+        // PING
         app.get("/ping", ctx ->
                 ctx.json(Map.of(
                         "status", "ok",
@@ -106,7 +133,6 @@ public class SyngeApplication {
                         "timestamp", Instant.now().toString()
                 ))
         );
-
 
         app.start(port);
 

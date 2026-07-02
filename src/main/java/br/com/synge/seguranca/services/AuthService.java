@@ -21,7 +21,7 @@ public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final UsuarioRepository usuarioRepository;
-    private final EscolaRepository escolaRepository; // Novo
+    private final EscolaRepository escolaRepository;
     private final PasswordService passwordService;
     private final JwtService jwtService;
     private final int maxLoginAttempts;
@@ -45,7 +45,7 @@ public class AuthService {
         Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpf);
         if (optionalUsuario.isEmpty()) {
             logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
-            throw new AuthenticationException("CPF ou senha inválidos.");
+            throw new AuthenticationException("CPF não cadastrado. Por favor, crie uma conta para continuar.");
         }
 
         Usuario usuario = optionalUsuario.get();
@@ -185,6 +185,7 @@ public class AuthService {
             try {
                 usuarioRepository.update(usuario);
                 logger.info("Código de recuperação gerado para usuário {}. Código: {}", usuario.getEmail(), recoveryCode);
+                // Em ambiente de desenvolvimento, imprimimos o código no console para testes
                 System.out.println("CÓDIGO DE RECUPERAÇÃO PARA " + usuario.getEmail() + ": " + recoveryCode);
             } catch (Exception e) {
                 logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
@@ -192,6 +193,7 @@ public class AuthService {
             }
         } else {
             logger.warn("Tentativa de recuperação de senha para e-mail não existente: {}", email);
+            // Não revelar que o e-mail não existe por segurança — apenas registrar no log
         }
     }
 
