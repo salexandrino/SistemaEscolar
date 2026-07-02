@@ -119,12 +119,12 @@ public class AuthService {
             throw new ValidationException("Senha e confirmação de senha não conferem.");
         }
 
-        if (usuarioRepository.existsByCpf(usuario.getCpf())) {
+        if (usuarioRepository.existsByCpf(usuario.getCpf(), usuario.getTenantId())) {
             logger.warn("Tentativa de registro com CPF duplicado: {}", usuario.getCpfMascarado());
             throw new ConflictException("CPF já cadastrado.");
         }
 
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+        if (usuarioRepository.existsByEmail(usuario.getEmail(), usuario.getTenantId())) {
             logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmailMascarado());
             throw new ConflictException("E-mail já cadastrado.");
         }
@@ -153,7 +153,7 @@ public class AuthService {
         usuario.setCriadoEm(LocalDateTime.now());
         usuario.setAtualizadoEm(LocalDateTime.now());
 
-        usuarioRepository.save(usuario);
+        usuarioRepository.save(usuario, usuario.getTenantId());
         logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
     }
 

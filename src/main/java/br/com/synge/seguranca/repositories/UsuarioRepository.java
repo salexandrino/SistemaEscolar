@@ -34,6 +34,25 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         return Optional.empty();
     }
 
+    // Tenant-aware overloads (use these from Services when tenant is known)
+    public Optional<Usuario> findByCpf(String cpf, UUID tenantId) {
+        String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE cpf = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            stmt.setObject(2, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUsuario(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar usuário por CPF {} e tenant {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
+        }
+        return Optional.empty();
+    }
+
     public Optional<Usuario> findByEmail(String email) {
         String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE email = ?";
         try (Connection conn = getConnection();
@@ -51,6 +70,25 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         return Optional.empty();
     }
 
+    // Tenant-aware overload
+    public Optional<Usuario> findByEmail(String email, UUID tenantId) {
+        String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE email = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setObject(2, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUsuario(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar usuário por email {} e tenant {}: {}", email, tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
+        }
+        return Optional.empty();
+    }
+
     public Optional<Usuario> findById(UUID id) {
         String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE id = ?";
         try (Connection conn = getConnection();
@@ -63,6 +101,25 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             }
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
+        }
+        return Optional.empty();
+    }
+
+    // Tenant-aware overload
+    public Optional<Usuario> findById(UUID id, UUID tenantId) {
+        String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, id);
+            stmt.setObject(2, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUsuario(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar usuário por ID {} e tenant {}: {}", id, tenantId, e.getMessage(), e);
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
@@ -103,6 +160,25 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         return false;
     }
 
+    // Tenant-aware overload
+    public boolean existsByCpf(String cpf, UUID tenantId) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE cpf = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cpf);
+            stmt.setObject(2, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar existência de CPF {} para tenant {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
+        }
+        return false;
+    }
+
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
         try (Connection conn = getConnection();
@@ -114,11 +190,38 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por email.", e);        }
+            logger.error("Erro ao buscar usuário por email.", e);
+            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
+        }
+        return false;
+    }
+
+    // Tenant-aware overload
+    public boolean existsByEmail(String email, UUID tenantId) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE email = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setObject(2, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar usuário por email {} e tenant {}", email, tenantId, e);
+            throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
+        }
         return false;
     }
 
     public void save(Usuario usuario) {
+        // Backwards-compatible: delegate to tenant-aware save using tenantId from entity
+        save(usuario, usuario.getTenantId());
+    }
+
+    // Tenant-aware save (preferred)
+    public void save(Usuario usuario, UUID tenantId) {
         String sql = "INSERT INTO usuario (id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -128,6 +231,9 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             usuario.setAtivo(false); // PENDENTE_APROVACAO
             usuario.setBloqueado(false);
             usuario.setTentativasLogin(0);
+
+            // Ensure tenantId is set on entity
+            usuario.setTenantId(tenantId);
 
             stmt.setObject(1, usuario.getId());
             stmt.setObject(2, usuario.getTenantId());
