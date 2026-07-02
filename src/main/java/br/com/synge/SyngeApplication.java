@@ -29,14 +29,13 @@ public class SyngeApplication {
 
         logger.info("Iniciando SYNGE...");
 
+
         try {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
         } catch (Exception e) {
-            logger.error("Falha ao inicializar banco ou aplicar migrations: {}", e.getMessage(), e);
-            // Não continuar a execução se as migrations ou inicialização do banco falharem
-            throw new RuntimeException("Falha na inicialização do banco de dados.", e);
+            e.printStackTrace();
         }
 
         int port = Integer.parseInt(
