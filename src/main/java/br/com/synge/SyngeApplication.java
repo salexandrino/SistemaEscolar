@@ -86,10 +86,7 @@ public class SyngeApplication {
         });
 
         app.get("/cadastro", ctx -> {
-            Context context = new Context(ctx.req().getLocale());
-            List<Escola> escolas = escolaRepository.findAllAtivas();
-            context.setVariable("escolas", escolas);
-            ctx.html(templateEngine.process("auth/cadastro", context));
+            ctx.result("ok");
         });
 
         // RECUPERAR SENHA (abrir a tela via Thymeleaf mapeada para /esqueci-senha)
