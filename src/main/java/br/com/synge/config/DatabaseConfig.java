@@ -19,29 +19,60 @@ public class DatabaseConfig {
     }
 
     public static void init() {
-        if (dataSource == null) {
-            Dotenv dotenv = Dotenv.load();
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(dotenv.get("DB_URL"));
-            config.setUsername(dotenv.get("DB_USER"));
-            config.setPassword(dotenv.get("DB_PASSWORD"));
-            config.setDriverClassName("org.postgresql.Driver");
-            config.setMaximumPoolSize(10);
-            config.setMinimumIdle(5);
-            config.setConnectionTimeout(30000);
-            config.setIdleTimeout(600000);
-            config.setMaxLifetime(1800000);
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-            try {
-                dataSource = new HikariDataSource(config);
-                logger.info("HikariCP DataSource inicializado.");
-            } catch (Exception e) {
-                logger.error("Erro ao inicializar HikariCP", e);
-                throw e;
-            }
+        if (dataSource != null) {
+            return;
+        }
+
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
+
+        String url = System.getenv("DB_URL");
+        String user = System.getenv("DB_USER");
+        String password = System.getenv("DB_PASSWORD");
+
+        if (url == null || url.isBlank()) {
+            url = dotenv.get("DB_URL");
+        }
+
+        if (user == null || user.isBlank()) {
+            user = dotenv.get("DB_USER");
+        }
+
+        if (password == null || password.isBlank()) {
+            password = dotenv.get("DB_PASSWORD");
+        }
+
+        HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(url);
+        config.setUsername(user);
+        config.setPassword(password);
+
+        config.setDriverClassName("org.postgresql.Driver");
+
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(5);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        try {
+
+            dataSource = new HikariDataSource(config);
+
+            logger.info("HikariCP inicializado com sucesso.");
+
+        } catch (Exception e) {
+
+            logger.error("Erro ao inicializar HikariCP.", e);
+
+            throw e;
         }
     }
 

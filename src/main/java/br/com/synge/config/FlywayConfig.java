@@ -20,13 +20,30 @@ public class FlywayConfig {
         try (Connection connection = DatabaseConfig.getConnection()) {
             // O Flyway precisa de um DataSource para operar.
             // Usamos o DataSource configurado no DatabaseConfig.
-            Dotenv dotenv = Dotenv.load();
+            Dotenv dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+
+            String dbUrl = System.getenv("DB_URL");
+            if (dbUrl == null || dbUrl.isBlank()) {
+                dbUrl = dotenv.get("DB_URL");
+            }
+
+            String dbUser = System.getenv("DB_USER");
+            if (dbUser == null || dbUser.isBlank()) {
+                dbUser = dotenv.get("DB_USER");
+            }
+
+            String dbPassword = System.getenv("DB_PASSWORD");
+            if (dbPassword == null || dbPassword.isBlank()) {
+                dbPassword = dotenv.get("DB_PASSWORD");
+            }
 
             Flyway flyway = Flyway.configure()
                     .dataSource(
-                            dotenv.get("DB_URL"),
-                            dotenv.get("DB_USER"),
-                            dotenv.get("DB_PASSWORD")
+                            dbUrl,
+                            dbUser,
+                            dbPassword
                     )
                     .locations("classpath:db/migration")
                     .load();

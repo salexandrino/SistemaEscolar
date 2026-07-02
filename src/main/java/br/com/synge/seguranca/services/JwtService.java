@@ -24,8 +24,14 @@ public class JwtService {
     private final long jwtExpirationMinutes; // Duração do JWT em minutos
 
     public JwtService() {
-        Dotenv dotenv = Dotenv.load();
-        String secretString = dotenv.get("JWT_SECRET");
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
+
+        String secretString = System.getenv("JWT_SECRET");
+        if (secretString == null || secretString.isBlank()) {
+            secretString = dotenv.get("JWT_SECRET");
+        }
 
         if (secretString == null || secretString.isEmpty()) {
             logger.error("JWT_SECRET não configurado.");
@@ -34,8 +40,11 @@ public class JwtService {
             secretKey = Keys.hmacShaKeyFor(secretString.getBytes());
         }
 
-        this.jwtExpirationMinutes =
-                Long.parseLong(dotenv.get("JWT_EXPIRATION_MINUTES", "1440"));
+        String expirationMinutes = System.getenv("JWT_EXPIRATION_MINUTES");
+        if (expirationMinutes == null || expirationMinutes.isBlank()) {
+            expirationMinutes = dotenv.get("JWT_EXPIRATION_MINUTES", "1440");
+        }
+        this.jwtExpirationMinutes = Long.parseLong(expirationMinutes);
     }
 
     public String gerarToken(UUID userId, UUID tenantId, Perfil perfil, String cpf) {

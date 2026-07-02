@@ -42,11 +42,6 @@
             <artifactId>thymeleaf</artifactId>
             <version>${thymeleaf.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.thymeleaf</groupId>
-            <artifactId>thymeleaf</artifactId>
-            <version>${thymeleaf.version}</version>
-        </dependency>
         <!-- Dotenv para variáveis de ambiente -->
         <dependency>
             <groupId>io.github.cdimascio</groupId>

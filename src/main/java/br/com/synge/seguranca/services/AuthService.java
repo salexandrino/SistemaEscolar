@@ -34,9 +34,21 @@ public class AuthService {
         this.passwordService = passwordService;
         this.jwtService = jwtService;
 
-        Dotenv dotenv = Dotenv.load();
-        this.maxLoginAttempts = Integer.parseInt(dotenv.get("MAX_LOGIN_ATTEMPTS", "5"));
-        this.lockoutDurationMinutes = Long.parseLong(dotenv.get("LOCKOUT_DURATION_MINUTES", "30"));
+        Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
+
+        String maxAttempts = System.getenv("MAX_LOGIN_ATTEMPTS");
+        if (maxAttempts == null || maxAttempts.isBlank()) {
+            maxAttempts = dotenv.get("MAX_LOGIN_ATTEMPTS", "5");
+        }
+        this.maxLoginAttempts = Integer.parseInt(maxAttempts);
+
+        String lockoutMinutes = System.getenv("LOCKOUT_DURATION_MINUTES");
+        if (lockoutMinutes == null || lockoutMinutes.isBlank()) {
+            lockoutMinutes = dotenv.get("LOCKOUT_DURATION_MINUTES", "30");
+        }
+        this.lockoutDurationMinutes = Long.parseLong(lockoutMinutes);
     }
 
     public String autenticar(String cpf, String senha) {
