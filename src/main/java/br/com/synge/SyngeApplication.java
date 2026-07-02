@@ -1,5 +1,4 @@
 package br.com.synge;
-
 import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.repositories.EscolaRepository;
@@ -35,7 +34,9 @@ public class SyngeApplication {
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Falha ao inicializar banco ou aplicar migrations: {}", e.getMessage(), e);
+            // Não continuar a execução se as migrations ou inicialização do banco falharem
+            throw new RuntimeException("Falha na inicialização do banco de dados.", e);
         }
 
         int port = Integer.parseInt(
