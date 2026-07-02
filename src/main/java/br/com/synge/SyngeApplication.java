@@ -7,7 +7,9 @@ import br.com.synge.seguranca.services.JwtService;
 import br.com.synge.config.DatabaseConfig;
 import br.com.synge.config.FlywayConfig;
 import br.com.synge.seguranca.controllers.AuthController;
+import br.com.synge.seguranca.controllers.EscolaController;
 import br.com.synge.seguranca.services.AuthService;
+import br.com.synge.seguranca.services.EscolaService;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.slf4j.Logger;
@@ -56,7 +58,10 @@ public class SyngeApplication {
                 jwtService
         );
 
+        EscolaService escolaService = new EscolaService(escolaRepository);
+
         AuthController authController = new AuthController(authService);
+        EscolaController escolaController = new EscolaController(escolaService);
 
         Javalin app = Javalin.create(config -> config.staticFiles.add(staticFiles -> {
             staticFiles.hostedPath = "/";
@@ -106,6 +111,17 @@ public class SyngeApplication {
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
         app.patch("/users/{id}/approve", authController::approveUser);
+
+        // ROTAS DE ADMINISTRAÇÃO DE ESCOLAS (SUPER_ADMIN ONLY)
+        app.post("/escolas", escolaController::criarEscola);
+        app.patch("/escolas/{id}", escolaController::atualizarEscola);
+        app.get("/escolas", escolaController::listarEscolas);
+        app.get("/escolas/ativas", escolaController::listarEscolasAtivas);
+        app.get("/escolas/inativas", escolaController::listarEscolasInativas);
+        app.get("/escolas/{id}", escolaController::obterEscola);
+        app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
+        app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
+        app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
 
         // Rota protegida para testar autenticação: retorna dados do usuário autenticado
         app.get("/area-logada", ctx -> {
