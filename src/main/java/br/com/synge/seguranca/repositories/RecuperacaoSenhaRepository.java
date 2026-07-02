@@ -1,6 +1,8 @@
 package br.com.synge.seguranca.repositories;
 
 import br.com.synge.config.DatabaseConfig;
+import br.com.synge.seguranca.repositories.base.BaseDAO;
+import br.com.synge.seguranca.repositories.base.DAO;
 import br.com.synge.seguranca.models.RecuperacaoSenha;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +12,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RecuperacaoSenhaRepository {
+public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<RecuperacaoSenha, UUID> {
 
     private static final Logger logger = LoggerFactory.getLogger(RecuperacaoSenhaRepository.class);
 
     public void save(RecuperacaoSenha recuperacaoSenha) {
         String sql = "INSERT INTO recuperacao_senha (id, usuario_id, codigo, expiracao, utilizado, criado_em) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             recuperacaoSenha.setId(UUID.randomUUID());
             recuperacaoSenha.setCriadoEm(LocalDateTime.now());
@@ -38,7 +40,7 @@ public class RecuperacaoSenhaRepository {
 
     public Optional<RecuperacaoSenha> findByCodigoAndUsuarioId(String codigo, UUID usuarioId) {
         String sql = "SELECT id, usuario_id, codigo, expiracao, utilizado, criado_em FROM recuperacao_senha WHERE codigo = ? AND usuario_id = ? AND utilizado = FALSE";
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, codigo);
             stmt.setObject(2, usuarioId);
@@ -55,7 +57,7 @@ public class RecuperacaoSenhaRepository {
 
     public void markAsUsed(UUID id) {
         String sql = "UPDATE recuperacao_senha SET utilizado = TRUE WHERE id = ?";
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setObject(1, id);
             stmt.executeUpdate();
@@ -75,5 +77,20 @@ public class RecuperacaoSenhaRepository {
         recuperacaoSenha.setUtilizado(rs.getBoolean("utilizado"));
         recuperacaoSenha.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
         return recuperacaoSenha;
+    }
+
+    @Override
+    public void update(RecuperacaoSenha entity) {
+        throw new UnsupportedOperationException("Ainda não implementado.");
+    }
+
+    @Override
+    public Optional<RecuperacaoSenha> findById(UUID id) {
+        throw new UnsupportedOperationException("Ainda não implementado.");
+    }
+
+    @Override
+    public java.util.List<RecuperacaoSenha> findAll() {
+        throw new UnsupportedOperationException("Ainda não implementado.");
     }
 }

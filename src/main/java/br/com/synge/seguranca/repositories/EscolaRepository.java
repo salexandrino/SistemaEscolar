@@ -1,6 +1,8 @@
 package br.com.synge.seguranca.repositories;
 
 import br.com.synge.config.DatabaseConfig;
+import br.com.synge.seguranca.repositories.base.BaseDAO;
+import br.com.synge.seguranca.repositories.base.DAO;
 import br.com.synge.seguranca.models.Escola;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class EscolaRepository {
+public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaRepository.class);
 
@@ -23,7 +25,7 @@ public class EscolaRepository {
         String sql = "SELECT id, nome, cnpj, status, criado_em, atualizado_em FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -43,7 +45,7 @@ public class EscolaRepository {
     public Optional<Escola> findById(UUID id) {
         String sql = "SELECT id, nome, cnpj, status, criado_em, atualizado_em FROM escola WHERE id = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setObject(1, id);
@@ -64,7 +66,7 @@ public class EscolaRepository {
     public Optional<Escola> findByCnpj(String cnpj) {
         String sql = "SELECT id, nome, cnpj, status, criado_em, atualizado_em FROM escola WHERE cnpj = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, cnpj);
@@ -85,7 +87,7 @@ public class EscolaRepository {
     public void save(Escola escola) {
         String sql = "INSERT INTO escola (id, nome, cnpj, status, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             escola.setId(UUID.randomUUID());
@@ -116,7 +118,7 @@ public class EscolaRepository {
     public void update(Escola escola) {
         String sql = "UPDATE escola SET nome = ?, cnpj = ?, status = ?, atualizado_em = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConfig.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             escola.setAtualizadoEm(LocalDateTime.now());
@@ -149,5 +151,10 @@ public class EscolaRepository {
         escola.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
 
         return escola;
+    }
+
+    @Override
+    public List<Escola> findAll() {
+        throw new UnsupportedOperationException("Ainda não implementado.");
     }
 }
