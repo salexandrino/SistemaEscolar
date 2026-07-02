@@ -36,6 +36,7 @@ public class AuthController {
     }
 
     public void showLoginPage(Context ctx) {
+        // Mantido por compatibilidade; rota /login agora faz o mesmo (SyngeApplication)
         ctx.render("auth/login.html", Map.of("errorMessage", ctx.sessionAttribute("errorMessage") != null ? ctx.sessionAttribute("errorMessage") : ""));
         ctx.sessionAttribute("errorMessage", null); // Limpa a mensagem após exibir
     }
@@ -88,6 +89,8 @@ public class AuthController {
             usuario.setConfirmacaoSenha(registerDTO.getConfirmacaoSenha()); // Campo temporário para validação
             usuario.setPerfil(registerDTO.getPerfil());
             usuario.setEscolaId(registerDTO.getEscolaId());
+            // tenant_id no banco é NOT NULL; aqui usamos o mesmo valor de escolaId para manter compatibilidade
+            usuario.setTenantId(registerDTO.getEscolaId());
 
             authService.register(usuario);
 

@@ -78,11 +78,8 @@
 
                 <!-- ERRO DO BACKEND -->
 
-                <div th:if="${error}"
-                     class="alert alert-danger">
-
-                    CPF ou senha inválidos.
-
+                <div th:if="${error}" class="alert alert-danger">
+                    <span th:text="${error}">CPF ou senha inválidos.</span>
                 </div>
 
 
@@ -105,10 +102,13 @@
 
                         <input
                                 type="text"
-                                name="cpf"
-                                class="form-control form-control-lg"
-                                placeholder="000.000.000-00"
-                                required>
+                                                        id="cpf"
+                                                        name="cpf"
+                                                        class="form-control form-control-lg"
+                                                        placeholder="000.000.000-00"
+                                                        maxlength="14"
+                                                        inputmode="numeric"
+                                                        required>
 
                         <div class="invalid-feedback">
                             Informe seu CPF.
@@ -190,48 +190,54 @@
 <script>
 
 
-    (() => {
-
-        'use strict'
-
+    document.addEventListener('DOMContentLoaded', () => {
+        const cpfInput = document.getElementById('cpf');
+        if (cpfInput) {
+            cpfInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                let formatted = '';
+                if (value.length > 0) formatted = value.substring(0, 3);
+                if (value.length > 3) formatted += '.' + value.substring(3, 6);
+                if (value.length > 6) formatted += '.' + value.substring(6, 9);
+                if (value.length > 9) formatted += '-' + value.substring(9, 11);
+                e.target.value = formatted;
+            });
+        }
 
         const forms = document.querySelectorAll('.needs-validation')
-
-
         Array.from(forms).forEach(form => {
-
-
             form.addEventListener('submit', event => {
+                const cpfValue = document.getElementById('cpf').value || '';
+                const cpfDigits = cpfValue.replace(/\D/g, '');
+                function isValidCpfNumber(str) {
+                                    return str.length === 11;
+                                }
 
-
-                if(!form.checkValidity()){
-
-
-                    event.preventDefault()
-
-                    event.stopPropagation()
-
-
+                if (cpfDigits.length !== 11) {
+                    // Evita envio e marca invalidez no campo CPF para feedback nativo
+                    document.getElementById('cpf').setCustomValidity('CPF inválido.');
+                    event.preventDefault();
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                } else {
+                    document.getElementById('cpf').setCustomValidity('');
                 }
 
-
+                if(!form.checkValidity()){
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
                 form.classList.add('was-validated')
-
-
             })
-
-
         })
-
-
-    })()
+    });
 
 
 
 </script>
 
-
-
+<div class="text-center mt-4 mb-4 small text-muted">&copy; 2026 SYNGE. Gestão Escolar Inteligente.</div>
 </body>
 
 

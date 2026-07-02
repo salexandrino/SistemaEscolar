@@ -1,21 +1,3 @@
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = themeToggle?.querySelector('i');
-const savedTheme = localStorage.getItem('synge-theme');
-
-function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    if (themeIcon) {
-        themeIcon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
-    }
-}
-
-applyTheme(savedTheme || 'light');
-
-themeToggle?.addEventListener('click', () => {
-    const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    applyTheme(nextTheme);
-    localStorage.setItem('synge-theme', nextTheme);
-});
 
 const counters = document.querySelectorAll('.counter');
 const counterObserver = new IntersectionObserver((entries, observer) => {

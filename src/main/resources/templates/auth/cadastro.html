@@ -44,7 +44,7 @@
             <div class="d-flex flex-column align-items-center">
                 <img th:src="${'/images/logo.png'}" alt="SYNGE Logo" class="img-fluid mb-4" style="max-width: 65%; height: auto;">
 
-                <p class="lead fw-medium px-4 mt-2" style="color: rgba(255,255,255,0.9); font-size: 1.15rem; line-height: 1.6;">
+                <p class="fst-italic login-slogan">
                     "Crie sua conta e experimente a plataforma definitiva para gestão de escolas."
                 </p>
             </div>
@@ -86,7 +86,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label for="cpf" class="form-label fw-bold">CPF <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control rounded-2" id="cpf" name="cpf" placeholder="000.000.000-00" required>
+                            <input type="text" class="form-control rounded-2" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" required>
                         </div>
                         <div class="col-md-6">
                             <label for="telefone" class="form-label fw-bold">Telefone <span class="text-danger">*</span></label>
@@ -99,10 +99,10 @@
                             <label for="perfil" class="form-label fw-bold">Perfil <span class="text-danger">*</span></label>
                             <select class="form-select rounded-2" id="perfil" name="perfil" required>
                                 <option value="" selected disabled>Selecione seu perfil</option>
+                                <option value="SUPER_ADMIN">Super Adm</option>
                                 <option value="GESTOR">Gestor</option>
                                 <option value="SECRETARIA">Secretaria</option>
                                 <option value="PROFESSOR">Professor</option>
-                                <option value="FINANCEIRO">Financeiro</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -138,6 +138,9 @@
                                 </div>
                                 <div class="col-6 d-flex align-items-center">
                                     <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Caractere especial
+                                </div>
+                                <div class="col-6 d-flex align-items-center">
+                                    <i class="bi bi-circle me-1" style="font-size: 0.5rem;"></i> Letra minúscula
                                 </div>
                             </div>
                         </div>
@@ -319,6 +322,11 @@
                 } else {
                     document.getElementById('confirmarSenha').setCustomValidity('');
                 }
+                const senhaRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\|[\]{};:\'",<.>\/?]).{8,64}$/;
+                if (!senhaRegex.test(senha)) {
+                    mostrarAlerta("A senha deve conter de 8 a 64 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial.", "danger");
+                    return;
+                }
 
                 if (!form.checkValidity()) {
                     form.classList.add('was-validated');
@@ -326,6 +334,18 @@
                 }
 
                 // Se o HTML/JS local validou tudo, criamos o objeto para o Back-end
+                // Validação de CPF no front-end (mesma lógica da validação server-side)
+                const cpfValue = document.getElementById('cpf').value || '';
+                const cpfDigits = cpfValue.replace(/\D/g, '');
+                function isValidCpfNumber(str) {
+                                    return str.length === 11;
+                                }
+
+                if (cpfDigits.length !== 11) {
+                    mostrarAlerta('CPF inválido.', 'danger');
+                    return;
+                }
+
                 const dadosCadastro = {
                     nomeCompleto: document.getElementById('nome').value,
                     email: document.getElementById('email').value,
@@ -347,11 +367,11 @@
                         body: JSON.stringify(dadosCadastro)
                     });
 
-                    if (response.ok) {
-                        mostrarAlerta("Cadastro realizado com sucesso! Você será redirecionado para o login.", 'success');
+                    if (response.status === 201) {
+                                            mostrarAlerta("Cadastro concluído e salvo com sucesso no sistema! Sua conta está pendente de aprovação pelo Gestor. Você será redirecionado para a tela de login em 6 segundos...", 'success');
                         setTimeout(() => {
                             window.location.href = "/login";
-                        }, 1800);
+                                            }, 6000);
                     } else {
                         const erro = await response.json();
                         mostrarAlerta(erro.message || "Verifique os dados informados.", 'danger');
@@ -388,6 +408,37 @@
             icone.classList.add('bi-eye-slash');
         }
     }
+</script>
+<script>
+    // Override visual password rules to include lowercase check
+    document.addEventListener('DOMContentLoaded', () => {
+        const senhaInput = document.getElementById('senha');
+        const passwordRuleContainer = document.querySelector('.password-rule');
+        if (!senhaInput || !passwordRuleContainer) return;
+        const ruleElems = Array.from(passwordRuleContainer.querySelectorAll('.col-6.d-flex'));
+        const specialRe = /[!@#$%^&*()\-_=+\|[\]{};:'\",<.>/?]/;
+
+        function updateRules() {
+            const s = senhaInput.value || '';
+            const checks = [s.length >= 8 && s.length <= 64, /\d/.test(s), /[A-Z]/.test(s), /[a-z]/.test(s), specialRe.test(s)];
+            checks.forEach((ok, i) => {
+                const el = ruleElems[i];
+                if (!el) return;
+                const ic = el.querySelector('i');
+                if (ok) {
+                    ic.className = 'bi bi-check-circle-fill me-1 text-success';
+                    el.classList.add('text-success');
+                } else {
+                    ic.className = 'bi bi-circle me-1';
+                    el.classList.remove('text-success');
+                }
+            });
+        }
+
+        senhaInput.addEventListener('input', updateRules);
+        // initialize
+        updateRules();
+    });
 </script>
 </body>
 </html>
