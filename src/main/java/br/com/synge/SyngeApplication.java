@@ -8,8 +8,10 @@ import br.com.synge.config.DatabaseConfig;
 import br.com.synge.config.FlywayConfig;
 import br.com.synge.seguranca.controllers.AuthController;
 import br.com.synge.seguranca.controllers.EscolaController;
+import br.com.synge.seguranca.controllers.UsuarioAdminController;
 import br.com.synge.seguranca.services.AuthService;
 import br.com.synge.seguranca.services.EscolaService;
+import br.com.synge.seguranca.services.UsuarioAdminService;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.slf4j.Logger;
@@ -59,9 +61,11 @@ public class SyngeApplication {
         );
 
         EscolaService escolaService = new EscolaService(escolaRepository);
+        UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
 
         AuthController authController = new AuthController(authService);
         EscolaController escolaController = new EscolaController(escolaService);
+        UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
 
         Javalin app = Javalin.create(config -> config.staticFiles.add(staticFiles -> {
             staticFiles.hostedPath = "/";
@@ -110,7 +114,12 @@ public class SyngeApplication {
         app.post("/auth/register", authController::register);
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
-        app.patch("/users/{id}/approve", authController::approveUser);
+        app.get("/users", usuarioAdminController::listar);
+        app.get("/users/{id}", usuarioAdminController::buscarPorId);
+        app.put("/users/{id}", usuarioAdminController::atualizar);
+        app.delete("/users/{id}", usuarioAdminController::inativar);
+        app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
+        app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
         // ROTAS DE ADMINISTRAÇÃO DE ESCOLAS (SUPER_ADMIN ONLY)
         app.post("/escolas", escolaController::criarEscola);

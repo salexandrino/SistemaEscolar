@@ -10,12 +10,15 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioRepository.class);
+    private static final String SELECT_USUARIO_COLUMNS = "id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at";
 
     public Optional<Usuario> findByCpf(String cpf) {
         String sql = "SELECT id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at FROM usuario WHERE cpf = ?";
@@ -287,6 +290,26 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         }
     }
 
+    public void updateCadastro(Usuario usuario) {
+        String sql = "UPDATE usuario SET escola_id = ?, nome_completo = ?, email = ?, cpf = ?, telefone = ?, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, usuario.getEscolaId());
+            stmt.setString(2, usuario.getNomeCompleto());
+            stmt.setString(3, usuario.getEmail());
+            stmt.setString(4, usuario.getCpf());
+            stmt.setString(5, usuario.getTelefone());
+            stmt.setObject(6, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(7, usuario.getId());
+            stmt.setObject(8, usuario.getTenantId());
+            stmt.executeUpdate();
+            logger.info("Cadastro do usuario atualizado: {}", usuario.getId());
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar cadastro do usuario {}: {}", usuario.getId(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar usuario no banco de dados.", e);
+        }
+    }
+
     public void approve(UUID id, UUID tenantId) {
         String sql = "UPDATE usuario SET ativo = TRUE, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection();
@@ -299,6 +322,51 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         } catch (SQLException e) {
             logger.error("Erro ao aprovar usuário ID {} para tenant ID {}: {}", id, tenantId, e.getMessage(), e);
             throw new RuntimeException("Erro ao aprovar usuário no banco de dados.", e);
+        }
+    }
+
+    public void approve(UUID id) {
+        String sql = "UPDATE usuario SET ativo = TRUE, atualizado_em = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(2, id);
+            stmt.executeUpdate();
+            logger.info("Usuario ID {} aprovado.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao aprovar usuario ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao aprovar usuario no banco de dados.", e);
+        }
+    }
+
+    public void updateProfile(UUID id, UUID tenantId, Perfil perfil) {
+        String sql = "UPDATE usuario SET perfil = ?, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, perfil.name());
+            stmt.setObject(2, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(3, id);
+            stmt.setObject(4, tenantId);
+            stmt.executeUpdate();
+            logger.info("Perfil do usuario ID {} atualizado.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar perfil do usuario ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar perfil do usuario no banco de dados.", e);
+        }
+    }
+
+    public void inactivate(UUID id, UUID tenantId) {
+        String sql = "UPDATE usuario SET ativo = FALSE, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(2, id);
+            stmt.setObject(3, tenantId);
+            stmt.executeUpdate();
+            logger.info("Usuario ID {} inativado.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao inativar usuario ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao inativar usuario no banco de dados.", e);
         }
     }
 
@@ -316,6 +384,40 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             logger.error("Erro ao atualizar senha do usuário ID {} para tenant ID {}: {}", id, tenantId, e.getMessage(), e);
             throw new RuntimeException("Erro ao atualizar senha do usuário no banco de dados.", e);
         }
+    }
+
+    public List<Usuario> findAllUsuarios() {
+        String sql = "SELECT " + SELECT_USUARIO_COLUMNS + " FROM usuario ORDER BY criado_em DESC";
+        List<Usuario> usuarios = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                usuarios.add(mapResultSetToUsuario(rs));
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar usuarios: {}", e.getMessage(), e);
+            throw new RuntimeException("Erro ao listar usuarios no banco de dados.", e);
+        }
+        return usuarios;
+    }
+
+    public List<Usuario> findAllByTenantId(UUID tenantId) {
+        String sql = "SELECT " + SELECT_USUARIO_COLUMNS + " FROM usuario WHERE tenant_id = ? ORDER BY criado_em DESC";
+        List<Usuario> usuarios = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    usuarios.add(mapResultSetToUsuario(rs));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar usuarios do tenant {}: {}", tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao listar usuarios no banco de dados.", e);
+        }
+        return usuarios;
     }
 
     private Usuario mapResultSetToUsuario(ResultSet rs) throws SQLException {
@@ -342,6 +444,6 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
     @Override
     public java.util.List<Usuario> findAll() {
-        throw new UnsupportedOperationException("Ainda não implementado.");
+        return findAllUsuarios();
     }
 }
