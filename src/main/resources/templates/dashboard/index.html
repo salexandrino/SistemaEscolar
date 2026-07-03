@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuários - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <nav class="breadcrumb-admin">
+        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+        <span class="mx-2">></span>
+        <span class="text-muted">Usuários</span>
+    </nav>
+
+    <h1 class="page-title">Usuários</h1>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar por nome, email ou CPF...">
+        </div>
+        <div class="toolbar-buttons">
+            <button class="btn-toolbar">
+                <i class="bi bi-funnel"></i>
+                Filtros
+            </button>
+            <a href="/dashboard/usuarios/novo" class="btn-toolbar primary">
+                <i class="bi bi-person-plus"></i>
+                Novo Usuário
+            </a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>NOME</th>
+                <th>EMAIL</th>
+                <th>ESCOLA</th>
+                <th>PERFIL</th>
+                <th>STATUS</th>
+                <th>APROVADO</th>
+                <th>AÇÕES</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Maria Santos Silva</td>
+                <td>maria.santos@example.com</td>
+                <td>Escola Estadual João</td>
+                <td><span class="badge perfil-badge">GESTOR</span></td>
+                <td><span class="badge status-ativo">ATIVO</span></td>
+                <td><span class="badge aprovado-sim">SIM</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/usuarios/visualizar/1" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/usuarios/editar/1" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="acao-btn" title="Alterar perfil" data-bs-toggle="modal" data-bs-target="#alterarPerfilModal" data-id="1" data-nome="Maria Santos Silva">
+                            <i class="bi bi-person"></i>
+                        </button>
+                        <button class="acao-btn danger" title="Remover" data-bs-toggle="modal" data-bs-target="#removerUsuarioModal" data-id="1" data-nome="Maria Santos Silva">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>João Pedro Oliveira</td>
+                <td>joao.pedro@example.com</td>
+                <td>Escola Municipal Das Flores</td>
+                <td><span class="badge perfil-badge">PROFESSOR</span></td>
+                <td><span class="badge status-ativo">ATIVO</span></td>
+                <td><span class="badge aprovado-sim">SIM</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/usuarios/visualizar/2" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/usuarios/editar/2" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="acao-btn" title="Alterar perfil" data-bs-toggle="modal" data-bs-target="#alterarPerfilModal" data-id="2" data-nome="João Pedro Oliveira">
+                            <i class="bi bi-person"></i>
+                        </button>
+                        <button class="acao-btn danger" title="Remover" data-bs-toggle="modal" data-bs-target="#removerUsuarioModal" data-id="2" data-nome="João Pedro Oliveira">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ana Costa Ribeiro</td>
+                <td>ana.costa@example.com</td>
+                <td>Escola Privada Saber</td>
+                <td><span class="badge perfil-badge">SECRETARIA</span></td>
+                <td><span class="badge status-pendente">PENDENTE</span></td>
+                <td><span class="badge aprovado-nao">NÃO</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/usuarios/visualizar/3" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/usuarios/editar/3" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="acao-btn" title="Aprovar" data-bs-toggle="modal" data-bs-target="#aprovarUsuarioModal" data-id="3" data-nome="Ana Costa Ribeiro">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="acao-btn danger" title="Remover" data-bs-toggle="modal" data-bs-target="#removerUsuarioModal" data-id="3" data-nome="Ana Costa Ribeiro">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Carlos Ferreira</td>
+                <td>carlos.ferreira@example.com</td>
+                <td>Escola Estadual João</td>
+                <td><span class="badge perfil-badge">GESTOR</span></td>
+                <td><span class="badge status-ativo">ATIVO</span></td>
+                <td><span class="badge aprovado-sim">SIM</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/usuarios/visualizar/4" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/usuarios/editar/4" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="acao-btn" title="Alterar perfil" data-bs-toggle="modal" data-bs-target="#alterarPerfilModal" data-id="4" data-nome="Carlos Ferreira">
+                            <i class="bi bi-person"></i>
+                        </button>
+                        <button class="acao-btn danger" title="Remover" data-bs-toggle="modal" data-bs-target="#removerUsuarioModal" data-id="4" data-nome="Carlos Ferreira">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination-footer">
+            <span>Mostrando 1 a 4 de 12 usuários</span>
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Anterior</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+            <select class="form-select" style="width: 80px; height: 36px; font-size: 13px;">
+                <option>4</option>
+                <option>8</option>
+                <option>12</option>
+            </select>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/modals :: modalsFragment}"></div>
+
+</div>
+</body>
+</html>

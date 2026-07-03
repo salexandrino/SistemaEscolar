@@ -76,6 +76,29 @@ public class SyngeApplication {
         // Registra middleware de autenticação (popula AuthUserContext quando há JWT válido)
         app.before(new br.com.synge.seguranca.middlewares.AuthMiddleware(jwtService));
 
+// Registra middlewares de autorização para rotas /dashboard/*
+// Dashboard principal: SUPER_ADMIN e GESTOR
+        app.before("/dashboard", new br.com.synge.seguranca.middlewares.RoleBasedMiddleware(
+                br.com.synge.seguranca.enums.Perfil.SUPER_ADMIN,
+                br.com.synge.seguranca.enums.Perfil.GESTOR
+        ));
+
+        // Usuários: SUPER_ADMIN e GESTOR
+        app.before("/dashboard/usuarios*", new br.com.synge.seguranca.middlewares.RoleBasedMiddleware(
+                br.com.synge.seguranca.enums.Perfil.SUPER_ADMIN,
+                br.com.synge.seguranca.enums.Perfil.GESTOR
+        ));
+
+        // Escolas: apenas SUPER_ADMIN
+        app.before("/dashboard/escolas*", new br.com.synge.seguranca.middlewares.RoleBasedMiddleware(
+                br.com.synge.seguranca.enums.Perfil.SUPER_ADMIN
+        ));
+
+        // Configurações: apenas SUPER_ADMIN
+        app.before("/dashboard/configuracoes*", new br.com.synge.seguranca.middlewares.RoleBasedMiddleware(
+                br.com.synge.seguranca.enums.Perfil.SUPER_ADMIN
+        ));
+
         // HOME
         app.get("/", ctx -> {
             Context context = new Context(ctx.req().getLocale());
@@ -151,6 +174,98 @@ public class SyngeApplication {
             }
         });
 
+        // ROTAS DO PAINEL ADMINISTRATIVO (protegidas por middleware de autenticação + autorização)
+        
+        // Dashboard Principal
+        app.get("/dashboard", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            // TODO: Popular cards com dados reais (total de escolas, usuários, etc.)
+            ctx.html(templateEngine.process("dashboard/index", context));
+        });
+// Listagem de Usuários
+        app.get("/dashboard/usuarios", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser authUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+
+            br.com.synge.seguranca.models.Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
+                    .orElseThrow(() -> new br.com.synge.seguranca.exceptions.NotFoundException("Usuário não encontrado."));
+
+            context.setVariable("currentUser", usuarioCompleto);
+            ctx.html(templateEngine.process("dashboard/usuarios/index", context));
+        });
+        // Novo Usuário
+        app.get("/dashboard/usuarios/novo", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            ctx.html(templateEngine.process("dashboard/usuarios/novo", context));
+        });
+
+        // Editar Usuário - CORRIGIDO
+        app.get("/dashboard/usuarios/editar/{id}", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            String usuarioId = ctx.pathParam("id");
+            context.setVariable("currentUser", currentUser);
+            // TODO: Buscar usuário real por ID e popular formulário
+            context.setVariable("usuarioId", usuarioId);
+            ctx.html(templateEngine.process("dashboard/usuarios/editar", context));
+        });
+
+        // Visualizar Usuário - CORRIGIDO
+        app.get("/dashboard/usuarios/visualizar/{id}", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            String usuarioId = ctx.pathParam("id");
+            context.setVariable("currentUser", currentUser);
+            // TODO: Buscar usuário real por ID
+            context.setVariable("usuarioId", usuarioId);
+            ctx.html(templateEngine.process("dashboard/usuarios/visualizar", context));
+        });
+
+        // Listagem de Escolas
+        app.get("/dashboard/escolas", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser authUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+
+            br.com.synge.seguranca.models.Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
+                    .orElseThrow(() -> new br.com.synge.seguranca.exceptions.NotFoundException("Usuário não encontrado."));
+
+            context.setVariable("currentUser", usuarioCompleto);
+            ctx.html(templateEngine.process("dashboard/escolas/index", context));
+        });
+        // Nova Escola (SUPER_ADMIN only - protegido por middleware)
+        app.get("/dashboard/escolas/nova", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            ctx.html(templateEngine.process("dashboard/escolas/nova", context));
+        });
+
+        // Editar Escola (SUPER_ADMIN only - protegido por middleware) - CORRIGIDO
+        app.get("/dashboard/escolas/editar/{id}", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            String escolaId = ctx.pathParam("id");
+            context.setVariable("currentUser", currentUser);
+            // TODO: Buscar escola real por ID
+            context.setVariable("escolaId", escolaId);
+            ctx.html(templateEngine.process("dashboard/escolas/editar", context));
+        });
+
+        // Visualizar Escola (SUPER_ADMIN only - protegido por middleware) - CORRIGIDO
+        app.get("/dashboard/escolas/visualizar/{id}", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+            String escolaId = ctx.pathParam("id");
+            context.setVariable("currentUser", currentUser);
+            // TODO: Buscar escola real por ID
+            context.setVariable("escolaId", escolaId);
+            ctx.html(templateEngine.process("dashboard/escolas/visualizar", context));
+        });
+
         // PING
         app.get("/ping", ctx ->
                 ctx.json(Map.of(
@@ -159,6 +274,17 @@ public class SyngeApplication {
                         "timestamp", Instant.now().toString()
                 ))
         );
+        // CAPTURA GLOBAL DE EXCEÇÕES (Evita o Server Error 500)
+        app.exception(br.com.synge.seguranca.exceptions.ApiException.class, (e, ctx) -> {
+            ctx.status(e.getStatus());
+            if (ctx.path().startsWith("/dashboard")) {
+                ctx.sessionAttribute("errorMessage", e.getMessage());
+                ctx.redirect("/login");
+            } else {
+                ctx.json(Map.of("message", e.getMessage()));
+            }
+        });
+
 
         app.start(port);
 
