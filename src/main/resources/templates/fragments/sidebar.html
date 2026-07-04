@@ -11,7 +11,7 @@
 
     <ul class="nav nav-pills flex-column mb-auto gap-1">
         <li class="nav-item">
-            <a href="/dashboard" class="nav-link text-white active d-flex align-items-center gap-2 py-2.5 px-3 rounded-3" style="background-color: #198754;">
+            <a href="/dashboard" class="nav-link text-white d-flex align-items-center gap-2 py-2.5 px-3 rounded-3 hover-bg">
                 <i class="bi bi-house-door-fill"></i>
                 <span class="fw-medium">Dashboard</span>
             </a>
@@ -20,37 +20,43 @@
         <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
             Gestão
         </li>
+
         <li>
-            <a href="/dashboard/escolas" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
-                <i class="bi bi-building"></i>
-                <span>Escolas</span>
+            <a class="nav-link text-white d-flex align-items-center justify-content-between py-2 px-3 rounded-3 opacity-85 hover-bg"
+               data-bs-toggle="collapse" href="#menuEscolas" role="button" aria-expanded="false" aria-controls="menuEscolas">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-building"></i>
+                    <span>Escolas</span>
+                </div>
+                <i class="bi bi-chevron-down small"></i>
             </a>
-        </li>
-        <li>
-            <a href="/dashboard/usuarios" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
-                <i class="bi bi-people"></i>
-                <span>Usuários</span>
-            </a>
+            <div class="collapse ps-3 mt-1" id="menuEscolas">
+                <ul class="nav nav-pills flex-column gap-1 border-start border-success-subtle ps-2 small">
+                    <li><a href="/dashboard/escolas/nova" class="nav-link text-white py-1 hover-bg-sub">Cadastrar</a></li>
+                    <li><a href="/dashboard/escolas" class="nav-link text-white py-1 hover-bg-sub">Listar</a></li>
+                    <li><a href="/dashboard/escolas" class="nav-link text-white py-1 hover-bg-sub">Editar</a></li>
+                    <li><a href="/dashboard/escolas" class="nav-link text-white py-1 hover-bg-sub">Visualizar</a></li>
+                </ul>
+            </div>
         </li>
 
-        <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
-            Relatórios
-        </li>
         <li>
-            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
-                <i class="bi bi-bar-chart-line"></i>
-                <span>Relatórios</span>
+            <a class="nav-link text-white d-flex align-items-center justify-content-between py-2 px-3 rounded-3 opacity-85 hover-bg"
+               data-bs-toggle="collapse" href="#menuUsuarios" role="button" aria-expanded="false" aria-controls="menuUsuarios">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-people"></i>
+                    <span>Usuários</span>
+                </div>
+                <i class="bi bi-chevron-down small"></i>
             </a>
-        </li>
-
-        <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
-            Configurações
-        </li>
-        <li>
-            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
-                <i class="bi bi-gear"></i>
-                <span>Configurações</span>
-            </a>
+            <div class="collapse ps-3 mt-1" id="menuUsuarios">
+                <ul class="nav nav-pills flex-column gap-1 border-start border-success-subtle ps-2 small">
+                    <li><a href="/dashboard/usuarios/novo" class="nav-link text-white py-1 hover-bg-sub">Cadastrar</a></li>
+                    <li><a href="/dashboard/usuarios" class="nav-link text-white py-1 hover-bg-sub">Listar</a></li>
+                    <li><a href="/dashboard/usuarios" class="nav-link text-white py-1 hover-bg-sub">Editar</a></li>
+                    <li><a href="/dashboard/usuarios?status=pendente" class="nav-link text-white py-1 hover-bg-sub">Aprovar</a></li>
+                </ul>
+            </div>
         </li>
     </ul>
 
@@ -66,6 +72,11 @@
         .hover-bg:hover {
             background-color: rgba(255, 255, 255, 0.1);
             opacity: 1;
+            transition: all 0.2s ease;
+        }
+        .hover-bg-sub:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
             transition: all 0.2s ease;
         }
         .hover-bg-danger:hover {

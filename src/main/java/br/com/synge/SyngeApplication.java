@@ -1,11 +1,16 @@
 package br.com.synge;
+
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
 import br.com.synge.seguranca.controllers.EscolaDashboardController;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.middlewares.AuthMiddleware;
-import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
+import br.com.synge.seguranca.models.AuthUser;
+import br.com.synge.administrativo.controllers.DashboardController;
+import br.com.synge.administrativo.repositories.DashboardRepository;
+import br.com.synge.administrativo.services.DashboardService;
+import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.models.Usuario;
@@ -38,24 +43,20 @@ import java.util.UUID;
 
 public class SyngeApplication {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(SyngeApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(SyngeApplication.class);
 
     public static void main(String[] args) throws SQLException {
-
         logger.info("Iniciando SYNGE...");
-
 
         try {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
-            // CÓDIGO TEMPORÁRIO 2: GERANDO O HASH USANDO O PASSWORD SERVICE DO PROJETO
+
             try (java.sql.Connection conn = DatabaseConfig.getConnection();
                  java.sql.PreparedStatement stmt = conn.prepareStatement(
                          "UPDATE usuario SET senha_hash = ? WHERE email = ?")) {
 
-                // Deixamos o próprio PasswordService do seu projeto gerar o hash do seu jeito
                 PasswordService ps = new PasswordService();
                 String hashGeradoPeloProjeto = ps.hash("SuperAdmin@123");
 
@@ -73,9 +74,7 @@ public class SyngeApplication {
             e.printStackTrace();
         }
 
-        int port = Integer.parseInt(
-                System.getenv().getOrDefault("PORT", "8080")
-        );
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
         TemplateEngine templateEngine = createTemplateEngine();
         UsuarioRepository usuarioRepository = new UsuarioRepository();
@@ -85,48 +84,25 @@ public class SyngeApplication {
         JwtService jwtService = new JwtService();
 
         DashboardRepository dashboardRepository = new DashboardRepository();
+        DashboardService dashboardService = new DashboardService(dashboardRepository);
+        DashboardController dashboardController = new DashboardController(dashboardService, templateEngine);
 
-        DashboardService dashboardService =
-                new DashboardService(dashboardRepository);
-
-        DashboardController dashboardController =
-                new DashboardController(
-                        dashboardService,
-                        templateEngine
-                );
-
-        AuthService authService = new AuthService(
-                usuarioRepository,
-                escolaRepository,
-                passwordService,
-                jwtService
-        );
-
+        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
         EscolaService escolaService = new EscolaService(escolaRepository);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
 
         AuthController authController = new AuthController(authService);
         EscolaController escolaController = new EscolaController(escolaService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
-        EscolaDashboardController escolaDashboardController =
-                new EscolaDashboardController(
-                        escolaService,
-                        templateEngine
-                );
+
         Javalin app = Javalin.create(config -> config.staticFiles.add(staticFiles -> {
             staticFiles.hostedPath = "/";
             staticFiles.directory = "/public";
             staticFiles.location = Location.CLASSPATH;
         }));
 
-        // Registra middleware de autenticação (popula AuthUserContext quando há JWT válido)
         app.before(new br.com.synge.seguranca.middlewares.AuthMiddleware(jwtService));
 
-// Registra middlewares de autorização para rotas /dashboard/*
-// Dashboard principal: SUPER_ADMIN e GESTOR
-        // app.before(new AuthMiddleware(jwtService));
-
-// app.before("/dashboard*", new SuperAdminMiddleware());
         // HOME
         app.get("/", ctx -> {
             Context context = new Context(ctx.req().getLocale());
@@ -134,52 +110,46 @@ public class SyngeApplication {
             ctx.html(templateEngine.process("home", context));
         });
 
-        // LOGIN (abrir a tela) - lê mensagem de erro da sessão e a repassa ao template como 'error'
+        // LOGIN
         app.get("/login", ctx -> {
             Context context = new Context(ctx.req().getLocale());
             String errorMessage = ctx.sessionAttribute("errorMessage");
             if (errorMessage != null && !errorMessage.isBlank()) {
                 context.setVariable("error", errorMessage);
-                ctx.sessionAttribute("errorMessage", null); // limpa após leitura
+                ctx.sessionAttribute("errorMessage", null);
             }
             ctx.html(templateEngine.process("auth/login", context));
         });
-        // LOGIN DO SUPER ADMIN
+
         app.get("/super-admin/login", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-
             String errorMessage = ctx.sessionAttribute("errorMessage");
-
             if (errorMessage != null && !errorMessage.isBlank()) {
                 context.setVariable("error", errorMessage);
                 ctx.sessionAttribute("errorMessage", null);
             }
-
             ctx.html(templateEngine.process("auth/login-super-admin", context));
         });
 
         app.get("/cadastro", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-
             context.setVariable("escolas", List.of());
-
             ctx.html(templateEngine.process("auth/cadastro", context));
         });
 
-
-        // RECUPERAR SENHA (abrir a tela via Thymeleaf mapeada para /esqueci-senha)
         app.get("/esqueci-senha", ctx -> {
             Context context = new Context(ctx.req().getLocale());
             ctx.html(templateEngine.process("auth/esqueci-senha", context));
         });
 
-        // ROTAS DA AUTENTICAÇÃO (Processamentos POST/PATCH)
+        // POST/PATCH AUTENTICAÇÃO E API
         app.post("/auth/forgot-password", authController::forgotPassword);
         app.post("/auth/login", authController::login);
         app.post("/auth/super-admin/login", authController::superAdminLogin);
         app.post("/auth/register", authController::register);
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
+
         app.get("/users", usuarioAdminController::listar);
         app.get("/users/{id}", usuarioAdminController::buscarPorId);
         app.put("/users/{id}", usuarioAdminController::atualizar);
@@ -187,7 +157,6 @@ public class SyngeApplication {
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
-        // ROTAS DE ADMINISTRAÇÃO DE ESCOLAS (SUPER_ADMIN ONLY)
         app.post("/escolas", escolaController::criarEscola);
         app.patch("/escolas/{id}", escolaController::atualizarEscola);
         app.get("/escolas", escolaController::listarEscolas);
@@ -198,7 +167,6 @@ public class SyngeApplication {
         app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
 
-        // Rota protegida para testar autenticação: retorna dados do usuário autenticado
         app.get("/area-logada", ctx -> {
             try {
                 br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
@@ -217,193 +185,25 @@ public class SyngeApplication {
             }
         });
 
-        // ROTAS DO PAINEL ADMINISTRATIVO (protegidas por middleware de autenticação + autorização)
-        
-        // Dashboard Principal
+        // =================================================================
+        // ROTAS DO PAINEL ADMINISTRATIVO (CENTRALIZADAS NO CONTROLLER)
+        // =================================================================
         app.get("/dashboard", dashboardController::dashboard);
 
-        // Listagem de Usuários
-        app.get("/dashboard/usuarios", ctx -> {
+        // --- GESTÃO DE USUÁRIOS ---
+        app.get("/dashboard/usuarios", dashboardController::usuarios);
+        app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
+        app.get("/dashboard/usuarios/editar", dashboardController::editarUsuario);
+        app.get("/dashboard/usuarios/visualizar", dashboardController::visualizarUsuario);
+
+        // --- GESTÃO DE ESCOLAS ---
+        app.get("/dashboard/escolas", dashboardController::escolas);
+        app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
+        app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
+        app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
+
+        app.get("/teste", ctx -> ctx.result("FUNCIONOU"));
 
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            Usuario currentUser = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", currentUser);
-
-            context.setVariable(
-                    "usuarios",
-                    usuarioAdminService.listarTodos()
-            );
-            System.out.println("Entrou na rota de usuários.");
-
-            System.out.println(currentUser.getNomeCompleto());
-
-            System.out.println(usuarioAdminService.listarTodos());
-
-            ctx.html(
-                    templateEngine.process(
-                            "dashboard/usuarios/index",
-                            context
-                    )
-            );
-
-        });
-        // Novo Usuário
-        app.get("/dashboard/usuarios/novo", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            context.setVariable("currentUser",
-                    AuthUserContext.getAuthUser());
-
-            context.setVariable("escolas",
-                    escolaService.listarTodas(AuthUserContext.getAuthUser()));
-
-            ctx.html(templateEngine.process(
-                    "dashboard/usuarios/novo",
-                    context
-            ));
-
-        });
-
-        // Editar Usuário - CORRIGIDO
-        app.get("/dashboard/usuarios/editar/{id}", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            UUID id = UUID.fromString(ctx.pathParam("id"));
-
-            Usuario usuario = usuarioAdminService.buscarPorId(id, authUser);
-
-            Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", usuarioCompleto);
-            context.setVariable("usuario", usuario);
-
-            ctx.html(templateEngine.process("dashboard/usuarios/editar", context));
-
-        });
-
-        // Visualizar Usuário - CORRIGIDO
-        app.get("/dashboard/usuarios/visualizar/{id}", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            UUID id = UUID.fromString(ctx.pathParam("id"));
-
-            Usuario usuario = usuarioAdminService.buscarPorId(id, authUser);
-
-            Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", usuarioCompleto);
-            context.setVariable("usuario", usuario);
-
-            ctx.html(templateEngine.process("dashboard/usuarios/visualizar", context));
-
-        });
-
-        // Listagem de Escolas
-        app.get("/dashboard/escolas", ctx -> {
-                ctx.result("FUNCIONOU");
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            Usuario currentUser = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", currentUser);
-
-            context.setVariable(
-                    "escolas",
-                    escolaService.listarTodas(authUser)
-            );
-            System.out.println("Entrou na rota de escolas.");
-
-            System.out.println(currentUser.getNomeCompleto());
-
-            System.out.println(escolaService.listarTodas(authUser));
-
-            ctx.html(
-                    templateEngine.process(
-                            "dashboard/escolas/index",
-                            context
-                    )
-            );
-
-        });
-        app.get("/teste", ctx -> {
-            ctx.result("FUNCIONOU");
-        });
-        // Nova Escola (SUPER_ADMIN only - protegido por middleware)
-        app.get("/dashboard/escolas/nova", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", usuarioCompleto);
-
-            ctx.html(templateEngine.process("dashboard/escolas/nova", context));
-
-        });
-
-        // Editar Escola (SUPER_ADMIN only - protegido por middleware) - CORRIGIDO
-        app.get("/dashboard/escolas/editar/{id}", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            UUID id = UUID.fromString(ctx.pathParam("id"));
-
-            Escola escola = escolaService.buscarEscolaPorId(id, authUser);
-
-            Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", usuarioCompleto);
-            context.setVariable("escola", escola);
-
-            ctx.html(templateEngine.process("dashboard/escolas/editar", context));
-
-        });
-
-        // Visualizar Escola (SUPER_ADMIN only - protegido por middleware) - CORRIGIDO
-        app.get("/dashboard/escolas/visualizar/{id}", ctx -> {
-
-            Context context = new Context(ctx.req().getLocale());
-
-            AuthUser authUser = AuthUserContext.getAuthUser();
-
-            UUID id = UUID.fromString(ctx.pathParam("id"));
-
-            Escola escola = escolaService.buscarEscolaPorId(id, authUser);
-
-            Usuario usuarioCompleto = usuarioRepository.findById(authUser.getUserId())
-                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-
-            context.setVariable("currentUser", usuarioCompleto);
-            context.setVariable("escola", escola);
-
-            ctx.html(templateEngine.process("dashboard/escolas/visualizar", context));
-
-        });
-        // PING
         app.get("/ping", ctx ->
                 ctx.json(Map.of(
                         "status", "ok",
@@ -411,7 +211,7 @@ public class SyngeApplication {
                         "timestamp", Instant.now().toString()
                 ))
         );
-        // CAPTURA GLOBAL DE EXCEÇÕES (Evita o Server Error 500)
+
         app.exception(br.com.synge.seguranca.exceptions.ApiException.class, (e, ctx) -> {
             ctx.status(e.getStatus());
             if (ctx.path().startsWith("/dashboard")) {
@@ -422,9 +222,7 @@ public class SyngeApplication {
             }
         });
 
-
         app.start(port);
-
         logger.info("Servidor iniciado na porta {}", port);
     }
 

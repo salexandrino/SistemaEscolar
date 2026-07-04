@@ -183,11 +183,12 @@
 
                     <button
                             type="button"
-                            class="btn btn-danger">
+                            class="btn btn-danger"
+                            onclick="confirmarRemocao()">
 
                         <i class="bi bi-trash"></i>
 
-                        Inativar Usuário
+                        Remover Usuário
 
                     </button>
 
@@ -221,5 +222,27 @@
     </div>
 
 </div>
+
+<script>
+    function confirmarRemocao() {
+        if (confirm('Tem a certeza absoluta de que deseja REMOVER este usuário? Esta ação não pode ser desfeita.')) {
+            // Cria um formulário invisível para disparar o DELETE para o backend
+            const form = document.createElement('form');
+            form.method = 'POST';
+            // Altere para a rota correta que remove o utilizador no seu Javalin (ex: /users/id ou rota de dashboard)
+            form.action = window.location.pathname.replace('/dashboard/usuarios/editar', '/users');
+
+            // Campo oculto para simular o DELETE no Javalin
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
 
 </html>
