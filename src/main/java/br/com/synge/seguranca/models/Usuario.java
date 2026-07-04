@@ -20,21 +20,18 @@ public class Usuario {
 
     private Perfil perfil;
 
-    // Usuário aprovado para acessar o sistema
     private boolean aprovado;
 
-    // Controle de bloqueio
     private LocalDateTime bloqueadoAte;
     private int tentativasLogin;
 
-    // Datas
     private LocalDateTime ultimoLogin;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
-    // Recuperação de senha
     private String resetPasswordToken;
     private LocalDateTime resetPasswordExpiresAt;
+
 
     public Usuario() {
     }
@@ -117,6 +114,17 @@ public class Usuario {
 
     public void setConfirmacaoSenha(String confirmacaoSenha) {
         this.confirmacaoSenha = confirmacaoSenha;
+    }
+    public String getStatus() {
+        return aprovado ? "APROVADO" : "PENDENTE";
+    }
+
+    public String getPerfilDescricao() {
+        return perfil != null ? perfil.name() : "";
+    }
+
+    public boolean isPendente() {
+        return !aprovado;
     }
 
     /* ==========================================================

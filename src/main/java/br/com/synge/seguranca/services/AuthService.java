@@ -9,6 +9,7 @@ import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.utils.ValidationUtil;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,13 @@ public class AuthService {
         usuario.setUltimoLogin(LocalDateTime.now()); // Atualiza último login
         usuarioRepository.update(usuario); // Persiste a atualização do último login
         logger.info("Login bem-sucedido para usuário ID: {}", usuario.getId());
-        return jwtService.gerarToken(usuario.getId(), usuario.getTenantId(), usuario.getPerfil(), usuario.getCpf());
+        return jwtService.gerarToken(
+                usuario.getId(),
+                usuario.getTenantId(),
+                usuario.getEscolaId(),
+                usuario.getPerfil(),
+                usuario.getCpf()
+        );
     }
 
     private void registrarTentativaLoginFalha(Usuario usuario) {
@@ -130,7 +137,7 @@ public class AuthService {
         }
 
         // Perfil
-        if (usuario.getPerfil() == Perfil.SUPER_ADMIN ) {
+        if (usuario.getPerfil() == Perfil.SUPER_ADMIN) {
             throw new AuthorizationException("Não é permitido cadastrar usuários com o perfil " + usuario.getPerfil().name() + " via este endpoint.");
         }
 
@@ -237,4 +244,70 @@ public class AuthService {
 
         logger.info("Senha do usuário {} redefinida com sucesso.", usuario.getEmail());
     }
-}
+
+    public String autenticarSuperAdmin(String email, String senha) {
+
+        logger.info("========== LOGIN SUPER ADMIN ==========");
+        logger.info("Email recebido: {}", email);
+
+        ValidationUtil.validateEmail(email);
+
+
+        System.out.println("================================");
+        System.out.println("LOGIN SUPER ADMIN");
+        System.out.println("Email recebido: " + email);
+
+        Optional<Usuario> optional = usuarioRepository.findSuperAdminByEmail(email);
+
+        System.out.println("Encontrou usuário? " + optional.isPresent());
+
+        if (optional.isEmpty()) {
+            throw new AuthenticationException("Usuário não encontrado.");
+        }
+
+        Usuario usuario = usuarioRepository.findSuperAdminByEmail(email)
+                .orElseThrow(() -> new AuthenticationException("Email ou senha inválidos."));
+        logger.info("Usuário encontrado: {}", usuario.getEmail());
+        logger.info("Perfil encontrado: {}", usuario.getPerfil());
+        System.out.println("ID: " + usuario.getId());
+        System.out.println("EMAIL BANCO: " + usuario.getEmail());
+        System.out.println("PERFIL: " + usuario.getPerfil());
+        System.out.println("ATIVO: " + usuario.isAtivo());
+
+        logger.info("Hash do banco: {}", usuario.getSenhaHash());
+
+        boolean senhaValida = passwordService.verificar(senha, usuario.getSenhaHash());
+
+        logger.info("Senha válida? {}", senhaValida);
+
+        logger.info("Senha recebida: '{}'", senha);
+        logger.info("Tamanho da senha: {}", senha == null ? "null" : senha.length());
+        logger.info("Hash do banco: {}", usuario.getSenhaHash());
+
+        boolean senhaCorreta = passwordService.verificar(senha, usuario.getSenhaHash());
+
+        logger.info("Senha correta? {}", senhaCorreta);
+        System.out.println("Senha digitada = " + senha);
+        System.out.println("Senha correta = " + senhaCorreta);
+        System.out.println("Hash = " + usuario.getSenhaHash());
+        System.out.println("Teste direto = " +
+                BCrypt.checkpw(senha, usuario.getSenhaHash()));
+
+        if (!senhaCorreta) {
+            throw new AuthenticationException("Senha incorreta.");
+        }
+
+
+        System.out.println("LOGIN OK!");
+
+        String token = jwtService.gerarToken(
+                usuario.getId(),
+                null,
+                null,
+                usuario.getPerfil(),
+                usuario.getCpf()
+        );
+
+        return token;
+    }
+    }

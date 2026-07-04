@@ -29,13 +29,8 @@ public class UsuarioAdminService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<Usuario> listar(AuthUser currentUser) {
-        validarUsuarioAutenticado(currentUser);
-        if (isMaster(currentUser)) {
-            return usuarioRepository.findAll();
-        }
-        validarAdministradorEscola(currentUser);
-        return usuarioRepository.findAllByTenantId(currentUser.getTenantId());
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
     }
 
     public Usuario buscarPorId(UUID id, AuthUser currentUser) {
@@ -165,4 +160,6 @@ public class UsuarioAdminService {
     private boolean isMaster(AuthUser currentUser) {
         return currentUser.getPerfil() == Perfil.SUPER_ADMIN;
     }
+
+
 }

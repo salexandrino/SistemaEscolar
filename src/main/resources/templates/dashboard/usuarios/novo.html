@@ -1,104 +1,204 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
-<head>
-    <meta charset="UTF-8">
-    <title>Novo Usuário - SYNGE</title>
-</head>
-<body>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+
 <div th:fragment="content">
 
-    <nav class="breadcrumb-admin">
-        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-admin mb-4">
+        <a href="/dashboard">Dashboard</a>
         <span class="mx-2">></span>
-        <a href="/dashboard/usuarios" class="text-decoration-none" style="color: var(--color-primary);">Usuários</a>
+        <a href="/dashboard/usuarios">Usuários</a>
         <span class="mx-2">></span>
         <span class="text-muted">Novo Usuário</span>
     </nav>
 
-    <h1 class="page-title">Novo Usuário</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div class="form-container bg-white p-4 rounded-3 shadow-sm">
-        <form action="/dashboard/usuarios/salvar" method="POST">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Nome Completo *</label>
-                        <input type="text" class="form-control" name="nomeCompleto" required placeholder="Digite o nome completo">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Email *</label>
-                        <input type="email" class="form-control" name="email" required placeholder="Digite o email">
-                    </div>
-                </div>
-            </div>
+        <h2 class="page-title">
+            <i class="bi bi-person-plus me-2"></i>
+            Novo Usuário
+        </h2>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">CPF *</label>
-                        <input type="text" class="form-control" name="cpf" required placeholder="000.000.000-00">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Telefone</label>
-                        <input type="text" class="form-control" name="telefone" placeholder="(00) 00000-0000">
-                    </div>
-                </div>
-            </div>
+        <a href="/dashboard/usuarios"
+           class="btn btn-secondary">
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Perfil de Acesso *</label>
-                        <select class="form-select" name="perfil" required>
-                            <option value="" disabled selected>Selecione um perfil</option>
-                            <option value="SUPER_ADMIN">Super Admin</option>
+            <i class="bi bi-arrow-left"></i>
+
+            Voltar
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-success text-white">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-person-fill-add"></i>
+
+                Cadastro de Usuário
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form
+                    th:action="@{/auth/register}"
+                    method="post">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Nome Completo
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="nomeCompleto"
+                                required>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                                type="email"
+                                class="form-control"
+                                name="email"
+                                required>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            CPF
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="cpf"
+                                required>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Telefone
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                name="telefone"
+                                required>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Senha
+                        </label>
+
+                        <input
+                                type="password"
+                                class="form-control"
+                                name="senha"
+                                required>
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Perfil
+                        </label>
+
+                        <select
+                                class="form-select"
+                                name="perfil"
+                                required>
+
+                            <option value="">Selecione...</option>
                             <option value="GESTOR">Gestor</option>
+                            <option value="SECRETARIA">Secretaria</option>
                             <option value="PROFESSOR">Professor</option>
-                            <option value="SECRETARIA">Secretária</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Escola *</label>
-                        <select class="form-select" name="escolaId" required>
-                            <option value="" disabled selected>Selecione uma escola</option>
-                            <option value="1">Escola Estadual João</option>
-                            <option value="2">Escola Municipal Das Flores</option>
-                            <option value="3">Escola Privada Saber</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+                            <option value="SUPER_ADMIN">Super Admin</option>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Senha *</label>
-                        <input type="password" class="form-control" name="senha" required placeholder="Digite uma senha">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Confirmar Senha *</label>
-                        <input type="password" class="form-control" name="confirmacaoSenha" required placeholder="Confirme a senha">
-                    </div>
-                </div>
-            </div>
+                        </select>
 
-            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                <a href="/dashboard/usuarios" class="btn btn-outline-secondary px-4">Cancelar</a>
-                <button type="submit" class="btn text-white px-4" style="background-color: var(--color-accent);">
-                    <i class="bi bi-save me-1"></i> Salvar Usuário
-                </button>
-            </div>
-        </form>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Escola
+                        </label>
+
+                        <select
+                                class="form-select"
+                                name="escolaId">
+
+                            <option value="">Selecione uma escola...</option>
+
+                            <option
+                                    th:each="escola : ${escolas}"
+                                    th:value="${escola.id}"
+                                    th:text="${escola.nome}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                            href="/dashboard/usuarios"
+                            class="btn btn-outline-secondary">
+
+                        Cancelar
+
+                    </a>
+
+                    <button
+                            type="submit"
+                            class="btn btn-success">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Cadastrar Usuário
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 
 </div>
-</body>
+
 </html>

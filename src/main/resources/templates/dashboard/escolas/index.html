@@ -1,121 +1,124 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
-<head>
-    <meta charset="UTF-8">
-    <title>Escolas - SYNGE</title>
-</head>
-<body>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+
 <div th:fragment="content">
 
-    <nav class="breadcrumb-admin">
-        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
-        <span class="mx-2">></span>
-        <span class="text-muted">Escolas</span>
-    </nav>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h1 class="page-title">Escolas</h1>
+        <h2>Escolas</h2>
 
-    <div class="toolbar">
-        <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="Buscar por nome ou CNPJ...">
-        </div>
-        <div class="toolbar-buttons">
-            <button class="btn-toolbar">
-                <i class="bi bi-funnel"></i>
-                Filtros
-            </button>
-            <a href="/dashboard/escolas/nova" class="btn-toolbar primary">
-                <i class="bi bi-building-plus"></i>
-                Nova Escola
-            </a>
-        </div>
+        <a href="/dashboard/escolas/nova"
+           class="btn btn-success">
+            <i class="bi bi-building-add"></i>
+            Nova Escola
+        </a>
+
     </div>
 
-    <div class="table-wrapper">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>NOME</th>
-                <th>CNPJ</th>
-                <th>CIDADE/UF</th>
-                <th>RESPONSÁVEL</th>
-                <th>STATUS</th>
-                <th>AÇÕES</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Colégio Estadual Synge</td>
-                <td>12.345.678/0001-90</td>
-                <td>São Paulo - SP</td>
-                <td>Carlos Alberto (Diretor)</td>
-                <td><span class="badge status-ativo">ATIVA</span></td>
-                <td>
-                    <div class="acoes">
-                        <a href="/dashboard/escolas/visualizar/1" class="acao-btn" title="Visualizar">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="/dashboard/escolas/editar/1" class="acao-btn" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Escola Municipal Cecília Meireles</td>
-                <td>98.765.432/0001-10</td>
-                <td>Rio de Janeiro - RJ</td>
-                <td>Ana Maria Silva</td>
-                <td><span class="badge status-ativo">ATIVA</span></td>
-                <td>
-                    <div class="acoes">
-                        <a href="/dashboard/escolas/visualizar/2" class="acao-btn" title="Visualizar">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="/dashboard/escolas/editar/2" class="acao-btn" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Instituto Educacional Saber</td>
-                <td>45.678.901/0002-33</td>
-                <td>Belo Horizonte - MG</td>
-                <td>Roberto Souza</td>
-                <td><span class="badge status-inativo">INATIVA</span></td>
-                <td>
-                    <div class="acoes">
-                        <a href="/dashboard/escolas/visualizar/3" class="acao-btn" title="Visualizar">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                        <a href="/dashboard/escolas/editar/3" class="acao-btn" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="card shadow-sm">
 
-        <div class="pagination-footer">
-            <span>Mostrando 1 a 3 de 3 escolas</span>
-            <nav>
-                <ul class="pagination">
-                    <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#">Próximo</a></li>
-                </ul>
-            </nav>
-            <select class="form-select" style="width: 80px; height: 36px; font-size: 13px;">
-                <option>3</option>
-                <option>6</option>
-                <option>12</option>
-            </select>
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-light">
+
+                <tr>
+
+                    <th>Nome</th>
+                    <th>CNPJ</th>
+                    <th>Cidade</th>
+                    <th>Responsável</th>
+                    <th>Status</th>
+                    <th width="220">Ações</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr th:each="escola : ${escolas}">
+
+                    <td th:text="${escola.nome}">
+                        Nome
+                    </td>
+
+                    <td th:text="${escola.cnpj}">
+                        CNPJ
+                    </td>
+
+                    <td>
+                        <span th:text="${escola.cidade}"></span> /
+                        <span th:text="${escola.estado}"></span>
+                    </td>
+
+                    <td th:text="${escola.nomeResponsavel}">
+                        Responsável
+                    </td>
+
+                    <td>
+
+                        <span
+                                class="badge bg-success"
+                                th:if="${escola.status == 'ATIVA'}">
+
+                            ATIVA
+
+                        </span>
+
+                        <span
+                                class="badge bg-danger"
+                                th:if="${escola.status == 'INATIVA'}">
+
+                            INATIVA
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a
+                                th:href="@{/dashboard/escolas/visualizar/{id}(id=${escola.id})}"
+                                class="btn btn-primary btn-sm">
+
+                            <i class="bi bi-eye"></i>
+
+                        </a>
+
+                        <a
+                                th:href="@{/dashboard/escolas/editar/{id}(id=${escola.id})}"
+                                class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-pencil"></i>
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(escolas)}">
+
+                    <td colspan="6" class="text-center">
+
+                        Nenhuma escola cadastrada.
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
         </div>
+
     </div>
 
 </div>
-</body>
+
 </html>

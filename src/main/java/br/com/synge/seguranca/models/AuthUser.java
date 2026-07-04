@@ -5,13 +5,19 @@ import br.com.synge.seguranca.enums.Perfil;
 import java.util.UUID;
 
 public class AuthUser {
+
     private UUID userId;
     private UUID tenantId;
-    private UUID escolaId; // Já existe, apenas confirmando
+    private UUID escolaId;
     private Perfil perfil;
     private String cpf;
 
-    public AuthUser(UUID userId, UUID tenantId, Perfil perfil, String cpf) { // Construtor atualizado
+    public AuthUser(UUID userId,
+                    UUID tenantId,
+                    UUID escolaId,
+                    Perfil perfil,
+                    String cpf) {
+
         this.userId = userId;
         this.tenantId = tenantId;
         this.escolaId = escolaId;
@@ -40,6 +46,6 @@ public class AuthUser {
     }
 
     public boolean hasPermission(String permission) {
-        return this.perfil.hasPermission(permission);
+        return perfil.hasPermission(permission);
     }
 }

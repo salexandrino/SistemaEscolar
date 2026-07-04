@@ -205,4 +205,14 @@ public class Escola {
     public void setAtualizadoEm(LocalDateTime atualizadoEm) {
         this.atualizadoEm = atualizadoEm;
     }
+    public boolean isAtiva() {
+        return "ATIVA".equalsIgnoreCase(status);
+    }
+
+    public boolean isInativa() {
+        return "INATIVA".equalsIgnoreCase(status);
+    }
+    public String getStatusDescricao() {
+        return status;
+    }
 }

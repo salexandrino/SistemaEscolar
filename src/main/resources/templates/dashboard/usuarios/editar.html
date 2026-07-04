@@ -1,94 +1,225 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Usuário - SYNGE</title>
-</head>
-<body>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+
 <div th:fragment="content">
 
-    <nav class="breadcrumb-admin">
-        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-admin mb-4">
+        <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
-        <a href="/dashboard/usuarios" class="text-decoration-none" style="color: var(--color-primary);">Usuários</a>
+
+        <a href="/dashboard/usuarios" class="text-decoration-none">
+            Usuários
+        </a>
+
         <span class="mx-2">></span>
+
         <span class="text-muted">Editar Usuário</span>
     </nav>
 
-    <h1 class="page-title">Editar Usuário</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div class="form-container bg-white p-4 rounded-3 shadow-sm">
-        <form th:action="@{/dashboard/usuarios/atualizar/{id}(id=${usuario.id})}" method="POST">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Nome Completo *</label>
-                        <input type="text" class="form-control" name="nomeCompleto" th:value="${usuario.nomeCompleto}" required placeholder="Digite o nome completo">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Email *</label>
-                        <input type="email" class="form-control" name="email" th:value="${usuario.email}" required placeholder="Digite o email">
-                    </div>
-                </div>
-            </div>
+        <div>
+            <h2 class="page-title mb-1">
+                <i class="bi bi-pencil-square text-warning"></i>
+                Editar Usuário
+            </h2>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">CPF *</label>
-                        <input type="text" class="form-control" name="cpf" th:value="${usuario.cpf}" required placeholder="000.000.000-00">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Telefone</label>
-                        <input type="text" class="form-control" name="telefone" th:value="${usuario.telefone}" placeholder="(00) 00000-0000">
-                    </div>
-                </div>
-            </div>
+            <p class="text-muted">
+                Atualize as informações do usuário.
+            </p>
+        </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Perfil de Acesso *</label>
-                        <select class="form-select" name="perfil" required>
-                            <option value="SUPER_ADMIN" th:selected="${usuario.perfil.name() == 'SUPER_ADMIN'}">Super Admin</option>
-                            <option value="GESTOR" th:selected="${usuario.perfil.name() == 'GESTOR'}">Gestor</option>
-                            <option value="PROFESSOR" th:selected="${usuario.perfil.name() == 'PROFESSOR'}">Professor</option>
-                            <option value="SECRETARIA" th:selected="${usuario.perfil.name() == 'SECRETARIA'}">Secretária</option>
+        <a href="/dashboard/usuarios"
+           class="btn btn-outline-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+            Voltar
+
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <form>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Nome Completo
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="Maria Santos Silva">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input
+                                type="email"
+                                class="form-control"
+                                value="maria@email.com">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            CPF
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="123.456.789-00">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Telefone
+                        </label>
+
+                        <input
+                                type="text"
+                                class="form-control"
+                                value="(11)99999-9999">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Escola
+                        </label>
+
+                        <select class="form-select">
+                            <option>Colégio SYNGE</option>
+                            <option selected>Escola Estadual João</option>
+                            <option>Escola Primavera</option>
                         </select>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-semibold small">Escola</label>
-                        <input type="text" class="form-control" th:value="${escolaNome}" disabled>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Perfil
+                        </label>
+
+                        <select class="form-select">
+                            <option>SUPER_ADMIN</option>
+                            <option selected>GESTOR</option>
+                            <option>SECRETARIA</option>
+                            <option>PROFESSOR</option>
+                        </select>
                     </div>
-                </div>
-            </div>
 
-            <div class="metadata-row d-flex gap-4 p-3 bg-light rounded mb-4" style="font-size: 13px; color: #666;">
-                <div class="metadata-item">
-                    <span class="fw-semibold">Cadastrado em:</span>
-                    <span th:text="${#temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')}">10/01/2024 às 14:30</span>
-                </div>
-                <div class="metadata-item" th:if="${usuario.atualizadoEm != null}">
-                    <span class="fw-semibold">Última atualização:</span>
-                    <span th:text="${#temporals.format(usuario.atualizadoEm, 'dd/MM/yyyy HH:mm')}">15/01/2024 às 09:15</span>
-                </div>
-            </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Status
+                        </label>
 
-            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                <a href="/dashboard/usuarios" class="btn btn-outline-secondary px-4">Cancelar</a>
-                <button type="submit" class="btn text-white px-4" style="background-color: var(--color-accent);">
-                    <i class="bi bi-check-lg me-1"></i> Atualizar Usuário
-                </button>
-            </div>
-        </form>
+                        <select class="form-select">
+                            <option selected>ATIVO</option>
+                            <option>INATIVO</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">
+                            Aprovação
+                        </label>
+
+                        <select class="form-select">
+                            <option selected>APROVADO</option>
+                            <option>PENDENTE</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Nova Senha
+                        </label>
+
+                        <input
+                                type="password"
+                                class="form-control"
+                                placeholder="Deixe vazio para não alterar">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Confirmar Nova Senha
+                        </label>
+
+                        <input
+                                type="password"
+                                class="form-control"
+                                placeholder="********">
+                    </div>
+
+                    <div class="col-12 mb-3">
+
+                        <label class="form-label">
+                            Observações
+                        </label>
+
+                        <textarea
+                                rows="4"
+                                class="form-control">Usuário cadastrado pelo Super Administrador.</textarea>
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+
+                    <button
+                            type="button"
+                            class="btn btn-danger">
+
+                        <i class="bi bi-trash"></i>
+
+                        Inativar Usuário
+
+                    </button>
+
+                    <div class="d-flex gap-2">
+
+                        <a href="/dashboard/usuarios"
+                           class="btn btn-secondary">
+
+                            Cancelar
+
+                        </a>
+
+                        <button
+                                type="submit"
+                                class="btn btn-warning">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Salvar Alterações
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 
 </div>
-</body>
+
 </html>

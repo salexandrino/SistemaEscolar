@@ -19,9 +19,11 @@
                 <li class="nav-item"><a class="nav-link" th:href="${'/#contato'}">Contato</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <a href="/dashboard/escolas" class="btn btn-dark px-3 fw-medium"
+                <a th:href="${'/super-admin/login'}"
+                   class="btn btn-dark px-3 fw-medium"
                    style="border-radius: 8px; height: 38px; display: inline-flex; align-items: center; font-size: 14px;">
-                    <i class="bi bi-shield-lock me-1"></i> Painel SuperAdm
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Painel SuperAdm
                 </a>
 
                 <a class="btn btn-outline-dark" th:href="${'/login'}"
@@ -86,7 +88,7 @@
             <!-- Avatar + Nome + Perfil + Dropdown -->
             <div class="dropdown d-flex align-items-center gap-2" style="cursor: pointer;">
                 <div class="rounded-circle bg-secondary" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span th:text="${#strings.abbreviate(currentUser?.getNomeCompleto() ?: 'U', 1)}">U</span>
+                    <span th:text="${currentUser != null and currentUser.nomeCompleto != null ? #strings.substring(currentUser.nomeCompleto, 0, 1) : 'U'}">U</span>
                 </div>
                 <div class="d-none d-md-block" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                     <div class="fw-bold text-white m-0" style="font-size: 13px;" th:text="${currentUser?.getNomeCompleto() ?: 'Usuário'}">Usuário</div>

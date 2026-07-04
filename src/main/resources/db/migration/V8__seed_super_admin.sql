@@ -25,7 +25,7 @@ SELECT
     '000.000.000-00',
     'synge.gestao@gmail.com',
     '(00)00000-0000',
-    '$2a$10$aFKSFPa9iSwzo1uxS/zHWOrjaay/9htx9RLxRhNwUVU4JKJilpagy',
+    '$2a$10$msYsuhuC7CWfiggSVMwdMugr0DL.sgwHC8WrDiD4zLh/RdA3cqj3y',
     'SUPER_ADMIN',
     TRUE,
     TRUE,

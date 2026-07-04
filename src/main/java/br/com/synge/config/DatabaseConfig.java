@@ -1,5 +1,6 @@
 package br.com.synge.config;
 
+import br.com.synge.administrativo.repositories.DashboardRepository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -14,7 +15,7 @@ public class DatabaseConfig {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);
     private static HikariDataSource dataSource;
 
-    private DatabaseConfig() {
+    private DatabaseConfig() throws SQLException {
         // Construtor privado para evitar instanciação
     }
 
@@ -89,4 +90,5 @@ public class DatabaseConfig {
             logger.info("HikariCP DataSource fechado.");
         }
     }
+
 }

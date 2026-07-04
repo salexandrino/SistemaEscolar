@@ -33,7 +33,7 @@ public class UsuarioAdminController {
     public void listar(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();
-            var usuarios = usuarioAdminService.listar(currentUser);
+            var usuarios = usuarioAdminService.listarTodos();
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("total", usuarios.size());
             response.put("usuarios", usuarios.stream().map(this::usuarioToMap).toList());

@@ -75,6 +75,29 @@ public class AuthController {
         ctx.redirect("/login");
         logger.info("Usuário deslogado.");
     }
+    public void superAdminLogin(Context ctx) {
+
+        try {
+
+            String email = ctx.formParam("email");
+            String senha = ctx.formParam("password");
+
+            String jwt = authService.autenticarSuperAdmin(email, senha);
+
+            CookieUtil.addJwtCookie(ctx, jwt);
+
+            ctx.redirect("/dashboard");
+
+        } catch (Exception e) {
+
+            e.printStackTrace(); // <<< ADICIONE ESTA LINHA
+
+            ctx.sessionAttribute("errorMessage", e.getMessage());
+
+            ctx.redirect("/super-admin/login");
+        }
+
+    }
 
     public void register(Context ctx) {
         try {

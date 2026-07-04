@@ -1,81 +1,145 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
-<head>
-    <meta charset="UTF-8">
-    <title>Visualizar Escola - SYNGE</title>
-</head>
-<body>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+    <span th:text="${escola.nome}"></span>
+
+    <span th:text="${escola.cnpj}"></span>
+
+    <span th:text="${escola.emailInstitucional}"></span>
+
+    <span th:text="${escola.status}"></span>
 <div th:fragment="content">
 
-    <nav class="breadcrumb-admin">
-        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-admin mb-4">
+        <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
-        <a href="/dashboard/escolas" class="text-decoration-none" style="color: var(--color-primary);">Escolas</a>
+
+        <a href="/dashboard/escolas" class="text-decoration-none">
+            Escolas
+        </a>
+
         <span class="mx-2">></span>
-        <span class="text-muted">Visualizar Escola</span>
+
+        <span class="text-muted">Visualizar</span>
     </nav>
 
-    <h1 class="page-title">Visualizar Escola</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title mb-0">
+            <i class="bi bi-building me-2"></i>
+            Visualizar Escola
+        </h2>
 
-    <div class="form-container bg-white p-4 rounded-3 shadow-sm">
+        <div>
+            <a href="/dashboard/escolas"
+               class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Voltar
+            </a>
 
-        <h5 class="fw-bold mb-3" style="color: var(--color-primary);">Dados da Instituição</h5>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small text-muted">Nome da Escola</label>
-                <div class="form-value p-2 bg-light rounded fw-semibold text-dark" th:text="${escola.nome}">Colégio Estadual Synge</div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small text-muted">CNPJ</label>
-                <div class="form-value p-2 bg-light rounded text-dark" th:text="${escola.cnpj}">12.345.678/0001-90</div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small text-muted">Email Institucional</label>
-                <div class="form-value p-2 bg-light rounded text-dark" th:text="${escola.emailInstitucional}">escola@synge.com</div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label fw-semibold small text-muted">Telefone</label>
-                <div class="form-value p-2 bg-light rounded text-dark" th:text="${escola.telefone}">(11) 5555-1234</div>
-            </div>
-        </div>
-
-        <h5 class="fw-bold mt-4 mb-3" style="color: var(--color-primary);">Localização e Gestão</h5>
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold small text-muted">Cidade / UF</label>
-                <div class="form-value p-2 bg-light rounded text-dark" th:text="${escola.cidade + ' - ' + school.estado}">São Paulo - SP</div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold small text-muted">Responsável</label>
-                <div class="form-value p-2 bg-light rounded text-dark" th:text="${escola.nomeResponsavel}">Carlos Alberto</div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label fw-semibold small text-muted">Status</label>
-                <div>
-                    <span class="badge status-ativo px-3 py-2 text-uppercase" th:text="${escola.status}">ATIVA</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="metadata-row d-flex gap-4 p-3 bg-light rounded mb-4" style="font-size: 13px; color: #666;">
-            <div class="metadata-item">
-                <span class="fw-semibold">Cadastrado em:</span>
-                <span th:text="${#temporals.format(escola.criadoEm, 'dd/MM/yyyy HH:mm')}">05/01/2024 às 10:00</span>
-            </div>
-            <div class="metadata-item" th:if="${escola.atualizadoEm != null}">
-                <span class="fw-semibold">Última atualização:</span>
-                <span th:text="${#temporals.format(escola.atualizadoEm, 'dd/MM/yyyy HH:mm')}">15/01/2024 às 09:15</span>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-end pt-3 border-top">
-            <a href="/dashboard/escolas" class="btn btn-secondary px-4">Voltar para a Listagem</a>
+            <a href="/dashboard/escolas/editar/1"
+               class="btn btn-warning">
+                <i class="bi bi-pencil"></i>
+                Editar
+            </a>
         </div>
     </div>
 
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                Dados da Escola
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Nome</label>
+
+                    <div class="form-control bg-light">
+                        Colégio Estadual SYNGE
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">CNPJ</label>
+
+                    <div class="form-control bg-light">
+                        12.345.678/0001-90
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Email</label>
+
+                    <div class="form-control bg-light">
+                        contato@synge.com.br
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Telefone</label>
+
+                    <div class="form-control bg-light">
+                        (11) 99999-9999
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="fw-bold">Cidade</label>
+
+                    <div class="form-control bg-light">
+                        São Paulo
+                    </div>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label class="fw-bold">UF</label>
+
+                    <div class="form-control bg-light">
+                        SP
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Responsável</label>
+
+                    <div class="form-control bg-light">
+                        Carlos Alberto
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Status</label>
+
+                    <div class="form-control bg-light">
+
+                        <span class="badge bg-success fs-6">
+                            ATIVA
+                        </span>
+
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="fw-bold">Data de Cadastro</label>
+
+                    <div class="form-control bg-light">
+                        10/05/2026
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
-</body>
+
 </html>

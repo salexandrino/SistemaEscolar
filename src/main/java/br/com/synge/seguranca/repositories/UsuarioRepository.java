@@ -441,6 +441,35 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         usuario.setResetPasswordExpiresAt(rs.getObject("reset_password_expires_at", LocalDateTime.class));
         return usuario;
     }
+    public Optional<Usuario> findSuperAdminByEmail(String email) {
+
+        String sql = """
+        SELECT *
+        FROM usuario
+        WHERE email = ?
+        AND perfil = 'SUPER_ADMIN'
+    """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUsuario(rs));
+                }
+
+            }
+
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar Super Admin por email.", e);
+            throw new RuntimeException(e);
+        }
+
+        return Optional.empty();
+    }
 
     @Override
     public java.util.List<Usuario> findAll() {

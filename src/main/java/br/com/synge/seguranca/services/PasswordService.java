@@ -25,6 +25,14 @@ public class PasswordService {
     }
 
     public boolean verificar(String senha, String senhaHash) {
-        return BCrypt.checkpw(senha, senhaHash);
-    }
-}
+
+        logger.info("=== PASSWORD SERVICE ===");
+        logger.info("Senha recebida: '{}'", senha);
+        logger.info("Hash recebido: {}", senhaHash);
+
+        boolean resultado = BCrypt.checkpw(senha, senhaHash);
+
+        logger.info("Resultado BCrypt: {}", resultado);
+
+        return resultado;
+    }}
