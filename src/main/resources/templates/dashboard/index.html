@@ -6,41 +6,185 @@
 <body>
 
 <div th:fragment="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="h2 mb-4">Painel Super Admin</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Olá, SUPER_ADMIN! 👋</h2>
+            <p class="text-muted small mb-0">Bem-vindo ao painel administrativo do Synge.</p>
+        </div>
+        <div class="text-end bg-white p-2 rounded shadow-sm border small">
+            <i class="bi bi-calendar3 text-success me-1"></i>
+            <span class="fw-semibold text-dark">Data Atual: </span>
+            <span class="text-muted" th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">04/07/2026</span>
+        </div>
+    </div>
 
-                <div class="row g-4 mb-4">
-                    <div class="col-md-3">
-                        <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
-                            <span class="text-muted small">Total de Escolas</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.totalEscolas : 0}">0</h3>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
-                            <span class="text-muted small">Escolas Ativas</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.escolasAtivas : 0}">0</h3>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
-                            <span class="text-muted small">Total de Usuários</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.totalUsuarios : 0}">0</h3>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
-                            <span class="text-muted small">Usuários Pendentes</span>
-                            <h3 class="fw-bold text-warning mt-1" th:text="${dashboard != null ? dashboard.usuariosPendentes : 0}">0</h3>
-                        </div>
-                    </div>
-                </div>
-
+    <div class="row g-3 mb-4">
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
+                <div class="text-success mb-2"><i class="bi bi-building h3"></i></div>
+                <span class="text-muted small d-block">Total de Escolas</span>
+                <h3 class="fw-bold text-dark mt-1" th:text="${dashboard != null ? dashboard.totalEscolas : 0}">0</h3>
+                <a href="/dashboard/escolas" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
+                <div class="text-success mb-2"><i class="bi bi-check-circle-fill h3"></i></div>
+                <span class="text-muted small d-block">Escolas Ativas</span>
+                <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.escolasAtivas : 0}">0</h3>
+                <a href="/dashboard/escolas?status=ativa" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
+                <div class="text-danger mb-2"><i class="bi bi-x-circle-fill h3"></i></div>
+                <span class="text-muted small d-block">Escolas Inativas</span>
+                <h3 class="fw-bold text-danger mt-1">0</h3>
+                <a href="/dashboard/escolas?status=inativa" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
+                <div class="text-success mb-2"><i class="bi bi-people-fill h3"></i></div>
+                <span class="text-muted small d-block">Usuários Cadastrados</span>
+                <h3 class="fw-bold text-dark mt-1" th:text="${dashboard != null ? dashboard.totalUsuarios : 0}">0</h3>
+                <a href="/dashboard/usuarios" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todos &rarr;</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
+                <div class="text-warning mb-2"><i class="bi bi-clock-history h3"></i></div>
+                <span class="text-muted small d-block">Usuários Pendentes</span>
+                <h3 class="fw-bold text-warning mt-1" th:text="${dashboard != null ? dashboard.usuariosPendentes : 0}">0</h3>
+                <a href="/dashboard/usuarios?status=pendente" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todos &rarr;</a>
             </div>
         </div>
     </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
+                <h5 class="fw-bold text-dark mb-1">Resumo Geral</h5>
+                <p class="text-muted small mb-3">Visão geral do sistema</p>
+                <div style="height: 250px;">
+                    <canvas id="chartResumoGeral"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
+                <h5 class="fw-bold text-dark mb-3">Distribuição de Usuários por Perfil</h5>
+                <div style="height: 230px;" class="d-flex justify-content-center">
+                    <canvas id="chartPerfilUsuarios"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
+                <h5 class="fw-bold text-dark mb-3">Ações Rápidas</h5>
+                <div class="row g-2 text-center">
+                    <div class="col-3">
+                        <a href="/dashboard/escolas/nova" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
+                            <i class="bi bi-plus-circle-fill text-success h3 mb-2"></i>
+                            <span class="small fw-semibold d-block">Nova Escola</span>
+                        </a>
+                    </div>
+                    <div class="col-3">
+                        <a href="/dashboard/usuarios" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
+                            <i class="bi bi-person-gear text-success h3 mb-2"></i>
+                            <span class="small fw-semibold d-block">Gerenciar Usuários</span>
+                        </a>
+                    </div>
+                    <div class="col-3">
+                        <a href="#" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
+                            <i class="bi bi-bar-chart-line-fill text-success h3 mb-2"></i>
+                            <span class="small fw-semibold d-block">Relatórios</span>
+                        </a>
+                    </div>
+                    <div class="col-3">
+                        <a href="#" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
+                            <i class="bi bi-shield-check text-success h3 mb-2"></i>
+                            <span class="small fw-semibold d-block">Auditoria</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
+                <h5 class="fw-bold text-dark mb-3">Atividades Recentes</h5>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-center justify-content-between border-bottom pb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-circle me-3 text-success"><i class="bi bi-building"></i></div>
+                            <div>
+                                <p class="mb-0 small fw-semibold text-dark">Escola "Colégio Exemplo" foi ativada</p>
+                                <span class="text-muted small">por SUPER_ADMIN</span>
+                            </div>
+                        </div>
+                        <span class="text-muted small">Hoje, 10:10</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between border-bottom pb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-circle me-3 text-success"><i class="bi bi-person-plus"></i></div>
+                            <div>
+                                <p class="mb-0 small fw-semibold text-dark">Novo usuário "João Silva" cadastrado</p>
+                                <span class="text-muted small">por GESTOR da Escola A</span>
+                            </div>
+                        </div>
+                        <span class="text-muted small">Hoje, 09:45</span>
+                    </div>
+                </div>
+                <a href="#" class="text-success small text-decoration-none mt-3 d-inline-block">Ver todas as atividades &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Gráfico de Linha (Resumo Geral)
+        const ctxResumo = document.getElementById('chartResumoGeral').getContext('2d');
+        new Chart(ctxResumo, {
+            type: 'line',
+            data: {
+                labels: ['Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
+                datasets: [{
+                    label: 'Usuários cadastrados',
+                    data: [65, 105, 120, 140, 150, 165],
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Novos usuários (mês)',
+                    data: [15, 22, 28, 30, 42, 50],
+                    borderColor: '#a3cfbb',
+                    backgroundColor: 'transparent',
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Gráfico de Rosca (Perfis)
+        const ctxPerfil = document.getElementById('chartPerfilUsuarios').getContext('2d');
+        new Chart(ctxPerfil, {
+            type: 'doughnut',
+            data: {
+                labels: ['SUPER_ADMIN', 'GESTOR', 'SECRETARIO', 'PROFESSOR', 'ALUNO'],
+                datasets: [{
+                    data: [2, 15, 21, 68, 50],
+                    backgroundColor: ['#0a4b29', '#198754', '#479f76', '#75b798', '#a3cfbb']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
 </div>
 
 </body>

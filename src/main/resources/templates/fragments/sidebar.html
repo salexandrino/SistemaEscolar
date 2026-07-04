@@ -1,36 +1,77 @@
-<!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="sidebarFragment" class="bg-primary border-right" id="sidebar-wrapper">
-    <div class="sidebar-heading text-white py-4 px-4">SYNGE</div>
-    <div class="list-group list-group-flush">
-        <a href="#academicoSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-graduation-cap me-2"></i> Gestão Acadêmica
-        </a>
-        <div class="collapse list-group-item-action bg-primary" id="academicoSubmenu">
-            <a href="/academico/anos-letivos" class="list-group-item list-group-item-action bg-primary text-white ps-5">Anos Letivos</a>
-            <a href="/academico/turmas" class="list-group-item list-group-item-action bg-primary text-white ps-5">Turmas/Séries</a>
-            <a href="/academico/alunos" class="list-group-item list-group-item-action bg-primary text-white ps-5">Alunos</a>
-            <a href="/academico/notas" class="list-group-item list-group-item-action bg-primary text-white ps-5">Notas</a>
+<div th:fragment="sidebarFragment" class="d-flex flex-column h-100 p-3 text-white" style="background-color: #064e26;">
+    <div class="d-flex align-items-center mb-4 px-2">
+        <div class="bg-white rounded p-1 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <span class="fw-bold text-success h4 mb-0">S</span>
         </div>
-
-        <a href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-dollar-sign me-2"></i> Gestão Financeira
-        </a>
-        <div class="collapse list-group-item-action bg-primary" id="financeiroSubmenu">
-            <a href="/financeiro/mensalidades" class="list-group-item list-group-item-action bg-primary text-white ps-5">Mensalidades</a>
-            <a href="/financeiro/taxas" class="list-group-item list-group-item-action bg-primary text-white ps-5">Taxas Avulsas</a>
-            <a href="/financeiro/fluxo-caixa" class="list-group-item list-group-item-action bg-primary text-white ps-5">Fluxo de Caixa</a>
-        </div>
-
-        <a href="#administracaoSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action bg-primary text-white">
-            <i class="fas fa-cogs me-2"></i> Administração
-        </a>
-        <div class="collapse list-group-item-action bg-primary" id="administracaoSubmenu">
-            <a href="/admin/usuarios" class="list-group-item list-group-item-action bg-primary text-white ps-5">Cadastro de Usuários</a>
-            <a href="/admin/configuracoes" class="list-group-item list-group-item-action bg-primary text-white ps-5">Configurações</a>
+        <div>
+            <h4 class="fw-bold mb-0 tracking-wide text-white">SYNGE</h4>
+            <small style="font-size: 0.65rem; color: #a3cfbb; letter-spacing: 0.5px;" class="text-uppercase d-block">Gestão Educacional</small>
         </div>
     </div>
+
+    <ul class="nav nav-pills flex-column mb-auto gap-1">
+        <li class="nav-item">
+            <a href="/dashboard" class="nav-link text-white active d-flex align-items-center gap-2 py-2.5 px-3 rounded-3" style="background-color: #198754;">
+                <i class="bi bi-house-door-fill"></i>
+                <span class="fw-medium">Dashboard</span>
+            </a>
+        </li>
+
+        <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
+            Gestão
+        </li>
+        <li>
+            <a href="/dashboard/escolas" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
+                <i class="bi bi-building"></i>
+                <span>Escolas</span>
+            </a>
+        </li>
+        <li>
+            <a href="/dashboard/usuarios" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
+                <i class="bi bi-people"></i>
+                <span>Usuários</span>
+            </a>
+        </li>
+
+        <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
+            Relatórios
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
+                <i class="bi bi-bar-chart-line"></i>
+                <span>Relatórios</span>
+            </a>
+        </li>
+
+        <li class="nav-section-title mt-4 mb-2 px-3 text-uppercase fw-semibold" style="font-size: 0.75rem; color: #a3cfbb; letter-spacing: 0.5px;">
+            Configurações
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg">
+                <i class="bi bi-gear"></i>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="mt-auto border-top pt-3 border-success-subtle">
+        <a href="/auth/logout" class="nav-link text-white d-flex align-items-center gap-2 py-2 px-3 rounded-3 opacity-85 hover-bg-danger">
+            <i class="bi bi-box-arrow-left"></i>
+            <span>Sair</span>
+        </a>
+    </div>
+
+    <style>
+        .opacity-85 { opacity: 0.85; }
+        .hover-bg:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+            transition: all 0.2s ease;
+        }
+        .hover-bg-danger:hover {
+            background-color: #dc3545;
+            opacity: 1;
+            transition: all 0.2s ease;
+        }
+    </style>
 </div>
-</body>
-</html>
