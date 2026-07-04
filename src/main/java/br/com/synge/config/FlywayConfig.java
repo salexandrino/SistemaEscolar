@@ -48,6 +48,10 @@ public class FlywayConfig {
                     .locations("classpath:db/migration")
                     .load();
 
+// EXECUTAR APENAS UMA VEZ
+            flyway.repair();
+
+            flyway.migrate();
             flyway.migrate();
             logger.info("Flyway migrations aplicadas com sucesso.");
         } catch (SQLException e) {
