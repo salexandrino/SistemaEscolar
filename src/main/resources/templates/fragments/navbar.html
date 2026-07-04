@@ -19,7 +19,13 @@
                 <li class="nav-item"><a class="nav-link" th:href="${'/#contato'}">Contato</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <a class="btn btn-outline-dark" th:href="${'/login'}">
+                <a href="/dashboard/escolas" class="btn btn-dark px-3 fw-medium"
+                   style="border-radius: 8px; height: 38px; display: inline-flex; align-items: center; font-size: 14px;">
+                    <i class="bi bi-shield-lock me-1"></i> Painel SuperAdm
+                </a>
+
+                <a class="btn btn-outline-dark" th:href="${'/login'}"
+                   style="border-radius: 8px; height: 38px; display: inline-flex; align-items: center; font-size: 14px;">
                     Entrar
                 </a>
             </div>
@@ -48,5 +54,102 @@
         </div>
     </div>
 </nav>
+
+<!-- NAVBAR ADMINISTRATIVO -->
+<nav th:fragment="adminNavbar" class="navbar navbar-expand-lg bg-primary sticky-top border-bottom" style="height: 60px;">
+    <div class="container-fluid d-flex align-items-center">
+        <!-- Hambúrguer + Logo -->
+        <button class="btn btn-primary me-3" id="sidebarToggleAdmin" type="button" aria-label="Menu">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-square-fill text-white fs-5" style="background-color: var(--color-accent); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                <span style="font-size: 18px; font-weight: bold; color: white;">S</span>
+            </i>
+            <div>
+                <div class="fw-bold text-white m-0" style="font-size: 14px;">SYNGE</div>
+                <div class="text-white m-0" style="font-size: 11px; opacity: 0.9;">Gestão Escolar</div>
+            </div>
+        </div>
+
+        <!-- Espaço flexível -->
+        <div class="flex-grow-1"></div>
+
+        <!-- Notificações + Perfil -->
+        <div class="d-flex align-items-center gap-3">
+            <!-- Sino de notificações -->
+            <div class="position-relative" style="cursor: pointer;">
+                <i class="bi bi-bell text-white fs-5"></i>
+                <span class="badge bg-danger rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 10px;">3</span>
+            </div>
+
+            <!-- Avatar + Nome + Perfil + Dropdown -->
+            <div class="dropdown d-flex align-items-center gap-2" style="cursor: pointer;">
+                <div class="rounded-circle bg-secondary" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; cursor: pointer;" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span th:text="${#strings.abbreviate(currentUser?.getNomeCompleto() ?: 'U', 1)}">U</span>
+                </div>
+                <div class="d-none d-md-block" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                    <div class="fw-bold text-white m-0" style="font-size: 13px;" th:text="${currentUser?.getNomeCompleto() ?: 'Usuário'}">Usuário</div>
+                    <div class="text-white m-0" style="font-size: 11px; opacity: 0.8;" th:text="${currentUser?.getPerfil()?.name() ?: 'Perfil'}">Perfil</div>
+                </div>
+                <i class="bi bi-chevron-down text-white ms-1"></i>
+
+                <!-- Dropdown Menu -->
+                <ul class="dropdown-menu dropdown-menu-end mt-2">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" th:href="${'/auth/logout'}"><i class="bi bi-door-left me-2"></i>Sair</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- SIDEBAR ADMINISTRATIVO -->
+<aside th:fragment="adminSidebar" class="sidebar bg-primary text-white p-0" style="width: 280px; height: calc(100vh - 60px); overflow-y: auto; position: fixed; top: 60px; left: 0; z-index: 999;">
+    <!-- Logo -->
+    <div class="p-3 border-bottom border-light" style="border-color: rgba(255,255,255,0.2) !important;">
+        <div class="fw-bold mb-1">SYNGE</div>
+        <div style="font-size: 12px; opacity: 0.9;">Gestão Escolar</div>
+    </div>
+
+    <!-- Menu Items -->
+    <nav class="nav flex-column p-2">
+        <!-- Dashboard -->
+        <a class="nav-link text-white px-3 py-2 rounded-2 mb-1" th:href="${'/dashboard'}" style="display: flex; align-items: center; gap: 12px;">
+            <i class="bi bi-house-door"></i> Dashboard
+        </a>
+
+        <!-- Escolas (SUPER_ADMIN only) -->
+        <a class="nav-link text-white px-3 py-2 rounded-2 mb-1" th:href="${'/dashboard/escolas'}" th:if="${currentUser?.getPerfil()?.name() == 'SUPER_ADMIN'}" style="display: flex; align-items: center; gap: 12px;">
+            <i class="bi bi-building"></i> Escolas
+        </a>
+
+        <!-- Usuários (SUPER_ADMIN e GESTOR) -->
+        <a class="nav-link text-white px-3 py-2 rounded-2 mb-1" th:href="${'/dashboard/usuarios'}" th:if="${currentUser?.getPerfil()?.name() == 'SUPER_ADMIN' or currentUser?.getPerfil()?.name() == 'GESTOR'}" style="display: flex; align-items: center; gap: 12px;">
+            <i class="bi bi-people"></i> Usuários
+        </a>
+
+        <!-- Relatórios (SUPER_ADMIN e GESTOR) -->
+        <a class="nav-link text-white px-3 py-2 rounded-2 mb-1" th:href="${'/dashboard/relatorios'}" th:if="${currentUser?.getPerfil()?.name() == 'SUPER_ADMIN' or currentUser?.getPerfil()?.name() == 'GESTOR'}" style="display: flex; align-items: center; gap: 12px;">
+            <i class="bi bi-bar-chart"></i> Relatórios
+        </a>
+
+        <!-- Configurações (SUPER_ADMIN only) -->
+        <a class="nav-link text-white px-3 py-2 rounded-2 mb-1" th:href="${'/dashboard/configuracoes'}" th:if="${currentUser?.getPerfil()?.name() == 'SUPER_ADMIN'}" style="display: flex; align-items: center; gap: 12px;">
+            <i class="bi bi-gear"></i> Configurações
+        </a>
+    </nav>
+
+    <!-- Divisória -->
+    <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
+
+    <!-- Logout -->
+    <div class="p-2">
+        <a class="nav-link text-white px-3 py-2 rounded-2" th:href="${'/auth/logout'}" style="display: flex; align-items: center; gap: 12px; color: #ff6b6b;">
+            <i class="bi bi-door-left"></i> Sair
+        </a>
+    </div>
+</aside>
 </body>
 </html>

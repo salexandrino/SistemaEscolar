@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizar Usuário - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <nav class="breadcrumb-admin">
+        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+        <span class="mx-2">></span>
+        <a href="/dashboard/usuarios" class="text-decoration-none" style="color: var(--color-primary);">Usuários</a>
+        <span class="mx-2">></span>
+        <span class="text-muted">Visualizar Usuário</span>
+    </nav>
+
+    <h1 class="page-title">Visualizar Usuário</h1>
+
+    <div class="form-container bg-white p-4 rounded-3 shadow-sm">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">Nome Completo</label>
+                    <div class="form-value p-2 bg-light rounded fw-semibold text-dark" th:text="${usuario.nomeCompleto}">Maria Santos Silva</div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">Email</label>
+                    <div class="form-value p-2 bg-light rounded text-dark" th:text="${usuario.email}">maria.santos@example.com</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">CPF</label>
+                    <div class="form-value p-2 bg-light rounded text-dark" th:text="${usuario.cpf}">000.000.000-00</div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">Telefone</label>
+                    <div class="form-value p-2 bg-light rounded text-dark" th:text="${usuario.telefone != null ? usuario.telefone : 'Não informado'}">(11) 99999-9999</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">Perfil de Acesso</label>
+                    <div>
+                        <span class="badge perfil-badge px-3 py-2 text-uppercase font-monospace" th:text="${usuario.perfil}">GESTOR</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label fw-semibold small text-muted">Escola Vinculada</label>
+                    <div class="form-value p-2 bg-light rounded text-dark" th:text="${escolaNome}">Escola Estadual João</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metadata-row d-flex gap-4 p-3 bg-light rounded mb-4" style="font-size: 13px; color: #666;">
+            <div class="metadata-item">
+                <span class="fw-semibold">Cadastrado em:</span>
+                <span th:text="${#temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')}">10/01/2024 às 14:30</span>
+            </div>
+            <div class="metadata-item" th:if="${usuario.atualizadoEm != null}">
+                <span class="fw-semibold">Última atualização:</span>
+                <span th:text="${#temporals.format(usuario.atualizadoEm, 'dd/MM/yyyy HH:mm')}">15/01/2024 às 09:15</span>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end pt-3 border-top">
+            <a href="/dashboard/usuarios" class="btn btn-secondary px-4">Voltar para a Listagem</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

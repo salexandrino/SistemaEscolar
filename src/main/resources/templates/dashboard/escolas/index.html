@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-admin :: html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Escolas - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <nav class="breadcrumb-admin">
+        <a href="/dashboard" class="text-decoration-none" style="color: var(--color-primary);">Dashboard</a>
+        <span class="mx-2">></span>
+        <span class="text-muted">Escolas</span>
+    </nav>
+
+    <h1 class="page-title">Escolas</h1>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Buscar por nome ou CNPJ...">
+        </div>
+        <div class="toolbar-buttons">
+            <button class="btn-toolbar">
+                <i class="bi bi-funnel"></i>
+                Filtros
+            </button>
+            <a href="/dashboard/escolas/nova" class="btn-toolbar primary">
+                <i class="bi bi-building-plus"></i>
+                Nova Escola
+            </a>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>NOME</th>
+                <th>CNPJ</th>
+                <th>CIDADE/UF</th>
+                <th>RESPONSÁVEL</th>
+                <th>STATUS</th>
+                <th>AÇÕES</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Colégio Estadual Synge</td>
+                <td>12.345.678/0001-90</td>
+                <td>São Paulo - SP</td>
+                <td>Carlos Alberto (Diretor)</td>
+                <td><span class="badge status-ativo">ATIVA</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/escolas/visualizar/1" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/escolas/editar/1" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Escola Municipal Cecília Meireles</td>
+                <td>98.765.432/0001-10</td>
+                <td>Rio de Janeiro - RJ</td>
+                <td>Ana Maria Silva</td>
+                <td><span class="badge status-ativo">ATIVA</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/escolas/visualizar/2" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/escolas/editar/2" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Instituto Educacional Saber</td>
+                <td>45.678.901/0002-33</td>
+                <td>Belo Horizonte - MG</td>
+                <td>Roberto Souza</td>
+                <td><span class="badge status-inativo">INATIVA</span></td>
+                <td>
+                    <div class="acoes">
+                        <a href="/dashboard/escolas/visualizar/3" class="acao-btn" title="Visualizar">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/dashboard/escolas/editar/3" class="acao-btn" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination-footer">
+            <span>Mostrando 1 a 3 de 3 escolas</span>
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">Próximo</a></li>
+                </ul>
+            </nav>
+            <select class="form-select" style="width: 80px; height: 36px; font-size: 13px;">
+                <option>3</option>
+                <option>6</option>
+                <option>12</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

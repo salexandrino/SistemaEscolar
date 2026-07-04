@@ -15,5 +15,10 @@
         </div>
     </div>
 </footer>
+
+<!-- FOOTER ADMINISTRATIVO -->
+<footer th:fragment="adminFooter" class="bg-primary text-white text-center py-3" style="margin-left: 280px;">
+    <small>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> SYNGE - Sistema de Gestão Escolar. Todos os direitos reservados.</small>
+</footer>
 </body>
 </html>
