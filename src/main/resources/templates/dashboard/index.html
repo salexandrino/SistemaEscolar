@@ -15,25 +15,25 @@
                     <div class="col-md-3">
                         <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
                             <span class="text-muted small">Total de Escolas</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard?.totalEscolas ?: 0}">0</h3>
+                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.totalEscolas : 0}">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
                             <span class="text-muted small">Escolas Ativas</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard?.escolasAtivas ?: 0}">0</h3>
+                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.escolasAtivas : 0}">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
                             <span class="text-muted small">Total de Usuários</span>
-                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard?.totalUsuarios ?: 0}">0</h3>
+                            <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.totalUsuarios : 0}">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card shadow-sm border-0 bg-white p-3 rounded-3">
                             <span class="text-muted small">Usuários Pendentes</span>
-                            <h3 class="fw-bold text-warning mt-1" th:text="${dashboard?.usuariosPendentes ?: 0}">0</h3>
+                            <h3 class="fw-bold text-warning mt-1" th:text="${dashboard != null ? dashboard.usuariosPendentes : 0}">0</h3>
                         </div>
                     </div>
                 </div>
