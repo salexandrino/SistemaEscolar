@@ -50,6 +50,25 @@ public class SyngeApplication {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
+            // CÓDIGO TEMPORÁRIO 2: GERANDO O HASH USANDO O PASSWORD SERVICE DO PROJETO
+            try (java.sql.Connection conn = DatabaseConfig.getConnection();
+                 java.sql.PreparedStatement stmt = conn.prepareStatement(
+                         "UPDATE usuario SET senha_hash = ? WHERE email = ?")) {
+
+                // Deixamos o próprio PasswordService do seu projeto gerar o hash do seu jeito
+                PasswordService ps = new PasswordService();
+                String hashGeradoPeloProjeto = ps.hash("SuperAdmin@123");
+
+                stmt.setString(1, hashGeradoPeloProjeto);
+                stmt.setString(2, "synge.gestao@gmail.com");
+                int linhasAfetadas = stmt.executeUpdate();
+                System.out.println("=================================================");
+                System.out.println("NOVO HASH GERADO PELO PROJETO: " + hashGeradoPeloProjeto);
+                System.out.println("Linhas modificadas: " + linhasAfetadas);
+                System.out.println("=================================================");
+            } catch (Exception e) {
+                System.out.println("Erro: " + e.getMessage());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

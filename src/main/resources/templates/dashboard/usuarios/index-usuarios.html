@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Usuários</h2>
+        <a href="/dashboard/usuarios/novo" class="btn btn-success">
+            <i class="bi bi-person-plus"></i> Novo Usuário
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>CPF</th>
+                        <th>Perfil</th>
+                        <th>Aprovado</th>
+                        <th width="180">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="usuario : ${usuarios}">
+                        <td th:text="${usuario.nomeCompleto}">Nome</td>
+                        <td th:text="${usuario.email}">Email</td>
+                        <td th:text="${usuario.cpf}">CPF</td>
+                        <td th:text="${usuario.perfil}">Perfil</td>
+                        <td>
+                            <span class="badge bg-success" th:if="${usuario.aprovado}">Sim</span>
+                            <span class="badge bg-warning" th:unless="${usuario.aprovado}">Não</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/dashboard/usuarios/visualizar/{id}(id=${usuario.id})}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a th:href="@{/dashboard/usuarios/editar/{id}(id=${usuario.id})}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(usuarios)}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Nenhum usuário encontrado.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
