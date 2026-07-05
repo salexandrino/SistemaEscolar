@@ -2,18 +2,33 @@ package br.com.synge.administrativo.controllers;
 
 import br.com.synge.administrativo.dto.DashboardDTO;
 import br.com.synge.administrativo.services.DashboardService;
+import br.com.synge.seguranca.models.AuthUser;
+import br.com.synge.seguranca.models.Escola;
+import br.com.synge.seguranca.services.EscolaService; // Importante importar o service
+import br.com.synge.seguranca.utils.AuthUserContext;
+import br.com.synge.seguranca.exceptions.NotFoundException;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
+import java.util.Map;
+import java.util.UUID;
 
 public class DashboardController {
+
+    // 1. ADICIONE O LOGGER PRÓPRIO DESTA CLASSE AQUI:
+    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
 
     private final DashboardService dashboardService;
     private final TemplateEngine templateEngine;
 
-    public DashboardController(
-            DashboardService dashboardService,
-            TemplateEngine templateEngine) {
+    // 2. ADICIONE A VARIÁVEL DO SERVICE AQUI:
+    private final EscolaService escolaService;
+
+    // 3. ATUALIZE O CONSTRUTOR PARA RECEBER O ESCOLASERVICE:
+    public DashboardController(DashboardService dashboardService, EscolaService escolaService, TemplateEngine templateEngine) {
         this.dashboardService = dashboardService;
+        this.escolaService = escolaService; // <--- Inicializa o service aqui
         this.templateEngine = templateEngine;
     }
 
@@ -48,16 +63,39 @@ public class DashboardController {
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
     }
 
-    // 4. Editar Escola (editar.html dentro de dashboard/escolas/)
     public void editarEscola(Context ctx) {
-        org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                ctx.redirect("/login");
+                return;
+            }
 
-        // Simulando que pegaria o ID enviado pela rota
-        // String id = ctx.pathParam("id");
+            String idParam = ctx.pathParam("id");
+            UUID schoolId = UUID.fromString(idParam);
 
-        thymeleaf.setVariable("content", "dashboard/escolas/editar");
-        ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
+            // Agora o 'escolaService' vai funcionar perfeitamente!
+            Escola escola = escolaService.buscarEscolaPorId(schoolId, currentUser);
+
+            Map<String, Object> model = Map.of(
+                    "escola", escola,
+                    "currentUser", currentUser
+            );
+
+            ctx.render("dashboard/escolas/editar.html", model);
+
+        } catch (IllegalArgumentException e) {
+            logger.error("UUID inválido fornecido na rota: {}", ctx.pathParam("id")); // Agora usa o logger local
+            ctx.status(400).result("ID da escola em formato inválido.");
+        } catch (NotFoundException e) {
+            logger.error("Escola não encontrada para o ID fornecido");
+            ctx.status(404).result("Escola não encontrada.");
+        } catch (Exception e) {
+            logger.error("Erro ao carregar a página de edição de escola", e);
+            ctx.status(500).result("Erro interno ao carregar a página.");
+        }
     }
+
 
     // 5. Visualizar Escola (visualizar.html dentro de dashboard/escolas/)
     public void visualizarEscola(Context ctx) {

@@ -1,6 +1,6 @@
 package br.com.synge.seguranca.repositories;
 
-import br.com.synge.config.DatabaseConfig;
+import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.repositories.base.BaseDAO;
 import br.com.synge.seguranca.repositories.base.DAO;
 import br.com.synge.seguranca.models.RecuperacaoSenha;
@@ -16,7 +16,7 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
 
     private static final Logger logger = LoggerFactory.getLogger(RecuperacaoSenhaRepository.class);
 
-    public void save(RecuperacaoSenha recuperacaoSenha) {
+    public Escola save(RecuperacaoSenha recuperacaoSenha) {
         String sql = "INSERT INTO recuperacao_senha (id, usuario_id, codigo, expiracao, utilizado, criado_em) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -36,6 +36,7 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
             logger.error("Erro ao salvar código de recuperação para usuário ID {}: {}", recuperacaoSenha.getUsuarioId(), e.getMessage(), e);
             throw new RuntimeException("Erro ao salvar código de recuperação no banco de dados.", e);
         }
+        return null;
     }
 
     public Optional<RecuperacaoSenha> findByCodigoAndUsuarioId(String codigo, UUID usuarioId) {

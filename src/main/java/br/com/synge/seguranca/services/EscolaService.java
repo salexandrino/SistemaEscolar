@@ -122,14 +122,13 @@ public class EscolaService {
      * Cadastra uma nova escola.
      */
     public Escola cadastrarEscola(CriarEscolaDTO dto, AuthUser authUser) {
-        verificarPermissaoMaster(authUser);
-        validarDadosObrigatorios(dto);
 
-        // Verifica se já existe escola com o mesmo CNPJ
-        Optional<Escola> escolaExistente = escolaRepository.findByCnpj(dto.getCnpj());
-        if (escolaExistente.isPresent()) {
-            logger.warn("Tentativa de cadastro duplicado de escola com CNPJ: {}", dto.getCnpj());
-            throw new ConflictException("Já existe uma escola cadastrada com este CNPJ.");
+        verificarPermissaoMaster(authUser);
+
+        validarDados(dto);
+
+        if (escolaRepository.findByCnpj(dto.getCnpj()).isPresent()) {
+            throw new ConflictException("CNPJ já cadastrado.");
         }
 
         Escola escola = new Escola();
@@ -138,22 +137,15 @@ public class EscolaService {
         escola.setEmailInstitucional(dto.getEmailInstitucional());
         escola.setTelefone(dto.getTelefone());
         escola.setEndereco(dto.getEndereco());
-        escola.setNumero(dto.getNumero());
-        escola.setComplemento(dto.getComplemento());
-        escola.setBairro(dto.getBairro());
+        escola.setCep(dto.getCep());
         escola.setCidade(dto.getCidade());
         escola.setEstado(dto.getEstado());
-        escola.setCep(dto.getCep());
         escola.setNomeResponsavel(dto.getNomeResponsavel());
         escola.setTelefoneResponsavel(dto.getTelefoneResponsavel());
         escola.setEmailResponsavel(dto.getEmailResponsavel());
         escola.setStatus("ATIVA");
 
-        escolaRepository.save(escola);
-
-        logger.info("Escola cadastrada com sucesso: {} (ID: {}, Tenant: {})", escola.getNome(), escola.getId(), escola.getTenantId());
-
-        return escola;
+        return escolaRepository.save(escola);
     }
 
     /**
@@ -234,7 +226,6 @@ public class EscolaService {
      */
     public Escola buscarEscolaPorId(UUID id, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
-
         return escolaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
     }
@@ -316,5 +307,19 @@ public class EscolaService {
         logger.info("Escola inativada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
 
         return escola;
+    }
+    private void validarDados(CriarEscolaDTO dto) {
+
+        if (dto.getNome() == null || dto.getNome().isBlank()) {
+            throw new ValidationException("Nome da escola é obrigatório.");
+        }
+
+        if (dto.getCnpj() == null || dto.getCnpj().isBlank()) {
+            throw new ValidationException("CNPJ é obrigatório.");
+        }
+
+        if (dto.getEmailInstitucional() == null || dto.getEmailInstitucional().isBlank()) {
+            throw new ValidationException("E-mail institucional é obrigatório.");
+        }
     }
 }

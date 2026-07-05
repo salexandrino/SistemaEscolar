@@ -16,7 +16,7 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import br.com.synge.seguranca.services.EscolaService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +25,15 @@ import java.util.UUID;
 public class EscolaController {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaController.class);
-    private final EscolaService escolaService;
 
-    public EscolaController(EscolaService escolaService) {
-        this.escolaService = escolaService;
-    }
+        // VERIFIQUE SE ESTA LINHA EXISTE EXATAMENTE ASSIM:
+        private final EscolaService escolaService;
 
+        // O construtor usa exatamente o mesmo nome e tipo:
+        public EscolaController(EscolaService escolaService) {
+            this.escolaService = escolaService;
+
+        }
     private Map<String, Object> escolaToMap(Escola escola) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", escola.getId());
@@ -72,32 +75,37 @@ public class EscolaController {
      */
     public void criarEscola(Context ctx) {
         try {
+
             AuthUser currentUser = AuthUserContext.getAuthUser();
             if (currentUser == null) {
                 throw new AuthenticationException("Usuário não autenticado.");
             }
 
-            CriarEscolaDTO dto = ctx.bodyAsClass(CriarEscolaDTO.class);
+            CriarEscolaDTO dto = new CriarEscolaDTO();
+
+            dto.setNome(ctx.formParam("nome"));
+            dto.setCnpj(ctx.formParam("cnpj"));
+            dto.setEmailInstitucional(ctx.formParam("emailInstitucional"));
+            dto.setTelefone(ctx.formParam("telefone"));
+            dto.setEndereco(ctx.formParam("endereco"));
+            dto.setCep(ctx.formParam("cep"));
+            dto.setCidade(ctx.formParam("cidade"));
+            dto.setEstado(ctx.formParam("estado"));
+            dto.setNomeResponsavel(ctx.formParam("nomeResponsavel"));
+            dto.setTelefoneResponsavel(ctx.formParam("telefoneResponsavel"));
+            dto.setEmailResponsavel(ctx.formParam("emailResponsavel"));
+
             Escola escola = escolaService.cadastrarEscola(dto, currentUser);
 
-            ctx.status(HttpStatus.CREATED);
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("message", "Escola cadastrada com sucesso.");
-            response.put("escola", escolaToMapSummarized(escola));
-            ctx.json(response);
+            ctx.status(201);
+            ctx.json(Map.of(
+                    "message", "Escola cadastrada com sucesso",
+                    "escola", escola
+            ));
 
-        } catch (AuthenticationException | AuthorizationException e) {
-            ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha na criação de escola: {}", e.getMessage());
-        } catch (ValidationException | ConflictException e) {
-            ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Erro de validação ao criar escola: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao criar escola: {}", e.getMessage(), e);
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            ctx.json(Map.of("message", "Erro interno ao criar escola."));
+            ctx.status(400);
+            ctx.json(Map.of("error", e.getMessage()));
         }
     }
 
@@ -368,6 +376,54 @@ public class EscolaController {
             logger.error("Erro inesperado ao inativar escola: {}", e.getMessage(), e);
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao inativar escola."));
+        }
+    }
+
+    public void exibirPaginaListagem(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                ctx.redirect("/login"); // Se não fixou o interceptor, redireciona
+                return;
+            }
+
+            // 1. Busca os dados reais utilizando o Service
+            List<Escola> escolas = escolaService.listarTodas(currentUser);
+
+            // 2. Passa a lista dentro do Map para o Thymeleaf ler
+            Map<String, Object> model = Map.of("escolas", escolas);
+
+            // 3. Renderiza o arquivo HTML (coloque o caminho correto a partir da pasta de templates)
+            ctx.render("dashboard/escolas/lista.html", model);
+
+        } catch (Exception e) {
+            logger.error("Erro ao carregar página de listagem", e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("Erro ao carregar página.");
+        }
+    }
+
+    /**
+     * GET /dashboard/escolas/visualizar/{id} - Renderiza a página de detalhes da escola
+     */
+    public void exibirPaginaVisualizar(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                ctx.redirect("/login");
+                return;
+            }
+
+            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
+            Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
+
+            // Disponibiliza a variável "${escola}" para o HTML que corrigimos antes
+            Map<String, Object> model = Map.of("escola", escola);
+
+            ctx.render("dashboard/escolas/visualizar.html", model);
+
+        } catch (Exception e) {
+            logger.error("Erro ao carregar página de visualização", e);
+            ctx.redirect("/dashboard/escolas");
         }
     }
 }

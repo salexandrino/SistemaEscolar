@@ -1,11 +1,13 @@
 package br.com.synge.seguranca.repositories.base;
 
+import br.com.synge.seguranca.models.Escola;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface DAO<T, ID> {
 
-    void save(T entity);
+    Escola save(T entity);
 
     void update(T entity);
 

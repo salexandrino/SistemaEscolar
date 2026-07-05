@@ -2,26 +2,20 @@
 <html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/master-admin :: html}">
-    <span th:text="${escola.nome}"></span>
 
-    <span th:text="${escola.cnpj}"></span>
+<head>
+    <title>Visualizar Escola - SYNGE</title>
+</head>
 
-    <span th:text="${escola.emailInstitucional}"></span>
+<body>
 
-    <span th:text="${escola.status}"></span>
 <div th:fragment="content">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb-admin mb-4">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
-
-        <a href="/dashboard/escolas" class="text-decoration-none">
-            Escolas
-        </a>
-
+        <a href="/dashboard/escolas" class="text-decoration-none">Escolas</a>
         <span class="mx-2">></span>
-
         <span class="text-muted">Visualizar</span>
     </nav>
 
@@ -32,16 +26,12 @@
         </h2>
 
         <div>
-            <a href="/dashboard/escolas"
-               class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i>
-                Voltar
+            <a href="/dashboard/escolas" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
             </a>
 
-            <a href="/dashboard/escolas/editar/1"
-               class="btn btn-warning">
-                <i class="bi bi-pencil"></i>
-                Editar
+            <a th:href="@{'/dashboard/escolas/editar/' + ${escola.id}}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
             </a>
         </div>
     </div>
@@ -49,88 +39,76 @@
     <div class="card shadow-sm">
 
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">
-                Dados da Escola
-            </h5>
+            <h5 class="mb-0">Dados da Escola</h5>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" th:if="${escola != null}">
 
             <div class="row">
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Nome</label>
-
-                    <div class="form-control bg-light">
-                        Colégio Estadual SYNGE
+                    <div class="form-control bg-light" th:text="${escola.nome}">
+                        Nome da Escola
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">CNPJ</label>
-
-                    <div class="form-control bg-light">
-                        12.345.678/0001-90
+                    <div class="form-control bg-light" th:text="${escola.cnpj}">
+                        00.000.000/0001-00
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Email</label>
-
-                    <div class="form-control bg-light">
-                        contato@synge.com.br
+                    <div class="form-control bg-light" th:text="${escola.emailInstitucional}">
+                        contato@escola.com
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Telefone</label>
-
-                    <div class="form-control bg-light">
-                        (11) 99999-9999
+                    <div class="form-control bg-light" th:text="${escola.telefone}">
+                        (00) 00000-0000
                     </div>
                 </div>
 
                 <div class="col-md-4 mb-3">
                     <label class="fw-bold">Cidade</label>
-
-                    <div class="form-control bg-light">
-                        São Paulo
+                    <div class="form-control bg-light" th:text="${escola.cidade}">
+                        Cidade
                     </div>
                 </div>
 
                 <div class="col-md-2 mb-3">
                     <label class="fw-bold">UF</label>
-
-                    <div class="form-control bg-light">
-                        SP
+                    <div class="form-control bg-light" th:text="${escola.estado}">
+                        UF
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Responsável</label>
-
-                    <div class="form-control bg-light">
-                        Carlos Alberto
+                    <div class="form-control bg-light" th:text="${escola.nomeResponsavel}">
+                        Nome do Responsável
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="fw-bold">Status</label>
-
                     <div class="form-control bg-light">
-
-                        <span class="badge bg-success fs-6">
-                            ATIVA
+                        <span th:text="${escola.status}"
+                              th:classappend="${escola.status == 'ATIVA'} ? 'badge bg-success fs-6' : 'badge bg-danger fs-6'">
+                            STATUS
                         </span>
-
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3" th:if="${escola.criadoEm != null}">
                     <label class="fw-bold">Data de Cadastro</label>
-
-                    <div class="form-control bg-light">
-                        10/05/2026
+                    <div class="form-control bg-light" th:text="${#temporals.format(escola.criadoEm, 'dd/MM/yyyy HH:mm')}">
+                        00/00/0000
                     </div>
                 </div>
 
@@ -138,8 +116,13 @@
 
         </div>
 
+        <div class="card-body" th:unless="${escola != null}">
+            <div class="alert alert-danger mb-0">Nenhum dado encontrado para esta escola.</div>
+        </div>
+
     </div>
 
 </div>
 
+</body>
 </html>

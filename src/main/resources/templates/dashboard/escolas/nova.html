@@ -11,7 +11,6 @@
 
 <div th:fragment="content">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb-admin mb-4">
         <a href="/dashboard">Dashboard</a>
         <span class="mx-2">></span>
@@ -38,191 +37,112 @@
     </div>
 
     <div class="card shadow-sm border-0">
-
         <div class="card-body">
 
             <form action="/escolas" method="post">
 
+                <h5 class="text-primary mb-3">Dados da Instituição</h5>
+
                 <div class="row">
-
                     <div class="col-md-8 mb-3">
-                        <label class="form-label">
-                            Nome da Escola
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Ex.: Colégio SYNGE">
+                        <label class="form-label">Nome da Escola</label>
+                        <input type="text" name="nome" class="form-control" placeholder="Ex.: Colégio SYNGE" required>
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">
-                            CNPJ
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="00.000.000/0001-00">
+                        <label class="form-label">CNPJ</label>
+                        <input type="text" name="cnpj" class="form-control" placeholder="00.000.000/0001-00" required>
                     </div>
-
                 </div>
 
                 <div class="row">
-
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            Email
-                        </label>
-
-                        <input
-                                type="email"
-                                class="form-control"
-                                placeholder="contato@escola.com.br">
+                        <label class="form-label">Email Institucional</label>
+                        <input type="email" name="emailInstitucional" class="form-control" placeholder="contato@escola.com.br">
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            Telefone
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="(00) 00000-0000">
+                        <label class="form-label">Telefone da Instituição</label>
+                        <input type="text" name="telefone" class="form-control" placeholder="(00) 00000-0000">
                     </div>
-
                 </div>
 
-                <div class="row">
+                <h5 class="text-primary mt-3 mb-3">Endereço</h5>
 
+                <div class="row">
                     <div class="col-md-8 mb-3">
-                        <label class="form-label">
-                            Endereço
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Rua, número, bairro">
+                        <label class="form-label">Logradouro / Endereço</label>
+                        <input type="text" name="endereco" class="form-control" placeholder="Rua, Avenida, etc.">
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">
-                            CEP
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="00000-000">
+                        <label class="form-label">CEP</label>
+                        <input type="text" name="cep" class="form-control" placeholder="00000-000">
                     </div>
-
                 </div>
 
                 <div class="row">
-
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">
-                            Cidade
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Cidade">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" name="cidade" class="form-control" placeholder="Cidade">
                     </div>
 
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label">
-                            UF
-                        </label>
-
-                        <select class="form-select">
-                            <option>AC</option>
-                            <option>AL</option>
-                            <option>AP</option>
-                            <option>AM</option>
-                            <option>BA</option>
-                            <option>CE</option>
-                            <option>DF</option>
-                            <option>ES</option>
-                            <option>GO</option>
-                            <option>MA</option>
-                            <option>MT</option>
-                            <option>MS</option>
-                            <option>MG</option>
-                            <option>PA</option>
-                            <option>PB</option>
-                            <option>PR</option>
-                            <option>PE</option>
-                            <option>PI</option>
-                            <option>RJ</option>
-                            <option>RN</option>
-                            <option>RS</option>
-                            <option>RO</option>
-                            <option>RR</option>
-                            <option>SC</option>
-                            <option>SP</option>
-                            <option>SE</option>
-                            <option>TO</option>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Estado (UF)</label>
+                        <select name="estado" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="AC">AC</option> <option value="AL">AL</option>
+                            <option value="AP">AP</option> <option value="AM">AM</option>
+                            <option value="BA">BA</option> <option value="CE">CE</option>
+                            <option value="DF">DF</option> <option value="ES">ES</option>
+                            <option value="GO">GO</option> <option value="MA">MA</option>
+                            <option value="MT">MT</option> <option value="MS">MS</option>
+                            <option value="MG">MG</option> <option value="PA">PA</option>
+                            <option value="PB">PB</option> <option value="PR">PR</option>
+                            <option value="PE">PE</option> <option value="PI">PI</option>
+                            <option value="RJ">RJ</option> <option value="RN">RN</option>
+                            <option value="RS">RS</option> <option value="RO">RO</option>
+                            <option value="RR">RR</option> <option value="SC">SC</option>
+                            <option value="SP">SP</option> <option value="SE">SE</option>
+                            <option value="TO">TO</option>
                         </select>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            Responsável
-                        </label>
-
-                        <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Nome do responsável">
-                    </div>
-
                 </div>
 
+                <h5 class="text-primary mt-3 mb-3">Dados do Responsável</h5>
+
                 <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label class="form-label">Nome do Responsável</label>
+                        <input type="text" name="nomeResponsavel" class="form-control" placeholder="Nome completo">
+                    </div>
 
                     <div class="col-md-4 mb-4">
-                        <label class="form-label">
-                            Status Inicial
-                        </label>
-
-                        <select class="form-select">
-                            <option selected>ATIVA</option>
-                            <option>INATIVA</option>
-                        </select>
+                        <label class="form-label">Telefone do Responsável</label>
+                        <input type="text" name="telefoneResponsavel" class="form-control" placeholder="(00) 00000-0000">
                     </div>
 
+                    <div class="col-md-4 mb-4">
+                        <label class="form-label">Email do Responsável</label>
+                        <input type="email" name="emailResponsavel" class="form-control" placeholder="responsavel@email.com">
+                    </div>
                 </div>
 
                 <hr>
 
                 <div class="d-flex justify-content-end gap-2">
-
-                    <a href="/dashboard/escolas"
-                       class="btn btn-secondary">
+                    <a href="/dashboard/escolas" class="btn btn-secondary">
                         Cancelar
                     </a>
-
-                    <button
-                            type="submit"
-                            class="btn btn-success">
-
+                    <button type="submit" class="btn btn-success">
                         <i class="bi bi-check-circle"></i>
-
                         Cadastrar Escola
-
                     </button>
-
                 </div>
 
             </form>
 
         </div>
-
     </div>
 
 </div>

@@ -1,6 +1,5 @@
 package br.com.synge.seguranca.repositories;
 
-import br.com.synge.config.DatabaseConfig;
 import br.com.synge.seguranca.repositories.base.BaseDAO;
 import br.com.synge.seguranca.repositories.base.DAO;
 import br.com.synge.seguranca.models.Escola;
@@ -139,7 +138,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     }
 
     @Override
-    public void save(Escola escola) {
+    public Escola save(Escola escola) {
         String sql = "INSERT INTO escola (id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, " +
                      "numero, complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
                      "email_responsavel, status, criado_em, atualizado_em) " +
@@ -185,6 +184,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
             logger.error("Erro ao salvar escola {}: {}", escola.getNome(), e.getMessage(), e);
             throw new RuntimeException("Erro ao salvar escola.", e);
         }
+        return escola;
     }
 
     @Override

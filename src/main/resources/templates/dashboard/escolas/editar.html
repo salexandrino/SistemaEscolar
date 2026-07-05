@@ -1,188 +1,161 @@
-<form
-        th:action="@{/escolas/{id}(id=${escola.id})}"
-        method="post">
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
 
-    <!-- Spring HiddenHttpMethodFilter -->
-    <input type="hidden" name="_method" value="PATCH">
+<head>
+    <title>Editar Escola - SYNGE</title>
+</head>
 
-    <div class="row">
+<body>
 
-        <div class="col-md-8 mb-3">
-            <label class="form-label">Nome da Escola</label>
+<div th:fragment="content">
 
-            <input
-                    type="text"
-                    class="form-control"
-                    name="nome"
-                    th:value="${escola.nome}"
-                    required>
+    <nav class="breadcrumb-admin mb-4">
+        <a href="/dashboard" class="text-decoration-none">Dashboard</a>
+        <span class="mx-2">></span>
+        <a href="/dashboard/escolas" class="text-decoration-none">Escolas</a>
+        <span class="mx-2">></span>
+        <span class="text-muted">Editar</span>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="page-title mb-0">
+                <i class="bi bi-pencil-square me-2"></i>
+                Editar Cadastro da Instituição
+            </h2>
+            <p class="text-muted small mb-0">Atualize as informações gerais da escola selecionada.</p>
         </div>
-
-        <div class="col-md-4 mb-3">
-            <label class="form-label">CNPJ</label>
-
-            <input
-                    type="text"
-                    class="form-control"
-                    name="cnpj"
-                    th:value="${escola.cnpj}"
-                    required>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Responsável</label>
-
-            <input
-                    type="text"
-                    class="form-control"
-                    name="nomeResponsavel"
-                    th:value="${escola.nomeResponsavel}">
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Email Institucional</label>
-
-            <input
-                    type="email"
-                    class="form-control"
-                    name="emailInstitucional"
-                    th:value="${escola.emailInstitucional}">
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <label class="form-label">Telefone</label>
-
-            <input
-                    type="text"
-                    class="form-control"
-                    name="telefone"
-                    th:value="${escola.telefone}">
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <label class="form-label">Cidade</label>
-
-            <input
-                    type="text"
-                    class="form-control"
-                    name="cidade"
-                    th:value="${escola.cidade}">
-        </div>
-
-        <div class="col-md-4 mb-3">
-
-            <label class="form-label">UF</label>
-
-            <select
-                    class="form-select"
-                    name="estado">
-
-                <option value="AC" th:selected="${escola.estado=='AC'}">AC</option>
-                <option value="AL" th:selected="${escola.estado=='AL'}">AL</option>
-                <option value="AP" th:selected="${escola.estado=='AP'}">AP</option>
-                <option value="AM" th:selected="${escola.estado=='AM'}">AM</option>
-                <option value="BA" th:selected="${escola.estado=='BA'}">BA</option>
-                <option value="CE" th:selected="${escola.estado=='CE'}">CE</option>
-                <option value="DF" th:selected="${escola.estado=='DF'}">DF</option>
-                <option value="ES" th:selected="${escola.estado=='ES'}">ES</option>
-                <option value="GO" th:selected="${escola.estado=='GO'}">GO</option>
-                <option value="MA" th:selected="${escola.estado=='MA'}">MA</option>
-                <option value="MT" th:selected="${escola.estado=='MT'}">MT</option>
-                <option value="MS" th:selected="${escola.estado=='MS'}">MS</option>
-                <option value="MG" th:selected="${escola.estado=='MG'}">MG</option>
-                <option value="PA" th:selected="${escola.estado=='PA'}">PA</option>
-                <option value="PB" th:selected="${escola.estado=='PB'}">PB</option>
-                <option value="PR" th:selected="${escola.estado=='PR'}">PR</option>
-                <option value="PE" th:selected="${escola.estado=='PE'}">PE</option>
-                <option value="PI" th:selected="${escola.estado=='PI'}">PI</option>
-                <option value="RJ" th:selected="${escola.estado=='RJ'}">RJ</option>
-                <option value="RN" th:selected="${escola.estado=='RN'}">RN</option>
-                <option value="RS" th:selected="${escola.estado=='RS'}">RS</option>
-                <option value="RO" th:selected="${escola.estado=='RO'}">RO</option>
-                <option value="RR" th:selected="${escola.estado=='RR'}">RR</option>
-                <option value="SC" th:selected="${escola.estado=='SC'}">SC</option>
-                <option value="SP" th:selected="${escola.estado=='SP'}">SP</option>
-                <option value="SE" th:selected="${escola.estado=='SE'}">SE</option>
-                <option value="TO" th:selected="${escola.estado=='TO'}">TO</option>
-
-            </select>
-
-        </div>
-
     </div>
 
-    <hr>
+    <div class="card shadow-sm mb-4">
 
-    <h5>Status da Escola</h5>
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i>Dados Cadastrais
+            </h5>
+        </div>
 
-    <div class="d-flex align-items-center gap-3">
+        <div class="card-body p-4">
+            <form th:action="'/escolas/' + ${escola.id}" method="post">
 
-        <span class="fw-bold"
-              th:text="${escola.status}">
-        </span>
+                <input type="hidden" name="_method" value="PATCH">
 
-        <!-- Botão Ativar -->
-        <form
-                th:if="${escola.status.name() == 'INATIVA'}"
-                th:action="@{/escolas/{id}/ativar(id=${escola.id})}"
-                method="post">
+                <div class="row g-3">
 
-            <input type="hidden" name="_method" value="PATCH">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold text-secondary small">Nome da Escola</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="nome" th:value="${escola.nome}" required>
+                    </div>
 
-            <button class="btn btn-success">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">CNPJ</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="cnpj" th:value="${escola.cnpj}" required>
+                    </div>
 
-                <i class="bi bi-check-circle"></i>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Responsável Legal</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="nomeResponsavel" th:value="${escola.nomeResponsavel}">
+                    </div>
 
-                Ativar Escola
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Email Institucional</label>
+                        <input type="email" class="form-control form-control-lg fs-6" name="emailInstitucional" th:value="${escola.emailInstitucional}">
+                    </div>
 
-            </button>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Telefone de Contato</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="telefone" th:value="${escola.telefone}">
+                    </div>
 
-        </form>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Cidade</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="cidade" th:value="${escola.cidade}">
+                    </div>
 
-        <!-- Botão Inativar -->
-        <form
-                th:if="${escola.status.name() == 'ATIVA'}"
-                th:action="@{/escolas/{id}/inativar(id=${escola.id})}"
-                method="post">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">UF (Estado)</label>
+                        <select class="form-select form-select-lg fs-6" name="estado">
+                            <option value="AC" th:selected="${escola.estado=='AC'}">AC</option>
+                            <option value="AL" th:selected="${escola.estado=='AL'}">AL</option>
+                            <option value="AP" th:selected="${escola.estado=='AP'}">AP</option>
+                            <option value="AM" th:selected="${escola.estado=='AM'}">AM</option>
+                            <option value="BA" th:selected="${escola.estado=='BA'}">BA</option>
+                            <option value="CE" th:selected="${escola.estado=='CE'}">CE</option>
+                            <option value="DF" th:selected="${escola.estado=='DF'}">DF</option>
+                            <option value="ES" th:selected="${escola.estado=='ES'}">ES</option>
+                            <option value="GO" th:selected="${escola.estado=='GO'}">GO</option>
+                            <option value="MA" th:selected="${escola.estado=='MA'}">MA</option>
+                            <option value="MT" th:selected="${escola.estado=='MT'}">MT</option>
+                            <option value="MS" th:selected="${escola.estado=='MS'}">MS</option>
+                            <option value="MG" th:selected="${escola.estado=='MG'}">MG</option>
+                            <option value="PA" th:selected="${escola.estado=='PA'}">PA</option>
+                            <option value="PB" th:selected="${escola.estado=='PB'}">PB</option>
+                            <option value="PR" th:selected="${escola.estado=='PR'}">PR</option>
+                            <option value="PE" th:selected="${escola.estado=='PE'}">PE</option>
+                            <option value="PI" th:selected="${escola.estado=='PI'}">PI</option>
+                            <option value="RJ" th:selected="${escola.estado=='RJ'}">RJ</option>
+                            <option value="RN" th:selected="${escola.estado=='RN'}">RN</option>
+                            <option value="RS" th:selected="${escola.estado=='RS'}">RS</option>
+                            <option value="RO" th:selected="${escola.estado=='RO'}">RO</option>
+                            <option value="RR" th:selected="${escola.estado=='RR'}">RR</option>
+                            <option value="SC" th:selected="${escola.estado=='SC'}">SC</option>
+                            <option value="SP" th:selected="${escola.estado=='SP'}">SP</option>
+                            <option value="SE" th:selected="${escola.estado=='SE'}">SE</option>
+                            <option value="TO" th:selected="${escola.estado=='TO'}">TO</option>
+                        </select>
+                    </div>
+                </div>
 
-            <input type="hidden" name="_method" value="PATCH">
+                <hr class="my-4">
 
-            <button
-                    class="btn btn-danger"
-                    onclick="return confirm('Deseja realmente inativar esta escola?')">
-
-                <i class="bi bi-x-circle"></i>
-
-                Inativar Escola
-
-            </button>
-
-        </form>
-
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="/dashboard/escolas" class="btn btn-outline-secondary px-4">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-save me-1"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <hr>
+    <div class="card shadow-sm border-danger-subtle bg-light">
+        <div class="card-body p-4">
+            <h5 class="text-danger-emphasis fw-bold mb-2">Zona de Controle Administrativo</h5>
+            <p class="text-muted small mb-3">Ative ou desative o acesso desta instituição à plataforma SYNGE imediatamente.</p>
 
-    <div class="d-flex justify-content-end gap-2">
+            <div class="d-flex align-items-center justify-content-between bg-white p-3 rounded border">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-secondary fw-semibold small">Status Atual:</span>
+                    <span th:text="${escola.status}"
+                          th:classappend="${escola.status.toString() == 'ATIVA'} ? 'badge bg-success fs-6' : 'badge bg-danger fs-6'">
+                        ATIVA
+                    </span>
+                </div>
 
-        <a
-                href="/dashboard/escolas"
-                class="btn btn-outline-secondary">
+                <div>
+                    <form th:if="${escola.status.toString() == 'INATIVA'}" th:action="'/escolas/' + ${escola.id} + '/ativar'" method="post">
+                        <input type="hidden" name="_method" value="PATCH">
+                        <button type="submit" class="btn btn-sm btn-success px-3">
+                            <i class="bi bi-check-circle me-1"></i> Ativar Escola
+                        </button>
+                    </form>
 
-            Cancelar
-
-        </a>
-
-        <button
-                type="submit"
-                class="btn btn-success">
-
-            <i class="bi bi-save"></i>
-
-            Salvar Alterações
-
-        </button>
-
+                    <form th:if="${escola.status.toString() == 'ATIVA'}" th:action="'/escolas/' + ${escola.id} + '/inativar'" method="post">
+                        <input type="hidden" name="_method" value="PATCH">
+                        <button type="submit" class="btn btn-sm btn-danger px-3" onclick="return confirm('Deseja realmente inativar esta escola?')">
+                            <i class="bi bi-x-circle me-1"></i> Inativar Escola
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
-</form>
+</div>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 package br.com.synge.seguranca.repositories;
 
-import br.com.synge.config.DatabaseConfig;
+import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.repositories.base.BaseDAO;
 import br.com.synge.seguranca.repositories.base.DAO;
 import br.com.synge.seguranca.enums.Perfil;
@@ -218,9 +218,10 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         return false;
     }
 
-    public void save(Usuario usuario) {
+    public Escola save(Usuario usuario) {
         // Backwards-compatible: delegate to tenant-aware save using tenantId from entity
         save(usuario, usuario.getTenantId());
+        return null;
     }
 
     // Tenant-aware save (preferred)

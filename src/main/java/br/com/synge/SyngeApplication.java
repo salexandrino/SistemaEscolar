@@ -4,6 +4,7 @@ import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
 import br.com.synge.seguranca.controllers.EscolaDashboardController;
+import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.middlewares.AuthMiddleware;
 import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
@@ -36,6 +37,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
@@ -54,8 +57,8 @@ public class SyngeApplication {
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
 
-            try (java.sql.Connection conn = DatabaseConfig.getConnection();
-                 java.sql.PreparedStatement stmt = conn.prepareStatement(
+            try (Connection conn = DatabaseConfig.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(
                          "UPDATE usuario SET senha_hash = ? WHERE email = ?")) {
 
                 PasswordService ps = new PasswordService();
@@ -75,8 +78,10 @@ public class SyngeApplication {
             e.printStackTrace();
         }
 
+
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
+        // 1. Primeiro criamos os Repositories e Services básicos
         TemplateEngine templateEngine = createTemplateEngine();
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         EscolaRepository escolaRepository = new EscolaRepository();
@@ -85,24 +90,45 @@ public class SyngeApplication {
         JwtService jwtService = new JwtService();
         SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
+
+// 2. Criamos os Services (Repare que o EscolaService agora vem ANTES)
         DashboardService dashboardService = new DashboardService(dashboardRepository);
-        DashboardController dashboardController = new DashboardController(dashboardService, templateEngine);
-
-        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
-        EscolaService escolaService = new EscolaService(escolaRepository);
+        EscolaService escolaService = new EscolaService(escolaRepository); // <--- Criado primeiro!
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
+        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
 
+// 3. Agora criamos os Controllers passando as dependências prontas
         AuthController authController = new AuthController(authService);
-        EscolaController escolaController = new EscolaController(escolaService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
+        EscolaController escolaController = new EscolaController(escolaService);
 
-        Javalin app = Javalin.create(config -> config.staticFiles.add(staticFiles -> {
-            staticFiles.hostedPath = "/";
-            staticFiles.directory = "/public";
-            staticFiles.location = Location.CLASSPATH;
-        }));
+        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, templateEngine);
 
-        app.before(new br.com.synge.seguranca.middlewares.AuthMiddleware(jwtService));
+        // ✔️ Código corrigido para Javalin 6
+        Javalin app = Javalin.create(config -> {
+            // 1. Mantém os arquivos estáticos da pasta public
+            config.staticFiles.add(staticFiles -> {
+                staticFiles.hostedPath = "/";
+                staticFiles.directory = "/public";
+                staticFiles.location = Location.CLASSPATH;
+            });
+
+            // 2. ADICIONE ESTA LINHA: Ensina o Javalin a usar o Thymeleaf quando chamamos ctx.render()
+            // ✔️ Configuração corrigida com a conversão de tipo correta para o Java
+            config.fileRenderer((filePath, model, ctx) -> {
+                Context thymeleafContext = new Context(ctx.req().getLocale());
+
+                @SuppressWarnings("unchecked")
+                Map<String, Object> cleanModel = (Map<String, Object>) (Map<String, ?>) model;
+                thymeleafContext.setVariables(cleanModel);
+
+                // FORÇAR O THYMELEAF A ACEITAR LINKS COM @ EM AMBIENTE NÃO-SPRING:
+                String templateName = filePath.replace(".html", "");
+                return templateEngine.process(templateName, thymeleafContext);
+            });
+        });
+
+        app.before(new AuthMiddleware(jwtService));
 
         // HOME
         app.get("/", ctx -> {
@@ -163,6 +189,7 @@ public class SyngeApplication {
         app.get("/escolas", escolaController::listarEscolas);
         app.get("/escolas/ativas", escolaController::listarEscolasAtivas);
         app.get("/escolas/inativas", escolaController::listarEscolasInativas);
+        app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
         app.get("/escolas/{id}", escolaController::obterEscola);
         app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
         app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
@@ -170,9 +197,9 @@ public class SyngeApplication {
 
         app.get("/area-logada", ctx -> {
             try {
-                br.com.synge.seguranca.models.AuthUser currentUser = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser();
+                AuthUser currentUser = AuthUserContext.getAuthUser();
                 if (currentUser == null) {
-                    throw new br.com.synge.seguranca.exceptions.AuthenticationException("Usuário não autenticado.");
+                    throw new AuthenticationException("Usuário não autenticado.");
                 }
                 ctx.json(Map.of(
                         "userId", currentUser.getUserId(),
@@ -180,7 +207,7 @@ public class SyngeApplication {
                         "perfil", currentUser.getPerfil(),
                         "cpf", currentUser.getCpf()
                 ));
-            } catch (br.com.synge.seguranca.exceptions.AuthenticationException e) {
+            } catch (AuthenticationException e) {
                 ctx.status(e.getStatus());
                 ctx.json(Map.of("message", e.getMessage()));
             }
@@ -217,7 +244,13 @@ public class SyngeApplication {
         // Rotas do Painel
         app.get("/dashboard", dashboardController::dashboard);
 
-        app.get("/dashboard/escolas", dashboardController::escolas);
+// Rotas que devolvem Páginas (HTML + Thymeleaf)
+        app.get("/dashboard/escolas", escolaController::exibirPaginaListagem);
+        app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
+
+// Rotas da API (JSON puro)
+        app.get("/api/escolas", escolaController::listarEscolas);
+        app.get("/api/escolas/{id}", escolaController::obterEscola);
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
@@ -234,20 +267,20 @@ public class SyngeApplication {
         // ==========================================
 
         // ADICIONADO: Captura o erro do SuperAdminMiddleware e joga o usuário para o login
-        app.exception(br.com.synge.seguranca.exceptions.AuthenticationException.class, (e, ctx) -> {
+        app.exception(AuthenticationException.class, (e, ctx) -> {
             ctx.redirect("/super-admin/login");
         });
 
         app.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404);
-            org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+            Context thymeleafContext = new Context();
             thymeleafContext.setVariable("message", e.getMessage());
             ctx.html(templateEngine.process("errors/404", thymeleafContext));
         });
 
         app.exception(Exception.class, (e, ctx) -> {
             ctx.status(500);
-            org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+            Context thymeleafContext = new Context();
             thymeleafContext.setVariable("message", "Ocorreu um erro interno inesperado.");
             ctx.html(templateEngine.process("errors/500", thymeleafContext));
         });
