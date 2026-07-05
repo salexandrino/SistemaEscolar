@@ -6,6 +6,7 @@ import br.com.synge.administrativo.services.DashboardService;
 import br.com.synge.seguranca.controllers.EscolaDashboardController;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.middlewares.AuthMiddleware;
+import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
@@ -82,7 +83,7 @@ public class SyngeApplication {
 
         PasswordService passwordService = new PasswordService();
         JwtService jwtService = new JwtService();
-
+        SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         DashboardController dashboardController = new DashboardController(dashboardService, templateEngine);
@@ -188,38 +189,67 @@ public class SyngeApplication {
         // =================================================================
         // ROTAS DO PAINEL ADMINISTRATIVO (CENTRALIZADAS NO CONTROLLER)
         // =================================================================
+        // ==========================================
+        // 1. FILTROS DE SEGURANÇA (OBRIGATÓRIO FICAR NO TOPO)
+        // ==========================================
+
+        // Protege o ping
+        app.before("/ping", superAdminAuth);
+
+        // Protege a rota mãe (/dashboard) e absolutamente QUALQUER sub-rota (escolas, usuários, etc.)
+        app.before("/dashboard", superAdminAuth);
+        app.before("/dashboard/*", superAdminAuth);
+
+        // ==========================================
+        // 2. DEFINIÇÃO DAS ROTAS (ABAIXO DOS FILTROS)
+        // ==========================================
+
+        // Rota Ping
+        app.get("/ping", ctx -> {
+            Map<String, String> response = Map.of(
+                    "status", "ok",
+                    "service", "eq14",
+                    "timestamp", Instant.now().toString()
+            );
+            ctx.json(response);
+        });
+
+        // Rotas do Painel
         app.get("/dashboard", dashboardController::dashboard);
 
-        // --- GESTÃO DE USUÁRIOS ---
-        app.get("/dashboard/usuarios", dashboardController::usuarios);
-        app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
-        app.get("/dashboard/usuarios/editar", dashboardController::editarUsuario);
-        app.get("/dashboard/usuarios/visualizar", dashboardController::visualizarUsuario);
-
-        // --- GESTÃO DE ESCOLAS ---
         app.get("/dashboard/escolas", dashboardController::escolas);
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
 
+        app.get("/dashboard/usuarios", dashboardController::usuarios);
+        app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
+        app.get("/dashboard/usuarios/editar", dashboardController::editarUsuario);
+        app.get("/dashboard/usuarios/visualizar", dashboardController::visualizarUsuario);
         app.get("/teste", ctx -> ctx.result("FUNCIONOU"));
 
-        app.get("/ping", ctx ->
-                ctx.json(Map.of(
-                        "status", "ok",
-                        "service", "eq14",
-                        "timestamp", Instant.now().toString()
-                ))
-        );
 
-        app.exception(br.com.synge.seguranca.exceptions.ApiException.class, (e, ctx) -> {
-            ctx.status(e.getStatus());
-            if (ctx.path().startsWith("/dashboard")) {
-                ctx.sessionAttribute("errorMessage", e.getMessage());
-                ctx.redirect("/login");
-            } else {
-                ctx.json(Map.of("message", e.getMessage()));
-            }
+        // ==========================================
+        // TRATAMENTO DE EXCEÇÕES E ERROS DA API
+        // ==========================================
+
+        // ADICIONADO: Captura o erro do SuperAdminMiddleware e joga o usuário para o login
+        app.exception(br.com.synge.seguranca.exceptions.AuthenticationException.class, (e, ctx) -> {
+            ctx.redirect("/super-admin/login");
+        });
+
+        app.exception(NotFoundException.class, (e, ctx) -> {
+            ctx.status(404);
+            org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+            thymeleafContext.setVariable("message", e.getMessage());
+            ctx.html(templateEngine.process("errors/404", thymeleafContext));
+        });
+
+        app.exception(Exception.class, (e, ctx) -> {
+            ctx.status(500);
+            org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+            thymeleafContext.setVariable("message", "Ocorreu um erro interno inesperado.");
+            ctx.html(templateEngine.process("errors/500", thymeleafContext));
         });
 
         app.start(port);
