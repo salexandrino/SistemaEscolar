@@ -247,59 +247,26 @@ public class AuthService {
 
     public String autenticarSuperAdmin(String email, String senha) {
 
-        logger.info("========== LOGIN SUPER ADMIN ==========");
-        logger.info("Email recebido: {}", email);
+        logger.info("Iniciando tentativa de login para o Super Admin: {}", email);
 
         ValidationUtil.validateEmail(email);
 
-
-        System.out.println("================================");
-        System.out.println("LOGIN SUPER ADMIN");
-        System.out.println("Email recebido: " + email);
-
-        Optional<Usuario> optional = usuarioRepository.findSuperAdminByEmail(email);
-
-        System.out.println("Encontrou usuário? " + optional.isPresent());
-
-        if (optional.isEmpty()) {
-            throw new AuthenticationException("Usuário não encontrado.");
-        }
-
+        // Busca o usuário apenas UMA vez no banco para economizar performance
         Usuario usuario = usuarioRepository.findSuperAdminByEmail(email)
                 .orElseThrow(() -> new AuthenticationException("Email ou senha inválidos."));
-        logger.info("Usuário encontrado: {}", usuario.getEmail());
-        logger.info("Perfil encontrado: {}", usuario.getPerfil());
-        System.out.println("ID: " + usuario.getId());
-        System.out.println("EMAIL BANCO: " + usuario.getEmail());
-        System.out.println("PERFIL: " + usuario.getPerfil());
-        System.out.println("ATIVO: " + usuario.isAtivo());
 
-        logger.info("Hash do banco: {}", usuario.getSenhaHash());
-
-        boolean senhaValida = passwordService.verificar(senha, usuario.getSenhaHash());
-
-        logger.info("Senha válida? {}", senhaValida);
-
-        logger.info("Senha recebida: '{}'", senha);
-        logger.info("Tamanho da senha: {}", senha == null ? "null" : senha.length());
-        logger.info("Hash do banco: {}", usuario.getSenhaHash());
-
+        // Verifica se a senha bate com o hash criptografado (Sem printar nada no console!)
         boolean senhaCorreta = passwordService.verificar(senha, usuario.getSenhaHash());
 
-        logger.info("Senha correta? {}", senhaCorreta);
-        System.out.println("Senha digitada = " + senha);
-        System.out.println("Senha correta = " + senhaCorreta);
-        System.out.println("Hash = " + usuario.getSenhaHash());
-        System.out.println("Teste direto = " +
-                BCrypt.checkpw(senha, usuario.getSenhaHash()));
-
         if (!senhaCorreta) {
-            throw new AuthenticationException("Senha incorreta.");
+            logger.warn("Tentativa de login falhou: Senha incorreta para o Super Admin: {}", email);
+            throw new AuthenticationException("Email ou senha inválidos.");
+            // Dica: Use uma mensagem genérica para não dar pistas a invasores se o e-mail ou a senha estavam certos
         }
 
+        logger.info("Super Admin [{}] autenticado com sucesso.", email);
 
-        System.out.println("LOGIN OK!");
-
+        // Gera o token JWT com segurança
         String token = jwtService.gerarToken(
                 usuario.getId(),
                 null,

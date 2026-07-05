@@ -116,8 +116,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     public Optional<Escola> findByCnpj(String cnpj) {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
-                     "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE cnpj = ?";
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE cnpj = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -131,7 +131,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
             }
 
         } catch (SQLException e) {
-            logger.error("Erro ao buscar escola por CNPJ {}: {}", cnpj, e.getMessage(), e);
+            // ✔️ LOG CORRIGIDO: Mais limpo e sem duplicar a mensagem da Stack Trace
+            logger.error("Erro ao buscar escola por CNPJ {}", cnpj, e);
             throw new RuntimeException("Erro ao buscar escola no banco de dados.", e);
         }
         return Optional.empty();

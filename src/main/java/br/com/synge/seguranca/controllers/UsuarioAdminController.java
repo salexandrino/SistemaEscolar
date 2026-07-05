@@ -32,19 +32,28 @@ public class UsuarioAdminController {
 
     public void listar(Context ctx) {
         try {
+            // 1. Garante que há um usuário autenticado na sessão
             AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            // 2. Se o service aceitar o contexto do usuário (recomendado para filtrar por Tenant/Escola)
+            // mude para: usuarioAdminService.listarTodos(currentUser);
             var usuarios = usuarioAdminService.listarTodos();
+
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("total", usuarios.size());
             response.put("usuarios", usuarios.stream().map(this::usuarioToMap).toList());
+
             ctx.status(HttpStatus.OK);
             ctx.json(response);
         } catch (AuthenticationException | AuthorizationException e) {
             responderErro(ctx, e.getStatus(), e.getMessage());
-            logger.warn("Falha ao listar usuarios: {}", e.getMessage());
+            logger.warn("Falha ao listar usuários (Acesso Negado): {}", e.getMessage());
         } catch (Exception e) {
-            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao listar usuarios.");
-            logger.error("Erro inesperado ao listar usuarios: {}", e.getMessage(), e);
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao listar usuários.");
+            logger.error("Erro inesperado ao listar usuários", e);
         }
     }
 

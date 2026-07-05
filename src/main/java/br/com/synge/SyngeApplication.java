@@ -67,10 +67,6 @@ public class SyngeApplication {
                 stmt.setString(1, hashGeradoPeloProjeto);
                 stmt.setString(2, "synge.gestao@gmail.com");
                 int linhasAfetadas = stmt.executeUpdate();
-                System.out.println("=================================================");
-                System.out.println("NOVO HASH GERADO PELO PROJETO: " + hashGeradoPeloProjeto);
-                System.out.println("Linhas modificadas: " + linhasAfetadas);
-                System.out.println("=================================================");
             } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
             }
