@@ -1,177 +1,86 @@
 <!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/master-admin :: html}">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
 
 <div th:fragment="content">
 
-    <!-- Breadcrumb -->
     <nav class="breadcrumb-admin mb-4">
-        <a href="/dashboard">Dashboard</a>
+        <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
-        <a href="/dashboard/usuarios">Usuários</a>
+        <a href="/dashboard/usuarios" class="text-decoration-none">Usuários</a>
         <span class="mx-2">></span>
         <span class="text-muted">Visualizar Usuário</span>
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="page-title">
-            <i class="bi bi-person-lines-fill me-2"></i>
-            Visualizar Usuário
-        </h2>
-
-        <a href="/dashboard/usuarios" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i>
-            Voltar
+        <div>
+            <h2 class="page-title mb-1">
+                <i class="bi bi-person-lines-fill me-2 text-success"></i>
+                Ficha do Usuário
+            </h2>
+            <p class="text-muted small mb-0">Detalhamento completo dos dados cadastrais do usuário no sistema.</p>
+        </div>
+        <a href="/dashboard/usuarios" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
         </a>
     </div>
 
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-person-circle"></i>
-                Dados do Usuário
-            </h5>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Dados do Usuário</h5>
         </div>
-
-        <div class="card-body">
+        <div class="card-body p-4">
 
             <div class="row">
-
                 <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Nome Completo</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.nomeCompleto}">
-                    </div>
+                    <label class="fw-semibold text-secondary small mb-1">Nome Completo</label>
+                    <div class="form-control bg-light" th:text="${usuario.nomeCompleto}">Nome Completo</div>
                 </div>
-
                 <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Email</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.email}">
-                    </div>
+                    <label class="fw-semibold text-secondary small mb-1">Endereço de E-mail</label>
+                    <div class="form-control bg-light" th:text="${usuario.email}">email@exemplo.com</div>
                 </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="fw-bold">CPF</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.cpf}">
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="fw-bold">Telefone</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.telefone}">
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label class="fw-bold">Perfil</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.perfil}">
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Escola</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${usuario.escola != null ? usuario.escola.nome : '-'}">
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3">
-                    <label class="fw-bold">Status</label>
-
-                    <div>
-
-                        <span class="badge bg-success"
-                              th:if="${usuario.status.name() == 'ATIVO'}">
-                            Ativo
-                        </span>
-
-                        <span class="badge bg-danger"
-                              th:if="${usuario.status.name() == 'INATIVO'}">
-                            Inativo
-                        </span>
-
-                        <span class="badge bg-warning text-dark"
-                              th:if="${usuario.status.name() == 'PENDENTE'}">
-                            Pendente
-                        </span>
-
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3">
-                    <label class="fw-bold">Aprovado</label>
-
-                    <div>
-
-                        <span class="badge bg-success"
-                              th:if="${usuario.aprovado}">
-                            Sim
-                        </span>
-
-                        <span class="badge bg-danger"
-                              th:unless="${usuario.aprovado}">
-                            Não
-                        </span>
-
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Criado em</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${#temporals.format(usuario.criadoEm,'dd/MM/yyyy HH:mm')}">
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="fw-bold">Última atualização</label>
-
-                    <div class="form-control bg-light"
-                         th:text="${#temporals.format(usuario.atualizadoEm,'dd/MM/yyyy HH:mm')}">
-                    </div>
-                </div>
-
             </div>
 
-            <hr>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="fw-semibold text-secondary small mb-1">Número de CPF</label>
+                    <div class="form-control bg-light" th:text="${usuario.cpf}">000.000.000-00</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="fw-semibold text-secondary small mb-1">Telefone de Contato</label>
+                    <div class="form-control bg-light" th:text="${usuario.telefone != null && usuario.telefone != '' ? usuario.telefone : 'Não informado'}">(00) 00000-0000</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="fw-semibold text-secondary small mb-1">Perfil de Acesso</label>
+                    <div class="form-control bg-light">
+                        <span class="badge bg-secondary px-2 py-1" th:text="${usuario.perfil}">Perfil</span>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="text-muted fw-bold mt-4 mb-3"><i class="bi bi-clock-history me-2"></i>Informações do Sistema</h6>
+            <div class="row">
+                <div class="col-md-6 mb-3" th:if="${usuario.criadoEm != null}">
+                    <label class="fw-semibold text-secondary small mb-1">Data de Criação do Cadastro</label>
+                    <div class="form-control bg-light text-muted small" th:text="${#temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
+                </div>
+                <div class="col-md-6 mb-3" th:if="${usuario.atualizadoEm != null}">
+                    <label class="fw-semibold text-secondary small mb-1">Última Atualização Registrada</label>
+                    <div class="form-control bg-light text-muted small" th:text="${#temporals.format(usuario.atualizadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
 
             <div class="d-flex justify-content-end gap-2">
-
-                <a th:href="@{/dashboard/usuarios/editar/{id}(id=${usuario.id})}"
-                   class="btn btn-warning">
-
-                    <i class="bi bi-pencil"></i>
-
-                    Editar
-
+                <a th:href="'/dashboard/usuarios/editar/' + ${usuario.id}" class="btn btn-warning text-dark fw-bold px-4">
+                    <i class="bi bi-pencil"></i> Editar Cadastro
                 </a>
-
-                <a href="/dashboard/usuarios"
-                   class="btn btn-secondary">
-
-                    Fechar
-
-                </a>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
+</body>
 </html>

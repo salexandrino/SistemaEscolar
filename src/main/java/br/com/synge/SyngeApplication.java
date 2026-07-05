@@ -1,5 +1,6 @@
 package br.com.synge;
 
+
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
@@ -8,11 +9,6 @@ import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.middlewares.AuthMiddleware;
 import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
-import br.com.synge.seguranca.models.AuthUser;
-import br.com.synge.administrativo.controllers.DashboardController;
-import br.com.synge.administrativo.repositories.DashboardRepository;
-import br.com.synge.administrativo.services.DashboardService;
-import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.models.Usuario;
@@ -98,7 +94,7 @@ public class SyngeApplication {
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(escolaService);
 
-        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, templateEngine);
+        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, templateEngine);
 
         // ✔️ Código corrigido para Javalin 6
         Javalin app = Javalin.create(config -> {
@@ -251,12 +247,11 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
 
+        // --- GESTÃO DE USUÁRIOS ---
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
-        app.get("/dashboard/usuarios/editar", dashboardController::editarUsuario);
-        app.get("/dashboard/usuarios/visualizar", dashboardController::visualizarUsuario);
-        app.get("/teste", ctx -> ctx.result("FUNCIONOU"));
-
+        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario); // <-- ADICIONADA A BARRA AQUI
+        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario); // <-- ADICIONADA A BARRA AQUI
 
         // ==========================================
         // TRATAMENTO DE EXCEÇÕES E ERROS DA API
