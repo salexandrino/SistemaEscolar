@@ -12,54 +12,43 @@ public class FlywayConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(FlywayConfig.class);
 
-    private FlywayConfig() {
-        // Construtor privado
-    }
+    private FlywayConfig() {}
 
     public static void migrate() {
         try (Connection connection = DatabaseConfig.getConnection()) {
-            // O Flyway precisa de um DataSource para operar.
-            // Usamos o DataSource configurado no DatabaseConfig.
-            Dotenv dotenv = Dotenv.configure()
-                    .ignoreIfMissing()
-                    .load();
+            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
             String dbUrl = System.getenv("DB_URL");
-            if (dbUrl == null || dbUrl.isBlank()) {
-                dbUrl = dotenv.get("DB_URL");
-            }
+            if (dbUrl == null || dbUrl.isBlank()) dbUrl = dotenv.get("DB_URL");
 
             String dbUser = System.getenv("DB_USER");
-            if (dbUser == null || dbUser.isBlank()) {
-                dbUser = dotenv.get("DB_USER");
-            }
+            if (dbUser == null || dbUser.isBlank()) dbUser = dotenv.get("DB_USER");
 
             String dbPassword = System.getenv("DB_PASSWORD");
-            if (dbPassword == null || dbPassword.isBlank()) {
-                dbPassword = dotenv.get("DB_PASSWORD");
-            }
+            if (dbPassword == null || dbPassword.isBlank()) dbPassword = dotenv.get("DB_PASSWORD");
 
             Flyway flyway = Flyway.configure()
-                    .dataSource(
-                            dbUrl,
-                            dbUser,
-                            dbPassword
-                    )
+                    .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
+                    // 🔥 SEGURANÇA PARA O SERVIDOR DO PROFESSOR:
+                    .baselineOnMigrate(true)   // Se o histórico do Flyway já existir na nuvem, não quebra
+                    .baselineVersion("4")      // Define a base como 4 para ele obrigatoriamente rodar a sua V5
+                    .validateOnMigrate(false)  // Evita erros de checagem de texto/espaços entre Windows e Linux
                     .load();
 
-// EXECUTAR APENAS UMA VEZ
+            logger.info("Reparando o histórico do Flyway no servidor...");
             flyway.repair();
 
+            logger.info("Criando/atualizando as tabelas na nuvem...");
             flyway.migrate();
-            flyway.migrate();
+
             logger.info("Flyway migrations aplicadas com sucesso.");
         } catch (SQLException e) {
-            logger.error("Erro de SQL ao obter conexão para Flyway: {}", e.getMessage(), e);
-            throw new RuntimeException("Falha ao inicializar o banco de dados com Flyway (SQL Exception).", e);
+            logger.error("Erro de SQL no Flyway: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
         } catch (Exception e) {
-            logger.error("Erro ao aplicar Flyway migrations: {}", e.getMessage(), e);
-            throw new RuntimeException("Falha ao inicializar o banco de dados com Flyway.", e);
+            logger.error("Erro ao aplicar Flyway: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

@@ -63,7 +63,7 @@ public class SyngeApplication {
                 stmt.setString(2, "synge.gestao@gmail.com");
                 int linhasAfetadas = stmt.executeUpdate();
             } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+                logger.warn("⚠️ Aviso: Não foi possível atualizar a senha do admin nativo (O banco pode estar iniciando): {}", e.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class SyngeApplication {
 
         TemplateEngine templateEngine = createTemplateEngine();
         UsuarioRepository usuarioRepository = new UsuarioRepository();
-        EscolaRepository escolaRepository = new EscolaRepository();
+        EscolaRepository schoolRepository = new EscolaRepository();
 
         PasswordService passwordService = new PasswordService();
         JwtService jwtService = new JwtService();
@@ -81,9 +81,9 @@ public class SyngeApplication {
         DashboardRepository dashboardRepository = new DashboardRepository();
 
         DashboardService dashboardService = new DashboardService(dashboardRepository);
-        EscolaService schoolService = new EscolaService(escolaRepository);
+        EscolaService schoolService = new EscolaService(schoolRepository);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
-        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
+        AuthService authService = new AuthService(usuarioRepository, schoolRepository, passwordService, jwtService);
 
         AuthController authController = new AuthController(authService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
@@ -198,7 +198,6 @@ public class SyngeApplication {
         // ==========================================
         // 1. FILTROS DE SEGURANÇA (OBRIGATÓRIO FICAR NO TOPO)
         // ==========================================
-        // CORRIGIDO: Removida a linha app.before("/ping", superAdminAuth) para o endpoint ficar público
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
@@ -206,18 +205,16 @@ public class SyngeApplication {
         // 2. DEFINIÇÃO DAS ROTAS
         // ==========================================
 
-        // 🌟 ENDPOINT /PING EXIGIDO PELO PORTAL DO PROFESSOR (PÚBLICO E EXATO)
         app.get("/ping", ctx -> {
             Map<String, Object> response = Map.of(
                     "status", "ok",
                     "service", "eq14",
-                    "timestamp", Instant.now().toString() // Retorna formato ISO-8601 UTC (ex: 2026-06-03T14:32:10Z)
+                    "timestamp", Instant.now().toString()
             );
             ctx.status(200);
             ctx.json(response);
         });
 
-        // Rotas principais do Painel
         app.get("/dashboard", dashboardController::dashboard);
 
         // --- GESTÃO DE ESCOLAS ---
