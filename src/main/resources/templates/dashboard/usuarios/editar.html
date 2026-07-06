@@ -70,11 +70,12 @@
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Perfil de Acesso</label>
+                        <label class="form-label fw-semibold">Perfil</label>
                         <select class="form-select" name="perfil" required>
-                            <option value="GESTOR" th:selected="${usuario.perfil.toString() == 'GESTOR'}">GESTOR</option>
-                            <option value="SECRETARIO" th:selected="${usuario.perfil.toString() == 'SECRETARIO'}">SECRETÁRIO</option>
-                            <option value="PROFESSOR" th:selected="${usuario.perfil.toString() == 'PROFESSOR'}">PROFESSOR</option>
+                            <option value="" disabled>Selecione o perfil</option>
+                            <option value="GESTOR" th:selected="${usuario.perfil.name() == 'GESTOR'}">Gestor</option>
+                            <option value="SECRETARIA" th:selected="${usuario.perfil.name() == 'SECRETARIA'}">Secretaria / Administrativo</option>
+                            <option value="PROFESSOR" th:selected="${usuario.perfil.name() == 'PROFESSOR'}">Professor / Pedagógico</option>
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
