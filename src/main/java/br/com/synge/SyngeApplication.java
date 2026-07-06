@@ -206,7 +206,7 @@ public class SyngeApplication {
             }
         });
 
-        // API de Usuários (JSON)
+        // API de Usuários (JSON / Formulários HTML)
         app.get("/users", usuarioAdminController::listar);
         app.get("/users/{id}", usuarioAdminController::buscarPorId);
         app.put("/users/{id}", usuarioAdminController::atualizar);
@@ -214,19 +214,36 @@ public class SyngeApplication {
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
-        // API de Escolas (JSON)
+// 🔥 ADICIONE ESTAS ROTAS ABAIXO PARA SUPORTAR OS BOTÕES DO DASHBOARD:
+        app.post("/users/{id}/inativar", usuarioAdminController::inativar); // Ou delete/ativar, dependendo do nome no seu controller
+        app.post("/users/{id}/approve", usuarioAdminController::aprovar);
+
+        // =================================================================
+// APIs E ROTAS DE CONTEXTO (No SyngeApplication.java)
+// =================================================================
+
+// ... (outras rotas) ...
+
+// API de Escolas (Suporta requisições JSON da API E formulários HTML do Dashboard)
         app.post("/escolas", escolaController::criarEscola);
         app.patch("/escolas/{id}", escolaController::atualizarEscola);
+        app.post("/escolas/{id}", escolaController::atualizarEscola);
         app.get("/escolas", escolaController::listarEscolas);
         app.get("/escolas/ativas", escolaController::listarEscolasAtivas);
         app.get("/escolas/inativas", escolaController::listarEscolasInativas);
         app.get("/escolas/{id}", escolaController::obterEscola);
         app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
+
+// 🟢 Rotas de Ativação (Compatível com API e com cliques de botões HTML)
         app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
+        app.post("/escolas/{id}/ativar", escolaController::ativarEscola);     // 🔥 Aceita o clique de ativar do HTML
+
+// 🔴 Rotas de Inativação (Compatível com API e com cliques de botões HTML)
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
+        app.post("/escolas/{id}/inativar", escolaController::inativarEscola);   // 🔥 Aceita o clique de inativar do HTML
+
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);
-
         // =================================================================
         // TRATAMENTO DE EXCEÇÕES
         // =================================================================

@@ -27,15 +27,12 @@ public class FlywayConfig {
                     .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(true)
-                    .baselineVersion("0")      // 🔥 OBRIGATÓRIO SER "0": Faz o Flyway ler a V1 que cria a tabela usuario
-                    .validateOnMigrate(false)
+                    .baselineVersion("0")      // 🔥 Banco novo => aplica TUDO a partir da V1
+                    .validateOnMigrate(true)   // 🔥 Reativado conforme instrução do professor
                     .load();
 
-            logger.info("Executando Flyway Repair para limpar histórico corrompido...");
-            flyway.repair(); // 🔥 Destrava o banco apagando migrações que falharam antes
-
             logger.info("Aplicando as migrações na nuvem...");
-            flyway.migrate(); // 🔥 Cria as tabelas de verdade
+            flyway.migrate(); // 🔥 Cria as tabelas oficialmente
 
             logger.info("Flyway migrations aplicadas com sucesso.");
         } catch (Exception e) {
