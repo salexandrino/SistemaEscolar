@@ -30,11 +30,11 @@ public class FlywayConfig {
             Flyway flyway = Flyway.configure()
                     .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
-                    // 🔥 SEGURANÇA PARA O SERVIDOR DO PROFESSOR:
-                    .baselineOnMigrate(true)   // Se o histórico do Flyway já existir na nuvem, não quebra
-                    .baselineVersion("4")      // Define a base como 4 para ele obrigatoriamente rodar a sua V5
-                    .validateOnMigrate(false)  // Evita erros de checagem de texto/espaços entre Windows e Linux
+                    .validateOnMigrate(false)
                     .load();
+
+            flyway.repair();
+            flyway.migrate();
 
             logger.info("Reparando o histórico do Flyway no servidor...");
             flyway.repair();
