@@ -177,14 +177,12 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
-
-        // Gestão de Usuários (Páginas HTML)
+// --- GESTÃO DE USUÁRIOS ---
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
-
         // =================================================================
         // APIs E ROTAS DE CONTEXTO
         // =================================================================
