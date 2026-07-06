@@ -31,7 +31,7 @@
             <h5 class="mb-0"><i class="bi bi-person-gear me-2"></i>Atualizar Cadastro</h5>
         </div>
         <div class="card-body p-4">
-            <form th:action="'/dashboard/usuarios/editar/' + ${usuario.id}" method="post" autocomplete="off">
+            <form th:action="'/dashboard/usuarios/editar/' + ${usuario.id}" method="post">
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -47,8 +47,7 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">CPF</label>
-                        <input type="text" class="form-control bg-light" th:value="${usuario.cpf}" disabled>
-                        <input type="hidden" name="cpf" th:value="${usuario.cpf}">
+                        <input type="text" class="form-control bg-light" name="cpf" th:value="${usuario.cpf}" readonly>
                         <div class="form-text small">O CPF não pode ser alterado.</div>
                     </div>
                     <div class="col-md-4 mb-3">
@@ -73,17 +72,51 @@
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">Perfil de Acesso</label>
                         <select class="form-select" name="perfil" required>
-                            <option value="GESTOR" th:selected="${usuario.perfil.name() == 'GESTOR'}">GESTOR</option>
-                            <option value="SECRETARIA" th:selected="${usuario.perfil.name() == 'SECRETARIA'}">SECRETÁRIA</option>
-                            <option value="PROFESSOR" th:selected="${usuario.perfil.name() == 'PROFESSOR'}">PROFESSOR</option>
+                            <option value="SUPER_ADMIN" th:selected="${usuario.perfil.toString() == 'SUPER_ADMIN'}">SUPER_ADMIN</option>
+                            <option value="GESTOR" th:selected="${usuario.perfil.toString() == 'GESTOR'}">GESTOR</option>
+                            <option value="SECRETARIO" th:selected="${usuario.perfil.toString() == 'SECRETARIO'}">SECRETÁRIO</option>
+                            <option value="PROFESSOR" th:selected="${usuario.perfil.toString() == 'PROFESSOR'}">PROFESSOR</option>
+                            <option value="ALUNO" th:selected="${usuario.perfil.toString() == 'ALUNO'}">ALUNO</option>
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">Status da Conta</label>
                         <select class="form-select" name="aprovado">
-                            <option value="true" th:selected="${usuario.ativo == true}">Ativo / Aprovado</option>
-                            <option value="false" th:selected="${usuario.ativo == false}">Inativo / Pendente</option>
+                            <option value="true" th:selected="${usuario.aprovado}">Ativo / Aprovado</option>
+                            <option value="false" th:selected="${!usuario.aprovado}">Inativo / Pendente</option>
                         </select>
+                    </div>
+                </div>
+
+                <h6 class="text-success fw-bold mt-4 mb-3"><i class="bi bi-geo-alt me-2"></i>Informações de Endereço</h6>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold">CEP</label>
+                        <input type="text" class="form-control" name="cep">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Logradouro (Endereço)</label>
+                        <input type="text" class="form-control" name="endereco">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold">Complemento</label>
+                        <input type="text" class="form-control" name="complemento">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Bairro</label>
+                        <input type="text" class="form-control" name="bairro">
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label fw-semibold">Cidade</label>
+                        <input type="text" class="form-control" name="cidade">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label fw-semibold">Estado (UF)</label>
+                        <input type="text" class="form-control" name="estado" maxlength="2">
                     </div>
                 </div>
 

@@ -144,6 +144,54 @@ public class DashboardController {
             ctx.redirect("/dashboard/usuarios");
         }
     }
+    // Método para processar o envio do formulário de edição (POST)
+    public void salvarEditarUsuario(Context ctx) {
+        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        try {
+            // 1. Captura o ID da URL e converte para UUID
+            java.util.UUID usuarioId = java.util.UUID.fromString(ctx.pathParam("id"));
+
+            // 2. Busca o usuário existente do banco de dados reais
+            br.com.synge.seguranca.models.Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new br.com.synge.seguranca.exceptions.NotFoundException("Usuário não encontrado."));
+
+            // 3. Captura os dados enviados pelo formulário HTML (ctx.formParam)
+            String nomeForm = ctx.formParam("nomeCompleto");
+            String emailForm = ctx.formParam("email");
+            String telefoneForm = ctx.formParam("telefone");
+            String perfilForm = ctx.formParam("perfil");
+            String aprovadoForm = ctx.formParam("aprovado");
+
+            // 4. Aplica as alterações no objeto Java se os campos não vierem nulos
+            if (nomeForm != null) usuario.setNomeCompleto(nomeForm);
+            if (emailForm != null) usuario.setEmail(emailForm);
+            if (telefoneForm != null) usuario.setTelefone(telefoneForm);
+
+            // Tratamento do Enum do Perfil baseado no pacote correto
+            if (perfilForm != null && !perfilForm.isBlank()) {
+                usuario.setPerfil(br.com.synge.seguranca.enums.Perfil.valueOf(perfilForm));
+            }
+
+            // Tratamento do Boolean de aprovação (ativo/inativo)
+            if (aprovadoForm != null) {
+                usuario.setAprovado("true".equals(aprovadoForm));
+            }
+
+            // O PASSO CRUCIAL: Salva as alterações de fato no banco de dados e comita
+            usuarioRepository.update(usuario);
+
+            // Atualiza a sessão e força o motor de renderização a carregar os dados novos
+            thymeleafContext.setVariable("usuario", usuario);
+
+            // Redireciona de volta para a lista com os dados atualizados
+            ctx.redirect("/dashboard/usuarios");
+
+        } catch (Exception e) {
+            logger.error("Erro ao salvar alterações do usuário", e);
+            // Se der qualquer erro no processo, te mantém na tela de edição para não perder o que digitou
+            ctx.redirect("/dashboard/usuarios/editar/" + ctx.pathParam("id"));
+        }
+    }
 
     // ALTERAÇÃO 4: Buscar o usuário real para a tela de Visualização completa
     public void visualizarUsuario(Context ctx) {
