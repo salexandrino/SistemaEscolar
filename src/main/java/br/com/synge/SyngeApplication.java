@@ -246,12 +246,14 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
-
-        // --- GESTÃO DE USUÁRIOS ---
+// --- GESTÃO DE USUÁRIOS ---
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
-        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario); // <-- ADICIONADA A BARRA AQUI
-        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario); // <-- ADICIONADA A BARRA AQUI
+        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
+
+// 🔥 ALTERE ESTA LINHA PARA APONTAR PARA O MÉTODO CORRETO:
+        app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
+        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
 
         // ==========================================
         // TRATAMENTO DE EXCEÇÕES E ERROS DA API
