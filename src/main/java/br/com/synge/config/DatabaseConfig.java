@@ -77,6 +77,11 @@ public class DatabaseConfig {
         }
     }
 
+    // 🔥 ADICIONADO: Método necessário para o FlywayConfig reutilizar a conexão existente
+    public static HikariDataSource getDataSource() {
+        return dataSource;
+    }
+
     public static Connection getConnection() throws SQLException {
         if (dataSource == null) {
             throw new SQLException("DataSource não inicializado. Chame DatabaseConfig.init() primeiro.");
