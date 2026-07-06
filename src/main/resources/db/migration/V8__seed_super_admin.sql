@@ -9,10 +9,8 @@ INSERT INTO usuario (
     senha_hash,
     perfil,
     ativo,
-    aprovado,
     tentativas_login,
     bloqueado,
-    bloqueado_ate,
     ultimo_login,
     criado_em,
     atualizado_em
@@ -28,10 +26,8 @@ SELECT
     '$2a$10$msYsuhuC7CWfiggSVMwdMugr0DL.sgwHC8WrDiD4zLh/RdA3cqj3y',
     'SUPER_ADMIN',
     TRUE,
-    TRUE,
     0,
     FALSE,
-    NULL,
     NULL,
     CURRENT_TIMESTAMP,
     CURRENT_TIMESTAMP

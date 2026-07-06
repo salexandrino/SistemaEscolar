@@ -213,7 +213,7 @@ public class SyngeApplication {
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
 // 🔥 ADICIONE ESTAS ROTAS ABAIXO PARA SUPORTAR OS BOTÕES DO DASHBOARD:
-        app.post("/users/{id}/inativar", usuarioAdminController::inativar); // Ou delete/ativar, dependendo do nome no seu controller
+        app.post("/users/{id}/inativar", usuarioAdminController::inativar);
         app.post("/users/{id}/approve", usuarioAdminController::aprovar);
 
         // =================================================================
