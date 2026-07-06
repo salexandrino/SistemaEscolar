@@ -1,6 +1,5 @@
 package br.com.synge;
 
-
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
@@ -70,7 +69,6 @@ public class SyngeApplication {
             e.printStackTrace();
         }
 
-
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
         // 1. Primeiro criamos os Repositories e Services básicos
@@ -83,30 +81,27 @@ public class SyngeApplication {
         SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
 
-// 2. Criamos os Services (Repare que o EscolaService agora vem ANTES)
+        // 2. Criamos os Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
-        EscolaService escolaService = new EscolaService(escolaRepository); // <--- Criado primeiro!
+        EscolaService schoolService = new EscolaService(escolaRepository);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
 
-// 3. Agora criamos os Controllers passando as dependências prontas
+        // 3. Agora criamos os Controllers passando as dependências prontas
         AuthController authController = new AuthController(authService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
-        EscolaController escolaController = new EscolaController(escolaService);
+        EscolaController escolaController = new EscolaController(schoolService);
 
-        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, templateEngine);
+        DashboardController dashboardController = new DashboardController(dashboardService, schoolService, usuarioRepository, templateEngine);
 
-        // ✔️ Código corrigido para Javalin 6
+        // ✔️ Configuração do Javalin 6
         Javalin app = Javalin.create(config -> {
-            // 1. Mantém os arquivos estáticos da pasta public
             config.staticFiles.add(staticFiles -> {
                 staticFiles.hostedPath = "/";
                 staticFiles.directory = "/public";
                 staticFiles.location = Location.CLASSPATH;
             });
 
-            // 2. ADICIONE ESTA LINHA: Ensina o Javalin a usar o Thymeleaf quando chamamos ctx.render()
-            // ✔️ Configuração corrigida com a conversão de tipo correta para o Java
             config.fileRenderer((filePath, model, ctx) -> {
                 Context thymeleafContext = new Context(ctx.req().getLocale());
 
@@ -114,7 +109,6 @@ public class SyngeApplication {
                 Map<String, Object> cleanModel = (Map<String, Object>) (Map<String, ?>) model;
                 thymeleafContext.setVariables(cleanModel);
 
-                // FORÇAR O THYMELEAF A ACEITAR LINKS COM @ EM AMBIENTE NÃO-SPRING:
                 String templateName = filePath.replace(".html", "");
                 return templateEngine.process(templateName, thymeleafContext);
             });
@@ -205,25 +199,16 @@ public class SyngeApplication {
             }
         });
 
-        // =================================================================
-        // ROTAS DO PAINEL ADMINISTRATIVO (CENTRALIZADAS NO CONTROLLER)
-        // =================================================================
         // ==========================================
         // 1. FILTROS DE SEGURANÇA (OBRIGATÓRIO FICAR NO TOPO)
         // ==========================================
-
-        // Protege o ping
         app.before("/ping", superAdminAuth);
-
-        // Protege a rota mãe (/dashboard) e absolutamente QUALQUER sub-rota (escolas, usuários, etc.)
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
         // ==========================================
-        // 2. DEFINIÇÃO DAS ROTAS (ABAIXO DOS FILTROS)
+        // 2. DEFINIÇÃO DAS ROTAS
         // ==========================================
-
-        // Rota Ping
         app.get("/ping", ctx -> {
             Map<String, String> response = Map.of(
                     "status", "ok",
@@ -233,31 +218,44 @@ public class SyngeApplication {
             ctx.json(response);
         });
 
-        // Rotas do Painel
+        // Rotas principais do Painel
         app.get("/dashboard", dashboardController::dashboard);
 
-// Rotas que devolvem Páginas (HTML + Thymeleaf)
+        // --- GESTÃO DE ESCOLAS ---
         app.get("/dashboard/escolas", escolaController::exibirPaginaListagem);
         app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
-
-// Rotas da API (JSON puro)
-        app.get("/api/escolas", escolaController::listarEscolas);
-        app.get("/api/escolas/{id}", escolaController::obterEscola);
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
 
-        // --- GESTÃO DE USUÁRIOS ---
+// 🌟 AS ROTAS DE SALVAMENTO DA ESCOLA (Aceitando os caminhos que seu HTML e API usam)
+        app.post("/dashboard/escolas/editar/{id}", escolaController::atualizarEscola);
+        app.post("/escolas/{id}", escolaController::atualizarEscola);   // 👈 ADICIONE ESTA (É a rota que o form HTML chama!)
+        app.patch("/api/escolas/{id}", escolaController::atualizarEscola);
+
+// Rotas de API de Escolas
+        app.get("/api/escolas", escolaController::listarEscolas);
+        app.get("/api/escolas/{id}", escolaController::obterEscola);
+
+// Rotas de ativação/inativação
+        app.post("/escolas/{id}/ativar", escolaController::ativarEscola);
+        app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
+
+
+// --- GESTÃO DE USUÁRIOS ---
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
-        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario); // <-- ADICIONADA A BARRA AQUI
-        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario); // <-- ADICIONADA A BARRA AQUI
+        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
+        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
+// 🌟 AS ROTAS DE SALVAMENTO DO USUÁRIO
+        app.post("/dashboard/usuarios/editar/{id}", usuarioAdminController::atualizar);
+        app.post("/usuarios/{id}", usuarioAdminController::atualizar);  // 👈 ADICIONE ESTA (Caso o HTML de usuário use o caminho curto também)
+
+
 
         // ==========================================
         // TRATAMENTO DE EXCEÇÕES E ERROS DA API
         // ==========================================
-
-        // ADICIONADO: Captura o erro do SuperAdminMiddleware e joga o usuário para o login
         app.exception(AuthenticationException.class, (e, ctx) -> {
             ctx.redirect("/super-admin/login");
         });

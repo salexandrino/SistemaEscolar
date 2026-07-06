@@ -292,22 +292,58 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
     }
 
     public void updateCadastro(Usuario usuario) {
-        String sql = "UPDATE usuario SET escola_id = ?, nome_completo = ?, email = ?, cpf = ?, telefone = ?, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setObject(1, usuario.getEscolaId());
-            stmt.setString(2, usuario.getNomeCompleto());
-            stmt.setString(3, usuario.getEmail());
-            stmt.setString(4, usuario.getCpf());
-            stmt.setString(5, usuario.getTelefone());
-            stmt.setObject(6, LocalDateTime.now(), Types.TIMESTAMP);
-            stmt.setObject(7, usuario.getId());
-            stmt.setObject(8, usuario.getTenantId());
-            stmt.executeUpdate();
-            logger.info("Cadastro do usuario atualizado: {}", usuario.getId());
+        // Atualização direta pelo ID único (Removida a trava do tenant_id que impedia o SUPER_ADMIN)
+        String sql = "UPDATE usuario SET escola_id = ?, nome_completo = ?, email = ?, cpf = ?, telefone = ?, atualizado_em = ? WHERE id = ?";
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+
+            // Desativamos o autoCommit para garantir que NÓS controlamos a gravação definitiva
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setObject(1, usuario.getEscolaId());
+                stmt.setString(2, usuario.getNomeCompleto());
+                stmt.setString(3, usuario.getEmail());
+                stmt.setString(4, usuario.getCpf());
+                stmt.setString(5, usuario.getTelefone());
+                stmt.setObject(6, LocalDateTime.now());
+                stmt.setObject(7, usuario.getId());
+
+                int linhasAfetadas = stmt.executeUpdate();
+
+                if (linhasAfetadas == 0) {
+                    logger.warn("⚠️ ALERTA: Nenhuma linha foi atualizada no banco. ID {} não encontrado.", usuario.getId());
+                    conn.rollback(); // Cancela se não achou ninguém
+                } else {
+                    // 🔥 CRUCIAL: Força o banco de dados a salvar e fixar a alteração no disco!
+                    conn.commit();
+                    logger.info("✅ SUCESSO REAL: Cadastro do usuario {} gravado e commitado no banco.", usuario.getId());
+                }
+            }
+
         } catch (SQLException e) {
-            logger.error("Erro ao atualizar cadastro do usuario {}: {}", usuario.getId(), e.getMessage(), e);
-            throw new RuntimeException("Erro ao atualizar usuario no banco de dados.", e);
+            // Se houver qualquer erro de banco, desfaz para não quebrar a integridade
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    logger.error("Erro ao dar rollback.", ex);
+                }
+            }
+            logger.error("Erro crítico ao executar updateCadastro para o usuário ID: " + usuario.getId(), e);
+            throw new RuntimeException(e);
+        } finally {
+            // Garante o fechamento correto da conexão
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Restaura o padrão antes de devolver a conexão pro pool
+                    conn.close();
+                } catch (SQLException e) {
+                    logger.error("Erro ao fechar conexão.", e);
+                }
+            }
         }
     }
 

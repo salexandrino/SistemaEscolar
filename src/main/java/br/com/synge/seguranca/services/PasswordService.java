@@ -25,14 +25,19 @@ public class PasswordService {
     }
 
     public boolean verificar(String senha, String senhaHash) {
+        // Log seguro: avisa o que está fazendo, mas não expõe os dados
+        logger.debug("Processando verificação de credenciais via BCrypt.");
 
-        logger.info("=== PASSWORD SERVICE ===");
-        logger.info("Senha recebida: '{}'", senha);
-        logger.info("Hash recebido: {}", senhaHash);
+        if (senha == null || senhaHash == null) {
+            logger.warn("Tentativa de verificação com senha ou hash nulos.");
+            return false;
+        }
 
+        // Executa a checagem nativa
         boolean resultado = BCrypt.checkpw(senha, senhaHash);
 
-        logger.info("Resultado BCrypt: {}", resultado);
+        // Registra apenas o resultado final
+        logger.debug("Resultado da validação de senha: {}", resultado);
 
         return resultado;
     }}

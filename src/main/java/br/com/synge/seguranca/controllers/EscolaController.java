@@ -16,7 +16,7 @@ import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import br.com.synge.seguranca.services.EscolaService;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,15 +25,12 @@ import java.util.UUID;
 public class EscolaController {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaController.class);
+    private final EscolaService escolaService;
 
-        // VERIFIQUE SE ESTA LINHA EXISTE EXATAMENTE ASSIM:
-        private final EscolaService escolaService;
+    public EscolaController(EscolaService escolaService) {
+        this.escolaService = escolaService;
+    }
 
-        // O construtor usa exatamente o mesmo nome e tipo:
-        public EscolaController(EscolaService escolaService) {
-            this.escolaService = escolaService;
-
-        }
     private Map<String, Object> escolaToMap(Escola escola) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", escola.getId());
@@ -69,20 +66,51 @@ public class EscolaController {
         map.put("atualizadoEm", escola.getAtualizadoEm());
         return map;
     }
+    /**
+     * GET /escolas/{id} - Busca uma escola por ID
+     */
+    public void obterEscola(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            UUID schoolId = UUID.fromString(ctx.pathParam("id"));
+            Escola escola = escolaService.buscarEscolaPorId(schoolId, currentUser);
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(escolaToMap(escola));
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha ao obter escola: {}", e.getMessage());
+        } catch (NotFoundException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            ctx.json(Map.of("message", "ID de escola inválido."));
+            logger.warn("ID de escola inválido: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao obter escola: {}", e.getMessage(), e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("message", "Erro interno ao obter escola."));
+        }
+    }
 
     /**
      * POST /escolas - Cadastra uma nova escola
      */
     public void criarEscola(Context ctx) {
         try {
-
             AuthUser currentUser = AuthUserContext.getAuthUser();
             if (currentUser == null) {
                 throw new AuthenticationException("Usuário não autenticado.");
             }
 
             CriarEscolaDTO dto = new CriarEscolaDTO();
-
             dto.setNome(ctx.formParam("nome"));
             dto.setCnpj(ctx.formParam("cnpj"));
             dto.setEmailInstitucional(ctx.formParam("emailInstitucional"));
@@ -110,7 +138,10 @@ public class EscolaController {
     }
 
     /**
-     * PATCH /escolas/{id} - Atualiza uma escola
+     * PATCH ou POST /escolas/{id} - Atualiza uma escola
+     */
+    /**
+     * PATCH ou POST /escolas/{id} - Atualiza uma escola
      */
     public void atualizarEscola(Context ctx) {
         try {
@@ -120,8 +151,44 @@ public class EscolaController {
             }
 
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
-            AtualizarEscolaDTO dto = ctx.bodyAsClass(AtualizarEscolaDTO.class);
+            AtualizarEscolaDTO dto;
+
+            // Detecta se o envio veio de um formulário HTML convencional
+            if (ctx.formParamMap() != null && !ctx.formParamMap().isEmpty()) {
+                dto = new AtualizarEscolaDTO();
+
+                // 💡 CORREÇÃO CRÍTICA: Usamos um método auxiliar 'obterCampoForm'
+                // para garantir que campos vazios virem 'null' e não quebrem a validação do Service
+                dto.setNome(obterCampoForm(ctx, "nome"));
+                dto.setCnpj(obterCampoForm(ctx, "cnpj"));
+                dto.setEmailInstitucional(obterCampoForm(ctx, "emailInstitucional"));
+                dto.setTelefone(obterCampoForm(ctx, "telefone"));
+                dto.setCidade(obterCampoForm(ctx, "cidade"));
+                dto.setEstado(obterCampoForm(ctx, "estado"));
+                dto.setNomeResponsavel(obterCampoForm(ctx, "nomeResponsavel"));
+
+                // Campos opcionais (que podem não estar no seu HTML atual)
+                dto.setEndereco(obterCampoForm(ctx, "endereco"));
+                dto.setNumero(obterCampoForm(ctx, "numero"));
+                dto.setComplemento(obterCampoForm(ctx, "complemento"));
+                dto.setBairro(obterCampoForm(ctx, "bairro"));
+                dto.setCep(obterCampoForm(ctx, "cep"));
+                dto.setTelefoneResponsavel(obterCampoForm(ctx, "telefoneResponsavel"));
+                dto.setEmailResponsavel(obterCampoForm(ctx, "emailResponsavel"));
+                dto.setStatus(obterCampoForm(ctx, "status"));
+            } else {
+                // Se for uma requisição de API com JSON puro
+                dto = ctx.bodyAsClass(AtualizarEscolaDTO.class);
+            }
+
             Escola escola = escolaService.atualizarEscola(escolaId, dto, currentUser);
+
+            // Redirecionamento automático se veio da tela do painel
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/escolas");
+                return;
+            }
 
             ctx.status(HttpStatus.OK);
             Map<String, Object> response = new LinkedHashMap<>();
@@ -149,17 +216,29 @@ public class EscolaController {
     }
 
     /**
+     * 💡 Método Auxiliar: Retorna null se o campo do formulário for nulo,
+     * vazio ou contiver apenas espaços. Evita erros no Service.
+     */
+    private String obterCampoForm(Context ctx, String nomeCampo) {
+        String valor = ctx.formParam(nomeCampo);
+        if (valor == null || valor.isBlank() || "null".equalsIgnoreCase(valor.trim())) {
+            return null;
+        }
+        return valor.trim();
+    }
+
+    /**
      * GET /escolas/{id} - Busca uma escola por ID
      */
-    public void obterEscola(Context ctx) {
+    public void obtenerEscola(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();
             if (currentUser == null) {
                 throw new AuthenticationException("Usuário não autenticado.");
             }
 
-            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
-            Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
+            UUID schoolId = UUID.fromString(ctx.pathParam("id"));
+            Escola escola = escolaService.buscarEscolaPorId(schoolId, currentUser);
 
             ctx.status(HttpStatus.OK);
             ctx.json(escolaToMap(escola));
@@ -302,9 +381,8 @@ public class EscolaController {
         }
     }
 
-
     /**
-     * PATCH /escolas/{id}/ativar - Ativa uma escola
+     * PATCH ou POST /escolas/{id}/ativar - Ativa uma escola
      */
     public void ativarEscola(Context ctx) {
         try {
@@ -315,6 +393,13 @@ public class EscolaController {
 
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.ativarEscola(escolaId, currentUser);
+
+            // 💡 REDIRECIONAMENTO AUTOMÁTICO: Evita a tela de JSON puro após ativar
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/escolas");
+                return;
+            }
 
             ctx.status(HttpStatus.OK);
             Map<String, Object> response = new LinkedHashMap<>();
@@ -342,7 +427,7 @@ public class EscolaController {
     }
 
     /**
-     * PATCH /escolas/{id}/inativar - Inativa uma escola
+     * PATCH ou POST /escolas/{id}/inativar - Inativa uma escola
      */
     public void inativarEscola(Context ctx) {
         try {
@@ -353,6 +438,13 @@ public class EscolaController {
 
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.inativarEscola(escolaId, currentUser);
+
+            // 💡 REDIRECIONAMENTO AUTOMÁTICO: Evita a tela de JSON puro após inativar
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/escolas");
+                return;
+            }
 
             ctx.status(HttpStatus.OK);
             Map<String, Object> response = new LinkedHashMap<>();
@@ -383,17 +475,12 @@ public class EscolaController {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();
             if (currentUser == null) {
-                ctx.redirect("/login"); // Se não fixou o interceptor, redireciona
+                ctx.redirect("/login");
                 return;
             }
 
-            // 1. Busca os dados reais utilizando o Service
             List<Escola> escolas = escolaService.listarTodas(currentUser);
-
-            // 2. Passa a lista dentro do Map para o Thymeleaf ler
             Map<String, Object> model = Map.of("escolas", escolas);
-
-            // 3. Renderiza o arquivo HTML (coloque o caminho correto a partir da pasta de templates)
             ctx.render("dashboard/escolas/lista.html", model);
 
         } catch (Exception e) {
@@ -416,9 +503,7 @@ public class EscolaController {
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
 
-            // Disponibiliza a variável "${escola}" para o HTML que corrigimos antes
             Map<String, Object> model = Map.of("escola", escola);
-
             ctx.render("dashboard/escolas/visualizar.html", model);
 
         } catch (Exception e) {

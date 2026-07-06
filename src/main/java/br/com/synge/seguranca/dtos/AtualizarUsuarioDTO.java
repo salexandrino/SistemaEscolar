@@ -48,4 +48,6 @@ public class AtualizarUsuarioDTO {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+
 }

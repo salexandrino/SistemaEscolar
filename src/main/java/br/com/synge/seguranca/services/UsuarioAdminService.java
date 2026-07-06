@@ -61,7 +61,7 @@ public class UsuarioAdminService {
         usuario.setTelefone(dto.getTelefone().trim());
 
         usuarioRepository.updateCadastro(usuario);
-        logger.info("Usuario ID {} atualizado administrativamente.", id);
+        logger.info("Usuario ID {} updated administrativamente.", id);
         return buscarPorId(id, currentUser);
     }
 

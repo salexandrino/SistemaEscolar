@@ -100,35 +100,76 @@ public class AuthController {
 
     public void register(Context ctx) {
         try {
-            RegisterDTO registerDTO = ctx.bodyAsClass(RegisterDTO.class);
+            Usuario usuario;
 
-            Usuario usuario = new Usuario();
-            usuario.setNomeCompleto(registerDTO.getNomeCompleto());
-            usuario.setEmail(registerDTO.getEmail());
-            usuario.setCpf(registerDTO.getCpf());
-            usuario.setTelefone(registerDTO.getTelefone());
-            usuario.setSenhaHash(registerDTO.getSenha());
-            usuario.setConfirmacaoSenha(registerDTO.getConfirmacaoSenha());
-            usuario.setPerfil(registerDTO.getPerfil());
-            usuario.setEscolaId(registerDTO.getEscolaId());
-            usuario.setTenantId(registerDTO.getEscolaId());
+            // Se a requisição vier do formulário HTML convencional, preenche o modelo manualmente
+            if (ctx.formParamMap() != null && !ctx.formParamMap().isEmpty()) {
+                usuario = new Usuario();
+                usuario.setNomeCompleto(ctx.formParam("nomeCompleto"));
+                usuario.setEmail(ctx.formParam("email"));
+                usuario.setCpf(ctx.formParam("cpf"));
+                usuario.setTelefone(ctx.formParam("telefone"));
 
+                // 🔐 CAPTURA DA SENHA E DA CONFIRMAÇÃO DE SENHA:
+                String senha = ctx.formParam("senha");
+                usuario.setSenhaHash(senha);
+
+                String confirmacao = ctx.formParam("confirmacaoSenha");
+                usuario.setConfirmacaoSenha(confirmacao); // 🌟 FALTAVA EXATAMENTE ESTA LINHA!
+
+                // Mapeia o Perfil selecionado (PROFESSOR, GESTOR, SECRETARIA)
+                String perfilParam = ctx.formParam("perfil");
+                if (perfilParam != null && !perfilParam.isBlank()) {
+                    try {
+                        usuario.setPerfil(br.com.synge.seguranca.enums.Perfil.valueOf(perfilParam));
+                    } catch (IllegalArgumentException e) {
+                        logger.warn("Perfil inválido recebido do formulário: {}", perfilParam);
+                    }
+                }
+
+                // Mapeia a Escola selecionada
+                String escolaIdParam = ctx.formParam("escolaId");
+                if (escolaIdParam != null && !escolaIdParam.isBlank()) {
+                    usuario.setEscolaId(UUID.fromString(escolaIdParam));
+                }
+
+                // Se houver lógica de Tenant herdada do administrador logado
+                AuthUser currentUser = AuthUserContext.getAuthUser();
+                if (currentUser != null) {
+                    usuario.setTenantId(currentUser.getTenantId());
+                }
+
+            } else {
+                // Mantém o comportamento original caso a requisição venha via JSON (Postman/API REST)
+                usuario = ctx.bodyAsClass(Usuario.class);
+            }
+
+            // Executa a sua regra de negócio existente do AuthService
             authService.register(usuario);
 
+            // REDIRECIONAMENTO SEGURO: Se o usuário foi cadastrado pela tela, volta para a listagem
+            if (ctx.formParamMap() != null && !ctx.formParamMap().isEmpty()) {
+                ctx.redirect("/dashboard/usuarios");
+                return;
+            }
+
             ctx.status(HttpStatus.CREATED);
-            ctx.json(new RegisterResponseDTO("Usuário cadastrado com sucesso. Aguardando aprovação."));
-            logger.info("Solicitação de registro criada com sucesso para o CPF: {}", usuario.getCpf().replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
-        } catch (ValidationException | ConflictException | NotFoundException | AuthorizationException e) {
-            ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha na validação de registro de usuário: {}", e.getMessage());
+            ctx.json(Map.of("message", "Usuário cadastrado com sucesso."));
+
+        } catch (br.com.synge.seguranca.exceptions.ValidationException |
+                 br.com.synge.seguranca.exceptions.ConflictException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
+            logger.warn("Aviso de negócio ao registrar usuário: {}", e.getMessage());
         } catch (Exception e) {
             logger.error("Erro crítico e inesperado durante o registro de usuário", e);
-            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
-            ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
         }
     }
 
+    private void responderErro(Context ctx, HttpStatus status, String message) {
+        ctx.status(status);
+        ctx.json(Map.of("message", message));
+    }
     public void approveUser(Context ctx) {
         try {
             UUID userId = UUID.fromString(ctx.pathParam("id"));
