@@ -1,8 +1,12 @@
 package br.com.synge.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class FlywayConfig {
 
@@ -11,31 +15,38 @@ public class FlywayConfig {
     private FlywayConfig() {}
 
     public static void migrate() {
-        try {
-            // 🔥 REUTILIZAÇÃO EXATA: Pegamos o pool do HikariCP que já está conectado com sucesso
-            var hikariDataSource = DatabaseConfig.getDataSource();
+        try (Connection connection = DatabaseConfig.getConnection()) {
+            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-            if (hikariDataSource == null) {
-                throw new IllegalStateException("O DataSource do HikariCP não foi inicializado antes do Flyway!");
-            }
+            String dbUrl = System.getenv("DB_URL");
+            if (dbUrl == null || dbUrl.isBlank()) dbUrl = dotenv.get("DB_URL");
+
+            String dbUser = System.getenv("DB_USER");
+            if (dbUser == null || dbUser.isBlank()) dbUser = dotenv.get("DB_USER");
+
+            String dbPassword = System.getenv("DB_PASSWORD");
+            if (dbPassword == null || dbPassword.isBlank()) dbPassword = dotenv.get("DB_PASSWORD");
 
             Flyway flyway = Flyway.configure()
-                    .dataSource(hikariDataSource) // Passa o pool pronto do Hikari aqui
+                    .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(true)
-                    .baselineVersion("0")
+                    .baselineVersion("4")      // Mantém a base simulada para estabilizar na nuvem
                     .validateOnMigrate(false)
                     .load();
 
-            logger.info("Executando Flyway Repair com o DataSource do Hikari...");
+            logger.info("Executando Flyway Repair original...");
             flyway.repair();
 
-            logger.info("Aplicando as migrações (V1 ao V11) usando o pool do Hikari...");
+            logger.info("Aplicando as migrações...");
             flyway.migrate();
 
-            logger.info("Flyway migrations aplicadas com sucesso total.");
+            logger.info("Flyway migrations aplicadas com sucesso.");
+        } catch (SQLException e) {
+            logger.error("Erro de SQL no Flyway: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
         } catch (Exception e) {
-            logger.error("❌ Erro crítico ao aplicar Flyway com HikariCP: {}", e.getMessage(), e);
+            logger.error("Erro ao aplicar Flyway: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

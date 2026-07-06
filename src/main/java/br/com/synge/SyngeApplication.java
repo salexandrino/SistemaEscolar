@@ -44,15 +44,13 @@ public class SyngeApplication {
     public static void main(String[] args) throws SQLException {
         logger.info("Iniciando SYNGE...");
 
-        // 🔥 PASSO 2: FAIL-FAST ATIVADO - Se der erro no banco, o app fecha imediatamente e mostra no log
         try {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
-            logger.info("Banco de dados e migrações inicializados com sucesso.");
+            logger.info("Banco de dados inicializado.");
         } catch (Exception e) {
-            logger.error("❌ FALHA CRÍTICA: O banco de dados ou o Flyway falhou ao carregar as tabelas. Encerrando aplicação.", e);
-            System.exit(1);
+            e.printStackTrace(); // Apenas printa o erro e deixa o Javalin iniciar
         }
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
