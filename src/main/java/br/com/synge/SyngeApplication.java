@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class SyngeApplication {
 
@@ -242,7 +243,7 @@ public class SyngeApplication {
         });
 
         app.start(port);
-        logger.info("Servidor iniciado na porta {}", port);
+        logger.info("Servidor iniciado na porta {}", Optional.of(port));
     }
 
     private static TemplateEngine createTemplateEngine() {

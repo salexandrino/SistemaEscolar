@@ -125,11 +125,9 @@ public class EscolaController {
 
             Escola escola = escolaService.cadastrarEscola(dto, currentUser);
 
+            // 🔥 ALTERADO: Em vez de ctx.json(...), define o status e redireciona para a listagem visual
             ctx.status(201);
-            ctx.json(Map.of(
-                    "message", "Escola cadastrada com sucesso",
-                    "escola", escola
-            ));
+            ctx.redirect("/dashboard/escolas");
 
         } catch (Exception e) {
             ctx.status(400);
