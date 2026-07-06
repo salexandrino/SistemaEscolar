@@ -1,6 +1,6 @@
 # Como resolver: banco sem tabelas / migrations não aplicadas
 
-**Equipe 16 — APS (SIGFA)**
+**Equipe 14 — APS (Synge)**
 **Diagnóstico feito em:** 2026-07-06 (Prof. Rodrigo)
 
 > Este documento explica **por que** o banco de produção está sem tabelas e traz o
@@ -106,7 +106,7 @@ O app precisa da variável de ambiente `JWT_SECRET` (o log acusa
 `JWT_SECRET não configurado`). No repositório, garanta que ela está documentada no
 `.env.example`, e no deploy ela precisa ser injetada pelo servidor.
 
-Avisem o professor que a eq16 precisa de `JWT_SECRET` no `.env` de produção — ele
+Avisem o professor que a eq14 precisa de `JWT_SECRET` no `.env` de produção — ele
 adiciona a variável no ambiente do servidor (o valor não vai para o git).
 
 ---
@@ -130,7 +130,7 @@ adiciona a variável no ambiente do servidor (o valor não vai para o git).
    tudo automaticamente — **não é preciso apagar o banco**.
 3. Verifique no log de deploy que aparece algo como
    `Successfully applied N migrations` (e **não** mais `No database found to handle`).
-4. Teste o login do super admin em `https://eq16.aps.rodrigor.com` — não deve mais dar
+4. Teste o login do super admin em `https://eq14.aps.rodrigor.com` — não deve mais dar
    `relation "usuario" does not exist`.
 
 ---
