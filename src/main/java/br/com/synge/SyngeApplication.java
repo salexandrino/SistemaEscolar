@@ -71,7 +71,6 @@ public class SyngeApplication {
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
-        // 1. Primeiro criamos os Repositories e Services básicos
         TemplateEngine templateEngine = createTemplateEngine();
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         EscolaRepository escolaRepository = new EscolaRepository();
@@ -81,20 +80,17 @@ public class SyngeApplication {
         SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
 
-        // 2. Criamos os Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         EscolaService schoolService = new EscolaService(escolaRepository);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
 
-        // 3. Agora criamos os Controllers passando as dependências prontas
         AuthController authController = new AuthController(authService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(schoolService);
 
         DashboardController dashboardController = new DashboardController(dashboardService, schoolService, usuarioRepository, templateEngine);
 
-        // ✔️ Configuração do Javalin 6
         Javalin app = Javalin.create(config -> {
             config.staticFiles.add(staticFiles -> {
                 staticFiles.hostedPath = "/";
@@ -202,19 +198,22 @@ public class SyngeApplication {
         // ==========================================
         // 1. FILTROS DE SEGURANÇA (OBRIGATÓRIO FICAR NO TOPO)
         // ==========================================
-        app.before("/ping", superAdminAuth);
+        // CORRIGIDO: Removida a linha app.before("/ping", superAdminAuth) para o endpoint ficar público
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
         // ==========================================
         // 2. DEFINIÇÃO DAS ROTAS
         // ==========================================
+
+        // 🌟 ENDPOINT /PING EXIGIDO PELO PORTAL DO PROFESSOR (PÚBLICO E EXATO)
         app.get("/ping", ctx -> {
-            Map<String, String> response = Map.of(
+            Map<String, Object> response = Map.of(
                     "status", "ok",
                     "service", "eq14",
-                    "timestamp", Instant.now().toString()
+                    "timestamp", Instant.now().toString() // Retorna formato ISO-8601 UTC (ex: 2026-06-03T14:32:10Z)
             );
+            ctx.status(200);
             ctx.json(response);
         });
 
@@ -228,30 +227,23 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/editar", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar", dashboardController::visualizarEscola);
 
-// 🌟 AS ROTAS DE SALVAMENTO DA ESCOLA (Aceitando os caminhos que seu HTML e API usam)
         app.post("/dashboard/escolas/editar/{id}", escolaController::atualizarEscola);
-        app.post("/escolas/{id}", escolaController::atualizarEscola);   // 👈 ADICIONE ESTA (É a rota que o form HTML chama!)
+        app.post("/escolas/{id}", escolaController::atualizarEscola);
         app.patch("/api/escolas/{id}", escolaController::atualizarEscola);
 
-// Rotas de API de Escolas
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);
 
-// Rotas de ativação/inativação
         app.post("/escolas/{id}/ativar", escolaController::ativarEscola);
         app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
 
-
-// --- GESTÃO DE USUÁRIOS ---
+        // --- GESTÃO DE USUÁRIOS ---
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
-// 🌟 AS ROTAS DE SALVAMENTO DO USUÁRIO
         app.post("/dashboard/usuarios/editar/{id}", usuarioAdminController::atualizar);
-        app.post("/usuarios/{id}", usuarioAdminController::atualizar);  // 👈 ADICIONE ESTA (Caso o HTML de usuário use o caminho curto também)
-
-
+        app.post("/usuarios/{id}", usuarioAdminController::atualizar);
 
         // ==========================================
         // TRATAMENTO DE EXCEÇÕES E ERROS DA API
