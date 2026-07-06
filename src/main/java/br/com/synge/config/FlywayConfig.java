@@ -30,9 +30,10 @@ public class FlywayConfig {
             Flyway flyway = Flyway.configure()
                     .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
+                    .baselineOnMigrate(true)
+                    .baselineVersion("0") // 🔥 MUDADO PARA 0 para ele ler a V1, V2, V3...
                     .validateOnMigrate(false)
                     .load();
-
             flyway.repair();
             flyway.migrate();
 

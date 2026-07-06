@@ -32,13 +32,10 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class SyngeApplication {
 
@@ -47,26 +44,15 @@ public class SyngeApplication {
     public static void main(String[] args) throws SQLException {
         logger.info("Iniciando SYNGE...");
 
+        // 🔥 PASSO 2: FAIL-FAST ATIVADO - Se der erro no banco, o app fecha imediatamente e mostra no log
         try {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
             FlywayConfig.migrate();
-
-            try (Connection conn = DatabaseConfig.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(
-                         "UPDATE usuario SET senha_hash = ? WHERE email = ?")) {
-
-                PasswordService ps = new PasswordService();
-                String hashGeradoPeloProjeto = ps.hash("SuperAdmin@123");
-
-                stmt.setString(1, hashGeradoPeloProjeto);
-                stmt.setString(2, "synge.gestao@gmail.com");
-                int linhasAfetadas = stmt.executeUpdate();
-            } catch (Exception e) {
-                logger.warn("⚠️ Aviso: Não foi possível atualizar a senha do admin nativo (O banco pode estar iniciando): {}", e.getMessage());
-            }
+            logger.info("Banco de dados e migrações inicializados com sucesso.");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("❌ FALHA CRÍTICA: O banco de dados ou o Flyway falhou ao carregar as tabelas. Encerrando aplicação.", e);
+            System.exit(1);
         }
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
@@ -195,16 +181,11 @@ public class SyngeApplication {
             }
         });
 
-        // ==========================================
-        // 1. FILTROS DE SEGURANÇA (OBRIGATÓRIO FICAR NO TOPO)
-        // ==========================================
+        // FILTROS DE SEGURANÇA
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
-        // ==========================================
-        // 2. DEFINIÇÃO DAS ROTAS
-        // ==========================================
-
+        // ENDPOINT /PING EXIGIDO PELO PORTAL DO PROFESSOR
         app.get("/ping", ctx -> {
             Map<String, Object> response = Map.of(
                     "status", "ok",
@@ -215,6 +196,7 @@ public class SyngeApplication {
             ctx.json(response);
         });
 
+        // ROTAS PRINCIPAIS DO PAINEL
         app.get("/dashboard", dashboardController::dashboard);
 
         // --- GESTÃO DE ESCOLAS ---
@@ -242,9 +224,7 @@ public class SyngeApplication {
         app.post("/dashboard/usuarios/editar/{id}", usuarioAdminController::atualizar);
         app.post("/usuarios/{id}", usuarioAdminController::atualizar);
 
-        // ==========================================
-        // TRATAMENTO DE EXCEÇÕES E ERROS DA API
-        // ==========================================
+        // TRATAMENTO DE EXCEÇÕES DA API
         app.exception(AuthenticationException.class, (e, ctx) -> {
             ctx.redirect("/super-admin/login");
         });
