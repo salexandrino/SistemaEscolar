@@ -72,11 +72,9 @@
                     <div class="col-md-4 mb-3">
                         <label class="form-label fw-semibold">Perfil de Acesso</label>
                         <select class="form-select" name="perfil" required>
-                            <option value="SUPER_ADMIN" th:selected="${usuario.perfil.toString() == 'SUPER_ADMIN'}">SUPER_ADMIN</option>
                             <option value="GESTOR" th:selected="${usuario.perfil.toString() == 'GESTOR'}">GESTOR</option>
                             <option value="SECRETARIO" th:selected="${usuario.perfil.toString() == 'SECRETARIO'}">SECRETÁRIO</option>
                             <option value="PROFESSOR" th:selected="${usuario.perfil.toString() == 'PROFESSOR'}">PROFESSOR</option>
-                            <option value="ALUNO" th:selected="${usuario.perfil.toString() == 'ALUNO'}">ALUNO</option>
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
