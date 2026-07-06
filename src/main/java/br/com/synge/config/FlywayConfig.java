@@ -4,15 +4,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class FlywayConfig {
-
     private static final Logger logger = LoggerFactory.getLogger(FlywayConfig.class);
-
-    private FlywayConfig() {}
 
     public static void migrate() {
         try (Connection connection = DatabaseConfig.getConnection()) {
@@ -31,23 +27,20 @@ public class FlywayConfig {
                     .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(true)
-                    .baselineVersion("4")      // Mantém a base simulada para estabilizar na nuvem
+                    .baselineVersion("0")      // 🔥 OBRIGATÓRIO SER "0": Faz o Flyway ler a V1 que cria a tabela usuario
                     .validateOnMigrate(false)
                     .load();
 
-            logger.info("Executando Flyway Repair original...");
-            flyway.repair();
+            logger.info("Executando Flyway Repair para limpar histórico corrompido...");
+            flyway.repair(); // 🔥 Destrava o banco apagando migrações que falharam antes
 
-            logger.info("Aplicando as migrações...");
-            flyway.migrate();
+            logger.info("Aplicando as migrações na nuvem...");
+            flyway.migrate(); // 🔥 Cria as tabelas de verdade
 
             logger.info("Flyway migrations aplicadas com sucesso.");
-        } catch (SQLException e) {
-            logger.error("Erro de SQL no Flyway: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
         } catch (Exception e) {
-            logger.error("Erro ao aplicar Flyway: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+            logger.error("FALHA CRÍTICA NO FLYWAY: {}", e.getMessage(), e);
+            throw new RuntimeException(e); // Garante que se der erro, você veja o motivo real nos logs
         }
     }
 }
