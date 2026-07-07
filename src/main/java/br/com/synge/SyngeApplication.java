@@ -50,9 +50,10 @@ public class SyngeApplication {
             // Deixa o FlywayConfig (ajustado com baseline 0) cuidar de tudo de forma limpa!
             FlywayConfig.migrate();
             logger.info("Banco de dados inicializado com sucesso.");
-        } catch (Exception e) {
-            logger.error("Erro ao inicializar banco: {}", e.getMessage());
-        }
+         } catch (Exception e) {
+        logger.error("Falha crítica ao inicializar banco/migrations. Encerrando aplicação.", e);
+        System.exit(1);
+    }
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
