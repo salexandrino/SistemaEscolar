@@ -53,7 +53,7 @@ public class AuthService {
     }
 
     public String autenticar(String cpf, String senha) {
-        ValidationUtil.validateCpf(cpf);
+        ValidationUtil.validarCpfComStrategy(cpf);
 
         Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpf);
         if (optionalUsuario.isEmpty()) {
@@ -120,7 +120,7 @@ public class AuthService {
 
         ValidationUtil.validateNomeCompleto(usuario.getNomeCompleto());
         ValidationUtil.validateEmail(usuario.getEmail());
-        ValidationUtil.validateCpf(usuario.getCpf());
+        ValidationUtil.validarCpfComStrategy(usuario.getCpf());
 
         if (!usuario.getSenhaHash().equals(usuario.getConfirmacaoSenha())) {
             throw new ValidationException("Senha e confirmação de senha não conferem.");
@@ -277,4 +277,4 @@ public class AuthService {
 
         return token;
     }
-    }
+}

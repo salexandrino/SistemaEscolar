@@ -125,7 +125,7 @@ public class UsuarioAdminService {
         }
         ValidationUtil.validateNomeCompleto(dto.getNomeCompleto());
         ValidationUtil.validateEmail(dto.getEmail());
-        ValidationUtil.validateCpf(dto.getCpf());
+        ValidationUtil.validarCpfComStrategy(dto.getCpf());
         ValidationUtil.validateTelefone(dto.getTelefone());
     }
 

@@ -3,6 +3,7 @@ package br.com.synge.seguranca.utils;
 import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.strategies.ContextoValidacao;
 import br.com.synge.seguranca.strategies.ValidadorCpf;
+import br.com.synge.seguranca.strategies.ValidadorCnpj;
 
 import java.util.regex.Pattern;
 
@@ -11,6 +12,8 @@ public class ValidationUtil {
     private static final Pattern CPF_PATTERN = Pattern.compile("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\(\\d{2}\\)\\d{5}-\\d{4}$"); // (99)99999-9999
+    private static final Pattern CEP_PATTERN = Pattern.compile("^\\d{5}-\\d{3}$"); // 00000-000
+    private static final Pattern UF_PATTERN = Pattern.compile("^[A-Z]{2}$"); // SP, RJ, PB...
 
     public static void validateNomeCompleto(String nomeCompleto) {
         if (nomeCompleto == null || nomeCompleto.trim().length() < 5 || nomeCompleto.trim().length() > 120) {
@@ -54,6 +57,15 @@ public class ValidationUtil {
         contexto.executar(cpf);
     }
 
+    // Mesma ideia, agora para CNPJ (usado no cadastro/edição de Escola)
+    public static void validarCnpjComStrategy(String cnpj) {
+        if (cnpj == null || cnpj.isBlank()) {
+            throw new ValidationException("O CNPJ não pode estar em branco.");
+        }
+        ContextoValidacao contexto = new ContextoValidacao(new ValidadorCnpj());
+        contexto.executar(cnpj);
+    }
+
     // Lógica de validação matemática do dígito verificador de CPF
     private static boolean isValidCpfMath(String cpf) {
         cpf = cpf.replace(".", "").replace("-", ""); // Remove formatação
@@ -95,6 +107,39 @@ public class ValidationUtil {
         }
         if (!PHONE_PATTERN.matcher(telefone).matches()) {
             throw new ValidationException("Formato de telefone inválido. Use (99)99999-9999.");
+        }
+    }
+
+    /**
+     * Validação genérica de tamanho para campos de texto (endereço, bairro, cidade, etc.).
+     * Usa "nomeCampo" só na mensagem de erro, pra ficar claro qual campo falhou.
+     */
+    public static void validateTamanho(String valor, int min, int max, String nomeCampo) {
+        if (valor == null || valor.trim().isBlank()) {
+            throw new ValidationException(nomeCampo + " é obrigatório.");
+        }
+        int tamanho = valor.trim().length();
+        if (tamanho < min || tamanho > max) {
+            throw new ValidationException(
+                    nomeCampo + " deve ter entre " + min + " e " + max + " caracteres.");
+        }
+    }
+
+    public static void validateCep(String cep) {
+        if (cep == null || cep.isBlank()) {
+            throw new ValidationException("CEP é obrigatório.");
+        }
+        if (!CEP_PATTERN.matcher(cep).matches()) {
+            throw new ValidationException("CEP deve estar no formato 00000-000.");
+        }
+    }
+
+    public static void validateUf(String uf) {
+        if (uf == null || uf.isBlank()) {
+            throw new ValidationException("Estado (UF) é obrigatório.");
+        }
+        if (!UF_PATTERN.matcher(uf.trim().toUpperCase()).matches()) {
+            throw new ValidationException("Estado deve ser a sigla de 2 letras (ex: SP, RJ, PB).");
         }
     }
 

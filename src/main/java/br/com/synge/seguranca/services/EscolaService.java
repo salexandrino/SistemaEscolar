@@ -11,6 +11,7 @@ import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.repositories.EscolaRepository;
+import br.com.synge.seguranca.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,43 +41,6 @@ public class EscolaService {
     }
 
     /**
-     * Valida os dados obrigatórios da escola.
-     */
-    private void validarDadosObrigatorios(CriarEscolaDTO dto) {
-        if (dto.getNome() == null || dto.getNome().isBlank()) {
-            throw new ValidationException("Nome da escola é obrigatório.");
-        }
-
-        if (dto.getCnpj() == null || dto.getCnpj().isBlank()) {
-            throw new ValidationException("CNPJ é obrigatório.");
-        }
-
-        if (dto.getEmailInstitucional() == null || dto.getEmailInstitucional().isBlank()) {
-            throw new ValidationException("E-mail institucional é obrigatório.");
-        }
-
-        if (dto.getTelefone() == null || dto.getTelefone().isBlank()) {
-            throw new ValidationException("Telefone é obrigatório.");
-        }
-
-        if (dto.getCidade() == null || dto.getCidade().isBlank()) {
-            throw new ValidationException("Cidade é obrigatória.");
-        }
-
-        if (dto.getEstado() == null || dto.getEstado().isBlank()) {
-            throw new ValidationException("Estado é obrigatório.");
-        }
-
-        if (dto.getCep() == null || dto.getCep().isBlank()) {
-            throw new ValidationException("CEP é obrigatório.");
-        }
-
-        if (dto.getNomeResponsavel() == null || dto.getNomeResponsavel().isBlank()) {
-            throw new ValidationException("Nome do responsável é obrigatório.");
-        }
-    }
-
-    /**
      * Valida os dados obrigatórios da atualização de escola.
      */
     private void validarDadosObrigatoriosAtualizacao(AtualizarEscolaDTO dto) {
@@ -86,6 +50,9 @@ public class EscolaService {
 
         if (dto.getCnpj() != null && dto.getCnpj().isBlank()) {
             throw new ValidationException("CNPJ não pode estar vazio.");
+        }
+        if (dto.getCnpj() != null && !dto.getCnpj().isBlank()) {
+            ValidationUtil.validarCnpjComStrategy(dto.getCnpj());
         }
 
         if (dto.getEmailInstitucional() != null && dto.getEmailInstitucional().isBlank()) {
@@ -113,7 +80,7 @@ public class EscolaService {
         }
 
         if (dto.getStatus() != null && !dto.getStatus().isBlank() &&
-            !dto.getStatus().equals("ATIVA") && !dto.getStatus().equals("INATIVA")) {
+                !dto.getStatus().equals("ATIVA") && !dto.getStatus().equals("INATIVA")) {
             throw new ValidationException("Status deve ser ATIVA ou INATIVA.");
         }
     }
@@ -310,16 +277,29 @@ public class EscolaService {
     }
     private void validarDados(CriarEscolaDTO dto) {
 
-        if (dto.getNome() == null || dto.getNome().isBlank()) {
-            throw new ValidationException("Nome da escola é obrigatório.");
-        }
+        ValidationUtil.validateTamanho(dto.getNome(), 3, 150, "Nome da escola");
 
         if (dto.getCnpj() == null || dto.getCnpj().isBlank()) {
             throw new ValidationException("CNPJ é obrigatório.");
         }
+        ValidationUtil.validarCnpjComStrategy(dto.getCnpj());
 
-        if (dto.getEmailInstitucional() == null || dto.getEmailInstitucional().isBlank()) {
-            throw new ValidationException("E-mail institucional é obrigatório.");
+        ValidationUtil.validateEmail(dto.getEmailInstitucional());
+
+        // Endereço completo — antes só existia checagem de "não vazio" para
+        // alguns desses campos, e "endereco"/"bairro" nem eram exigidos.
+        ValidationUtil.validateTamanho(dto.getEndereco(), 5, 200, "Endereço");
+        ValidationUtil.validateTamanho(dto.getBairro(), 2, 100, "Bairro");
+        ValidationUtil.validateTamanho(dto.getCidade(), 2, 100, "Cidade");
+        ValidationUtil.validateUf(dto.getEstado());
+        ValidationUtil.validateCep(dto.getCep());
+        ValidationUtil.validateTamanho(dto.getNomeResponsavel(), 5, 150, "Nome do responsável");
+
+        if (dto.getNumero() != null && dto.getNumero().length() > 10) {
+            throw new ValidationException("Número do endereço deve ter no máximo 10 caracteres.");
+        }
+        if (dto.getComplemento() != null && dto.getComplemento().length() > 100) {
+            throw new ValidationException("Complemento deve ter no máximo 100 caracteres.");
         }
     }
 }
