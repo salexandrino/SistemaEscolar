@@ -28,6 +28,20 @@
         }
         .text-danger { color: #dc3545 !important; }
         .password-rule { font-size: 0.75rem; color: #6c757d; }
+        /* Tag pequena de campo inválido, no lugar do alerta grande */
+        .field-tag {
+            display: none;
+            align-items: center;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            margin-top: 0.35rem;
+            width: fit-content;
+        }
+        .field-tag.show { display: inline-flex; }
         /* Garante que o painel direito permita rolagem se a tela for pequena */
         .right-panel-scroll {
             overflow-y: auto;
@@ -87,6 +101,7 @@
                         <div class="col-md-6 mb-3 mb-md-0">
                             <label for="cpf" class="form-label fw-bold">CPF <span class="text-danger">*</span></label>
                             <input type="text" class="form-control rounded-2" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" required>
+                            <span id="cpfTag" class="field-tag"><i class="bi bi-x-circle-fill me-1"></i>CPF inválido</span>
                         </div>
                         <div class="col-md-6">
                             <label for="telefone" class="form-label fw-bold">Telefone <span class="text-danger">*</span></label>
@@ -270,10 +285,39 @@
         });
     }
 
+    // Validação real de CPF no front-end (mesma regra de dígito verificador do back-end)
+    function isValidCpf(cpfStr) {
+        const digits = (cpfStr || '').replace(/\D/g, '');
+        if (digits.length !== 11) return false;
+        if (/^(\d)\1{10}$/.test(digits)) return false; // todos os dígitos iguais
+
+        const nums = digits.split('').map(Number);
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += nums[i] * (10 - i);
+        let resto = soma % 11;
+        const d1 = resto < 2 ? 0 : 11 - resto;
+        if (d1 !== nums[9]) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += nums[i] * (11 - i);
+        resto = soma % 11;
+        const d2 = resto < 2 ? 0 : 11 - resto;
+        return d2 === nums[10];
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const cpfInput = document.getElementById('cpf');
+        const cpfTag = document.getElementById('cpfTag');
         const telInput = document.getElementById('telefone');
         const senhaInput = document.getElementById('senha');
+
+        function validarCpfNoCampo() {
+            const digits = cpfInput.value.replace(/\D/g, '');
+            const invalido = digits.length > 0 && !isValidCpf(cpfInput.value);
+            cpfTag.classList.toggle('show', invalido);
+            cpfInput.classList.toggle('is-invalid', invalido);
+            return !invalido;
+        }
 
         if (cpfInput) {
             cpfInput.addEventListener('input', (e) => {
@@ -284,7 +328,11 @@
                 if (value.length > 6) formatted += '.' + value.substring(6, 9);
                 if (value.length > 9) formatted += '-' + value.substring(9, 11);
                 e.target.value = formatted;
+                // some a tag enquanto a pessoa digita, só reaparece no blur/submit
+                cpfTag.classList.remove('show');
+                cpfInput.classList.remove('is-invalid');
             });
+            cpfInput.addEventListener('blur', validarCpfNoCampo);
         }
 
         if (telInput) {
@@ -333,16 +381,14 @@
                     return;
                 }
 
-                // Se o HTML/JS local validou tudo, criamos o objeto para o Back-end
-                // Validação de CPF no front-end (mesma lógica da validação server-side)
-                const cpfValue = document.getElementById('cpf').value || '';
-                const cpfDigits = cpfValue.replace(/\D/g, '');
-                function isValidCpfNumber(str) {
-                                    return str.length === 11;
-                                }
-
-                if (cpfDigits.length !== 11) {
-                    mostrarAlerta('CPF inválido.', 'danger');
+                // Validação real de CPF (dígito verificador) antes de enviar —
+                // mostra a tagzinha no campo em vez do alerta grande.
+                const cpfCampo = document.getElementById('cpf');
+                const cpfTagEl = document.getElementById('cpfTag');
+                if (!isValidCpf(cpfCampo.value)) {
+                    cpfTagEl.classList.add('show');
+                    cpfCampo.classList.add('is-invalid');
+                    cpfCampo.focus();
                     return;
                 }
 
@@ -368,13 +414,20 @@
                     });
 
                     if (response.status === 201) {
-                                            mostrarAlerta("Cadastro concluído e salvo com sucesso no sistema! Sua conta está pendente de aprovação pelo Gestor. Você será redirecionado para a tela de login em 6 segundos...", 'success');
+                        mostrarAlerta("Cadastro concluído e salvo com sucesso no sistema! Sua conta está pendente de aprovação pelo Gestor. Você será redirecionado para a tela de login em 6 segundos...", 'success');
                         setTimeout(() => {
                             window.location.href = "/login";
-                                            }, 6000);
+                        }, 6000);
                     } else {
                         const erro = await response.json();
-                        mostrarAlerta(erro.message || "Verifique os dados informados.", 'danger');
+                        const msg = erro.message || "Verifique os dados informados.";
+                        if (msg.toUpperCase().includes('CPF')) {
+                            cpfTagEl.classList.add('show');
+                            cpfCampo.classList.add('is-invalid');
+                            cpfCampo.focus();
+                        } else {
+                            mostrarAlerta(msg, 'danger');
+                        }
                     }
                 } catch (error) {
                     console.error("Erro na conexão:", error);
