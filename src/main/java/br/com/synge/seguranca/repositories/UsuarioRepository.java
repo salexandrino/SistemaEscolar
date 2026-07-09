@@ -265,7 +265,10 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
     }
 
     public void update(Usuario usuario) {
-        String sql = "UPDATE usuario SET nome_completo = ?, email = ?, cpf = ?, telefone = ?, senha_hash = ?, perfil = ?, ativo = ?, bloqueado = ?, tentativas_login = ?, ultimo_login = ?, atualizado_em = ?, reset_password_token = ?, reset_password_expires_at = ? WHERE id = ? AND tenant_id = ?";
+        // IS NOT DISTINCT FROM trata NULL corretamente: "tenant_id = ?" nunca é
+        // verdadeiro quando o valor é NULL (regra do SQL), o que fazia o UPDATE
+        // não encontrar nenhuma linha para usuários sem tenant (ex: Super Admin).
+        String sql = "UPDATE usuario SET nome_completo = ?, email = ?, cpf = ?, telefone = ?, senha_hash = ?, perfil = ?, ativo = ?, bloqueado = ?, tentativas_login = ?, ultimo_login = ?, atualizado_em = ?, reset_password_token = ?, reset_password_expires_at = ? WHERE id = ? AND tenant_id IS NOT DISTINCT FROM ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usuario.getNomeCompleto());
@@ -283,7 +286,11 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             stmt.setObject(13, usuario.getResetPasswordExpiresAt(), Types.TIMESTAMP);
             stmt.setObject(14, usuario.getId());
             stmt.setObject(15, usuario.getTenantId());
-            stmt.executeUpdate();
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas == 0) {
+                logger.warn("Nenhuma linha foi atualizada para o usuário {}. Verifique se o ID/tenant_id realmente existem.", usuario.getId());
+                throw new RuntimeException("Usuário não encontrado para atualização (id: " + usuario.getId() + ").");
+            }
             logger.info("Usuário atualizado: {}", usuario.getId());
         } catch (SQLException e) {
             logger.error("Erro ao atualizar usuário {}: {}", usuario.getId(), e.getMessage(), e);

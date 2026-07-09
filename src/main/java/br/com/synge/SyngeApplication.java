@@ -50,10 +50,10 @@ public class SyngeApplication {
             // Deixa o FlywayConfig (ajustado com baseline 0) cuidar de tudo de forma limpa!
             FlywayConfig.migrate();
             logger.info("Banco de dados inicializado com sucesso.");
-         } catch (Exception e) {
-        logger.error("Falha crítica ao inicializar banco/migrations. Encerrando aplicação.", e);
-        System.exit(1);
-    }
+        } catch (Exception e) {
+            logger.error("Falha crítica ao inicializar banco/migrations. Encerrando aplicação.", e);
+            System.exit(1);
+        }
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
 
@@ -143,7 +143,9 @@ public class SyngeApplication {
 
         app.get("/cadastro", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-            context.setVariable("escolas", List.of());
+            // Antes mandava uma lista vazia fixa — agora busca as escolas ativas de
+            // verdade, pra aparecerem no dropdown do formulário de auto-cadastro.
+            context.setVariable("escolas", escolaRepository.findAllAtivas());
             ctx.html(templateEngine.process("auth/cadastro", context));
         });
 
