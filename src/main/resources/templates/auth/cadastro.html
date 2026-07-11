@@ -99,8 +99,6 @@
                             <label for="perfil" class="form-label fw-bold">Perfil <span class="text-danger">*</span></label>
                             <select class="form-select rounded-2" id="perfil" name="perfil" required>
                                 <option value="" selected disabled>Selecione seu perfil</option>
-                                <option value="SUPER_ADMIN">Super Adm</option>
-                                <option value="GESTOR">Gestor</option>
                                 <option value="SECRETARIA">Secretaria</option>
                                 <option value="PROFESSOR">Professor</option>
                             </select>
@@ -338,8 +336,8 @@
                 const cpfValue = document.getElementById('cpf').value || '';
                 const cpfDigits = cpfValue.replace(/\D/g, '');
                 function isValidCpfNumber(str) {
-                                    return str.length === 11;
-                                }
+                    return str.length === 11;
+                }
 
                 if (cpfDigits.length !== 11) {
                     mostrarAlerta('CPF inválido.', 'danger');
@@ -368,10 +366,10 @@
                     });
 
                     if (response.status === 201) {
-                                            mostrarAlerta("Cadastro concluído e salvo com sucesso no sistema! Sua conta está pendente de aprovação pelo Gestor. Você será redirecionado para a tela de login em 6 segundos...", 'success');
+                        mostrarAlerta("Cadastro concluído e salvo com sucesso no sistema! Sua conta está pendente de aprovação pelo Gestor. Você será redirecionado para a tela de login em 6 segundos...", 'success');
                         setTimeout(() => {
                             window.location.href = "/login";
-                                            }, 6000);
+                        }, 6000);
                     } else {
                         const erro = await response.json();
                         mostrarAlerta(erro.message || "Verifique os dados informados.", 'danger');

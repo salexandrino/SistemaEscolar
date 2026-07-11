@@ -2,6 +2,7 @@ package br.com.synge.seguranca.controllers;
 
 import br.com.synge.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.synge.seguranca.dtos.CriarEscolaDTO;
+import br.com.synge.seguranca.dtos.CriarEscolaResponseDTO;
 import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.AuthorizationException;
 import br.com.synge.seguranca.exceptions.BusinessException;
@@ -120,12 +121,17 @@ public class EscolaController {
             dto.setCidade(ctx.formParam("cidade"));
             dto.setEstado(ctx.formParam("estado"));
             dto.setNomeResponsavel(ctx.formParam("nomeResponsavel"));
+            dto.setCpfResponsavel(ctx.formParam("cpfResponsavel"));
             dto.setTelefoneResponsavel(ctx.formParam("telefoneResponsavel"));
             dto.setEmailResponsavel(ctx.formParam("emailResponsavel"));
 
-            Escola escola = escolaService.cadastrarEscola(dto, currentUser);
+            CriarEscolaResponseDTO resultado = escolaService.cadastrarEscola(dto, currentUser);
 
-            // 🔥 ALTERADO: Em vez de ctx.json(...), define o status e redireciona para a listagem visual
+            // Flash de sessão só pra essa próxima requisição — a senha em texto puro
+            // nunca é salva em lugar nenhum, é mostrada uma única vez pro Super Admin.
+            ctx.sessionAttribute("gestorEmailGerado", resultado.getEmailGestor());
+            ctx.sessionAttribute("gestorSenhaGerada", resultado.getSenhaGeradaGestor());
+
             ctx.status(201);
             ctx.redirect("/dashboard/escolas");
 
@@ -478,7 +484,20 @@ public class EscolaController {
             }
 
             List<Escola> escolas = escolaService.listarTodas(currentUser);
-            Map<String, Object> model = Map.of("escolas", escolas);
+
+            Map<String, Object> model = new java.util.HashMap<>();
+            model.put("escolas", escolas);
+
+            String gestorEmail = ctx.sessionAttribute("gestorEmailGerado");
+            String gestorSenha = ctx.sessionAttribute("gestorSenhaGerada");
+            if (gestorEmail != null && gestorSenha != null) {
+                model.put("gestorEmailGerado", gestorEmail);
+                model.put("gestorSenhaGerada", gestorSenha);
+                // flash: mostra só uma vez, some depois desse render
+                ctx.sessionAttribute("gestorEmailGerado", null);
+                ctx.sessionAttribute("gestorSenhaGerada", null);
+            }
+
             ctx.render("dashboard/escolas/lista.html", model);
 
         } catch (Exception e) {

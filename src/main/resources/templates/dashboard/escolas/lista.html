@@ -11,6 +11,23 @@
 
 <div th:fragment="content">
 
+    <div th:if="${gestorSenhaGerada}" class="alert alert-success border-0 shadow-sm mb-4">
+        <div class="d-flex align-items-start">
+            <i class="bi bi-check-circle-fill fs-4 me-3 mt-1"></i>
+            <div>
+                <h6 class="mb-1">Escola cadastrada! Gestor criado com acesso imediato.</h6>
+                <p class="mb-1 small">
+                    Copie esta senha agora — ela <strong>não</strong> ficará visível novamente.
+                    Repasse ao Gestor e peça que troque no primeiro acesso.
+                </p>
+                <div class="d-flex align-items-center gap-2 mt-2">
+                    <span class="badge bg-light text-dark border">E-mail: <span th:text="${gestorEmailGerado}"></span></span>
+                    <span class="badge bg-light text-dark border">Senha temporária: <code th:text="${gestorSenhaGerada}"></code></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav class="breadcrumb-admin mb-4">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>

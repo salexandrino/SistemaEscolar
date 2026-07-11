@@ -110,7 +110,7 @@ public class SyngeApplication {
 
         // 2. Inicialização dos Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
-        EscolaService escolaService = new EscolaService(escolaRepository);
+        EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
         // Acadêmico

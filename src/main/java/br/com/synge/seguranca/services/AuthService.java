@@ -153,6 +153,12 @@ public class AuthService {
         if (usuario.getPerfil() == Perfil.SUPER_ADMIN) {
             throw new AuthorizationException("Não é permitido cadastrar usuários com o perfil " + usuario.getPerfil().name() + " via este endpoint.");
         }
+        // GESTOR nasce junto com a escola (EscolaService.cadastrarEscola), nunca via
+        // auto-cadastro público — evita que qualquer pessoa vire administradora de
+        // uma escola que não é dela.
+        if (usuario.getPerfil() == Perfil.GESTOR) {
+            throw new AuthorizationException("O perfil de Gestor é criado automaticamente no cadastro da escola e não está disponível para auto-cadastro.");
+        }
 
         // Escola
         if (usuario.getEscolaId() == null) {
@@ -165,15 +171,9 @@ public class AuthService {
 
         usuario.setSenhaHash(passwordService.hash(usuario.getSenhaHash()));
 
-        // 🔐 REGRA DE NEGÓCIO DA ATIVAÇÃO AUTOMÁTICA
-        if (usuario.getPerfil() == Perfil.GESTOR) {
-            usuario.setAtivo(true); // 🔥 Nasce ativo
-            logger.info("Usuário com perfil GESTOR criado. Ativação automática concedida.");
-        } else {
-            usuario.setAtivo(false); // 🔥 Demais nascem pendentes
-        }
-
-        // ⚠️ ATENÇÃO: Garanta que NÃO exista nenhuma linha "usuario.setAtivo(false);" aqui em baixo!
+        // 🔐 Todo auto-cadastro público nasce pendente de aprovação por um Gestor
+        // da escola (GESTOR e SUPER_ADMIN já foram bloqueados acima e nunca chegam aqui).
+        usuario.setAtivo(false);
         usuario.setBloqueado(false);
         usuario.setTentativasLogin(0);
         usuario.setCriadoEm(LocalDateTime.now());
