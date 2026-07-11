@@ -50,11 +50,16 @@ public class BoletimService {
         b.setIdTurma(idTurma);
         b.setIdDisciplina(idDisciplina);
         b.setMedia(media);
-        b.setTotalPresencas(0);
-        b.setTotalFaltas(0);
-        b.setTotalFaltasJustificadas(0);
+        // Frequência ainda não é controlada pelo sistema (não existe tabela de
+        // chamada/presença). Deixamos null em vez de 0 para não passar a
+        // falsa informação de que o aluno tem 100% de presença.
+        b.setTotalPresencas(null);
+        b.setTotalFaltas(null);
+        b.setTotalFaltasJustificadas(null);
 
-        if (media.compareTo(new BigDecimal("7.0")) >= 0) {
+        if (media.compareTo(RegrasAcademicas.MEDIA_MINIMA_APROVACAO) >= 0) {
+            // Nota: aprovação aqui considera apenas a média. Frequência mínima
+            // (ex.: 75%) não é verificada pois o sistema não tem controle de presença.
             b.setSituacao("APROVADO");
         } else {
             b.setSituacao("REPROVADO");

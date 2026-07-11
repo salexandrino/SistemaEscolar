@@ -74,6 +74,35 @@ public class TurmaService {
         return turmaRepository.contarMatriculas(tenantId, idTurma);
     }
 
+    /**
+     * Valida se uma turma está apta a receber uma nova matrícula:
+     * - a turma precisa existir e estar com situação ATIVA (não ENCERRADA);
+     * - o ano letivo ao qual ela pertence precisa estar ATIVO (não ARQUIVADO);
+     * - precisa haver vaga disponível (matriculados < capacidade).
+     * Lança ValidationException com a razão específica caso alguma regra falhe.
+     */
+    public Turma validarDisponibilidadeParaMatricula(UUID tenantId, UUID idTurma) {
+        Turma turma = turmaRepository.buscarPorId(tenantId, idTurma)
+                .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
+
+        if (!"ATIVA".equals(turma.getSituacao())) {
+            throw new ValidationException("Não é possível matricular: a turma está encerrada.");
+        }
+
+        var anoLetivo = anoLetivoRepository.buscarPorId(tenantId, turma.getIdAnoLetivo())
+                .orElseThrow(() -> new ValidationException("Ano letivo da turma não encontrado."));
+        if (!anoLetivo.isAtivo() || "ARQUIVADO".equals(anoLetivo.getSituacao())) {
+            throw new ValidationException("Não é possível matricular: o ano letivo desta turma está arquivado.");
+        }
+
+        int matriculados = turmaRepository.contarMatriculas(tenantId, idTurma);
+        if (matriculados >= turma.getCapacidade()) {
+            throw new ValidationException("Não é possível matricular: a turma atingiu sua capacidade máxima (" + turma.getCapacidade() + " vagas).");
+        }
+
+        return turma;
+    }
+
     private TurmaResponseDTO toDto(Turma t) {
         TurmaResponseDTO d = new TurmaResponseDTO();
         d.setId(t.getId());

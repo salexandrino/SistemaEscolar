@@ -34,7 +34,7 @@ public class AlunoService {
     private final ValidadorCpf validadorCpf;
     private final TurmaService turmaService;
 
-    public AlunoService(AlunoRepository alunoRepository, 
+    public AlunoService(AlunoRepository alunoRepository,
                         HistoricoSituacaoAlunoRepository historicoRepository,
                         MatriculaRepository matriculaRepository,
                         DocumentoAlunoRepository documentoRepository,
@@ -59,7 +59,7 @@ public class AlunoService {
         if (dto.getDataNascimento() != null && dto.getDataNascimento().isAfter(LocalDate.now())) {
             throw new ValidationException("A data de nascimento não pode ser no futuro.");
         }
-        
+
         UUID tenantId = tenant();
 
         if (dto.getCpf() != null && !dto.getCpf().isBlank()) {
@@ -82,7 +82,7 @@ public class AlunoService {
         a.setAtualizadoEm(LocalDateTime.now());
 
         Aluno criado = alunoRepository.criar(a);
-        
+
         HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
         h.setId(UUID.randomUUID());
         h.setTenantId(tenantId);
@@ -99,26 +99,26 @@ public class AlunoService {
     public AlunoResponseDTO atualizar(UUID id, AtualizarAlunoDTO dto) {
         if (dto == null || dto.getNome() == null || dto.getNome().isBlank()) throw new ValidationException("Nome é obrigatório.");
         UUID tenantId = tenant();
-        
+
         Aluno a = alunoRepository.buscarPorId(tenantId, id)
                 .orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        
+
         a.setNome(dto.getNome().trim());
         a.setDataNascimento(dto.getDataNascimento());
         a.setEmail(dto.getEmail());
         a.setTelefone(dto.getTelefone());
-        
+
         alunoRepository.atualizar(a);
-        
+
         return toDto(alunoRepository.buscarPorId(tenantId, id).get());
     }
 
     public void alterarSituacao(UUID id, AlterarSituacaoAlunoDTO dto) {
         if (dto == null || dto.getNovaSituacao() == null) throw new ValidationException("Nova situação é obrigatória.");
-        
+
         UUID tenantId = tenant();
         Aluno a = alunoRepository.buscarPorId(tenantId, id).orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        
+
         SituacaoAluno atual;
         SituacaoAluno nova;
         try {
@@ -148,17 +148,14 @@ public class AlunoService {
     public MatriculaResponseDTO matricular(UUID idAluno, MatricularAlunoDTO dto) {
         UUID tenantId = tenant();
         alunoRepository.buscarPorId(tenantId, idAluno).orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        
+
         if (matriculaRepository.existeAtiva(tenantId, idAluno, dto.getIdTurma())) {
             throw new ValidationException("Aluno já matriculado nesta turma.");
         }
 
-        // Validação de Vaga Disponível e Ano Letivo Ativo (via turmaService)
-        // Como o turmaService.consultarCapacidadeMatriculados não está totalmente explícito no código atual,
-        // vamos encapsular numa chamada ao banco/service se possível.
-        // Simulando a regra como pedida:
-        // if (!turmaService.isAnoLetivoAtivo(dto.getIdTurma())) throw new ValidationException("Ano letivo arquivado.");
-        
+        // Validação de Vaga Disponível e Ano Letivo Ativo
+        turmaService.validarDisponibilidadeParaMatricula(tenantId, dto.getIdTurma());
+
         Matricula m = new Matricula();
         m.setId(UUID.randomUUID());
         m.setTenantId(tenantId);
@@ -168,7 +165,7 @@ public class AlunoService {
         m.setStatus("ATIVA");
         m.setCriadoEm(LocalDateTime.now());
         m.setAtualizadoEm(LocalDateTime.now());
-        
+
         Matricula criada = matriculaRepository.criar(m);
         return toDto(criada);
     }
@@ -176,15 +173,15 @@ public class AlunoService {
     public void transferir(UUID idAluno, TransferirAlunoDTO dto) throws Exception {
         UUID tenantId = tenant();
         alunoRepository.buscarPorId(tenantId, idAluno).orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        
+
         Matricula mAtual = matriculaRepository.obterAtivaPorAluno(tenantId, idAluno)
                 .orElseThrow(() -> new ValidationException("Aluno não possui matrícula ativa para transferir."));
-        
+
         try (Connection conn = DatabaseConfig.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 matriculaRepository.atualizarStatus(tenantId, mAtual.getId(), "TRANSFERIDA");
-                
+
                 Matricula mNova = new Matricula();
                 mNova.setId(UUID.randomUUID());
                 mNova.setTenantId(tenantId);
@@ -195,7 +192,7 @@ public class AlunoService {
                 mNova.setCriadoEm(LocalDateTime.now());
                 mNova.setAtualizadoEm(LocalDateTime.now());
                 matriculaRepository.criar(mNova);
-                
+
                 HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
                 h.setId(UUID.randomUUID());
                 h.setTenantId(tenantId);
@@ -205,7 +202,7 @@ public class AlunoService {
                 h.setMotivo("Transferência de turma: " + dto.getMotivo());
                 h.setCriadoEm(LocalDateTime.now());
                 historicoRepository.criar(h);
-                
+
                 conn.commit();
             } catch (Exception e) {
                 conn.rollback();
@@ -217,7 +214,7 @@ public class AlunoService {
     public DocumentoAlunoDTO adicionarDocumento(UUID idAluno, CriarDocumentoAlunoDTO dto) {
         UUID tenantId = tenant();
         alunoRepository.buscarPorId(tenantId, idAluno).orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        
+
         DocumentoAluno d = new DocumentoAluno();
         d.setId(UUID.randomUUID());
         d.setTenantId(tenantId);
@@ -226,9 +223,9 @@ public class AlunoService {
         d.setReferencia(dto.getReferencia());
         d.setCriadoEm(LocalDateTime.now());
         d.setAtualizadoEm(LocalDateTime.now());
-        
+
         DocumentoAluno criado = documentoRepository.criar(d);
-        
+
         DocumentoAlunoDTO response = new DocumentoAlunoDTO();
         response.setId(criado.getId());
         response.setTipo(criado.getTipo());

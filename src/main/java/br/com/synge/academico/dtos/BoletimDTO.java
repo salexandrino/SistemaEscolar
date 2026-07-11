@@ -8,9 +8,13 @@ public class BoletimDTO {
     private UUID idTurma;
     private UUID idDisciplina;
     private BigDecimal media;
-    private int totalPresencas;
-    private int totalFaltas;
-    private int totalFaltasJustificadas;
+    // Nullable de propósito: o sistema ainda não tem controle de frequência
+    // (não existe tabela/model de chamada). Usar "0" aqui, como fazia
+    // a versão anterior, mentia dizendo "aluno sem nenhuma falta" quando na
+    // verdade o dado simplesmente não existe. null == "não disponível".
+    private Integer totalPresencas;
+    private Integer totalFaltas;
+    private Integer totalFaltasJustificadas;
     private String situacao;
 
     public UUID getIdAluno() { return idAluno; }
@@ -25,14 +29,14 @@ public class BoletimDTO {
     public BigDecimal getMedia() { return media; }
     public void setMedia(BigDecimal media) { this.media = media; }
 
-    public int getTotalPresencas() { return totalPresencas; }
-    public void setTotalPresencas(int totalPresencas) { this.totalPresencas = totalPresencas; }
+    public Integer getTotalPresencas() { return totalPresencas; }
+    public void setTotalPresencas(Integer totalPresencas) { this.totalPresencas = totalPresencas; }
 
-    public int getTotalFaltas() { return totalFaltas; }
-    public void setTotalFaltas(int totalFaltas) { this.totalFaltas = totalFaltas; }
+    public Integer getTotalFaltas() { return totalFaltas; }
+    public void setTotalFaltas(Integer totalFaltas) { this.totalFaltas = totalFaltas; }
 
-    public int getTotalFaltasJustificadas() { return totalFaltasJustificadas; }
-    public void setTotalFaltasJustificadas(int totalFaltasJustificadas) { this.totalFaltasJustificadas = totalFaltasJustificadas; }
+    public Integer getTotalFaltasJustificadas() { return totalFaltasJustificadas; }
+    public void setTotalFaltasJustificadas(Integer totalFaltasJustificadas) { this.totalFaltasJustificadas = totalFaltasJustificadas; }
 
     public String getSituacao() { return situacao; }
     public void setSituacao(String situacao) { this.situacao = situacao; }

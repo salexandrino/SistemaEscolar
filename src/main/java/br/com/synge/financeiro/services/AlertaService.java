@@ -13,14 +13,18 @@ import java.util.UUID;
 
 public class AlertaService {
     private final MensalidadeRepository mensalidadeRepository;
+    private final InadimplenciaService inadimplenciaService;
 
-    public AlertaService(MensalidadeRepository mensalidadeRepository) {
+    public AlertaService(MensalidadeRepository mensalidadeRepository, InadimplenciaService inadimplenciaService) {
         this.mensalidadeRepository = mensalidadeRepository;
+        this.inadimplenciaService = inadimplenciaService;
     }
 
     public Map<String, Object> gerarAlertasFinanceiros(UUID tenantId) {
-        List<Mensalidade> pendentes = mensalidadeRepository.listarPorStatus(tenantId, "PENDENTE");
-        List<Mensalidade> atrasadas = mensalidadeRepository.listarPorStatus(tenantId, "EM_ATRASO");
+        // A transição PENDENTE -> EM_ATRASO fica centralizada no
+        // InadimplenciaService, para não termos duas implementações
+        // independentes da mesma regra que podem divergir com o tempo.
+        List<Mensalidade> atrasadas = inadimplenciaService.listarDevedores(tenantId);
 
         List<Map<String, Object>> alertasAVencer = new ArrayList<>();
         List<Map<String, Object>> alertasVencidos = new ArrayList<>();
@@ -28,23 +32,18 @@ public class AlertaService {
         LocalDate hoje = LocalDate.now();
 
         // 1. Identificar mensalidades a vencer nos próximos 5 dias
+        // (após a chamada acima, as que já venceram deixaram de estar PENDENTE)
+        List<Mensalidade> pendentes = mensalidadeRepository.listarPorStatus(tenantId, "PENDENTE");
         for (Mensalidade m : pendentes) {
-            if (m.getDataVencimento().isAfter(hoje) || m.getDataVencimento().isEqual(hoje)) {
-                long diasParaVencer = ChronoUnit.DAYS.between(hoje, m.getDataVencimento());
-                if (diasParaVencer <= 5) {
-                    Map<String, Object> alerta = new HashMap<>();
-                    alerta.put("idMensalidade", m.getId());
-                    alerta.put("idAluno", m.getIdAluno());
-                    alerta.put("valor", m.getValorOriginal());
-                    alerta.put("vencimento", m.getDataVencimento());
-                    alerta.put("mensagem", "Mensalidade vence em " + diasParaVencer + " dias.");
-                    alertasAVencer.add(alerta);
-                }
-            } else {
-                // Caso esteja pendente mas a data passou, ela deveria estar como EM_ATRASO
-                m.setStatus("EM_ATRASO");
-                mensalidadeRepository.atualizarStatus(tenantId, m.getId(), "EM_ATRASO");
-                atrasadas.add(m);
+            long diasParaVencer = ChronoUnit.DAYS.between(hoje, m.getDataVencimento());
+            if (diasParaVencer >= 0 && diasParaVencer <= 5) {
+                Map<String, Object> alerta = new HashMap<>();
+                alerta.put("idMensalidade", m.getId());
+                alerta.put("idAluno", m.getIdAluno());
+                alerta.put("valor", m.getValorOriginal());
+                alerta.put("vencimento", m.getDataVencimento());
+                alerta.put("mensagem", "Mensalidade vence em " + diasParaVencer + " dias.");
+                alertasAVencer.add(alerta);
             }
         }
 

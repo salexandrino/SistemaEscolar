@@ -124,7 +124,7 @@ public class SyngeApplication {
         ValidadorCpf validadorCpf = new ValidadorCpf();
         ProfessorService professorService = new ProfessorService(professorRepository, tdpRepository, validadorCpf);
         AlunoService alunoService = new AlunoService(alunoRepository, historicoRepository, matriculaRepository, documentoRepository, validadorCpf, turmaService);
-        LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository);
+        LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository, alunoRepository);
         // CORRIGIDO: Removido FrequenciaService e ajustado construtor do BoletimService
         BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, new CalculoMediaAritmetica());
 
@@ -144,14 +144,14 @@ public class SyngeApplication {
         AlunoController alunoController = new AlunoController(alunoService);
         // CORRIGIDO: Construtor aceita apenas notasService e boletimService
         GestaoPedagogicaController pedagogicaController = new GestaoPedagogicaController(notasService, boletimService);
-    // 1. Inicialização de Repositories
+        // 1. Inicialização de Repositories
         MensalidadeRepository mensalidadeRepository = new MensalidadeRepository();
         ParcelaRepository parcelaRepository = new ParcelaRepository();
         DescontoRepository descontoRepository = new DescontoRepository();
         PagamentoRepository pagamentoRepository = new PagamentoRepository();
 
         // 2. Inicialização dos Services
-        MensalidadeService mensalidadeService = new MensalidadeService(mensalidadeRepository, descontoRepository, pagamentoRepository);
+        MensalidadeService mensalidadeService = new MensalidadeService(mensalidadeRepository, descontoRepository, pagamentoRepository, parcelaRepository);
         ParcelamentoService parcelamentoService = new ParcelamentoService(parcelaRepository, mensalidadeRepository);
         InadimplenciaService inadimplenciaService = new InadimplenciaService(mensalidadeRepository);
         RelatorioFinanceiroService relatorioFinanceiroService = new RelatorioFinanceiroService(mensalidadeRepository);
@@ -160,7 +160,7 @@ public class SyngeApplication {
         MensalidadeController mensalidadeController = new MensalidadeController(mensalidadeService, parcelamentoService);
         RelatorioFinanceiroController relatorioFinanceiroController = new RelatorioFinanceiroController(inadimplenciaService, relatorioFinanceiroService);
 // No bloco de inicialização de Services:
-        AlertaService alertaService = new AlertaService(mensalidadeRepository);
+        AlertaService alertaService = new AlertaService(mensalidadeRepository, inadimplenciaService);
 
         // No bloco de inicialização de Controllers:
         AlertaController alertaController = new AlertaController(alertaService);
@@ -299,6 +299,8 @@ public class SyngeApplication {
         app.put("/users/{id}", usuarioAdminController::atualizar);
         app.delete("/users/{id}", usuarioAdminController::inativar);
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
+        app.patch("/users/{id}/unlock", usuarioAdminController::desbloquear);
+        app.post("/users/{id}/unlock", usuarioAdminController::desbloquear);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
         app.post("/users/{id}/inativar", usuarioAdminController::inativar);

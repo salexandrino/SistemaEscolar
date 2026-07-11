@@ -32,7 +32,14 @@ public class ParcelamentoService {
         }
 
         BigDecimal qtd = new BigDecimal(dto.getQuantidadeParcelas());
-        BigDecimal valorCada = m.getValorOriginal().divide(qtd, 2, RoundingMode.HALF_UP);
+        BigDecimal valorCada = m.getValorOriginal().divide(qtd, 2, RoundingMode.DOWN);
+
+        // Arredondar cada parcela para baixo e jogar a diferença (os centavos
+        // que sobram) na última parcela garante que a SOMA das parcelas seja
+        // sempre exatamente igual ao valor original da mensalidade.
+        // Ex.: R$100,00 em 3x -> 33,33 + 33,33 + 33,34 = 100,00 (antes: 99,99).
+        BigDecimal somaParcelasIniciais = valorCada.multiply(qtd.subtract(BigDecimal.ONE));
+        BigDecimal valorUltimaParcela = m.getValorOriginal().subtract(somaParcelasIniciais);
 
         List<Parcela> lista = new ArrayList<>();
         for (int i = 1; i <= dto.getQuantidadeParcelas(); i++) {
@@ -41,7 +48,7 @@ public class ParcelamentoService {
             p.setTenantId(tenantId);
             p.setIdMensalidade(m.getId());
             p.setNumeroParcela(i);
-            p.setValorParcela(valorCada);
+            p.setValorParcela(i == dto.getQuantidadeParcelas() ? valorUltimaParcela : valorCada);
             p.setDataVencimento(m.getDataVencimento().plusMonths(i - 1));
             p.setStatus("PENDENTE");
             lista.add(p);

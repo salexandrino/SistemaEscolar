@@ -108,7 +108,9 @@ public class TurmaRepository extends BaseDAO {
     }
 
     public int contarMatriculas(UUID tenantId, UUID idTurma) {
-        String sql = "SELECT COUNT(1) FROM matricula WHERE id_turma = ? AND tenant_id = ?";
+        // Conta apenas matrículas ATIVAS: alunos transferidos/cancelados não devem
+        // ocupar vaga permanentemente na turma de origem.
+        String sql = "SELECT COUNT(1) FROM matricula WHERE id_turma = ? AND tenant_id = ? AND status = 'ATIVA'";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setObject(1, idTurma);
             ps.setObject(2, tenantId);

@@ -2,8 +2,10 @@ package br.com.synge.academico.services;
 
 import br.com.synge.academico.dtos.LancamentoNotaDTO;
 import br.com.synge.academico.dtos.AlunoRecuperacaoDTO;
+import br.com.synge.academico.models.Aluno;
 import br.com.synge.academico.models.Avaliacao;
 import br.com.synge.academico.models.Nota;
+import br.com.synge.academico.repositories.AlunoRepository;
 import br.com.synge.academico.repositories.AvaliacaoRepository;
 import br.com.synge.academico.repositories.MatriculaRepository;
 import br.com.synge.academico.repositories.NotaRepository;
@@ -27,13 +29,16 @@ public class LancamentoNotasService {
     private final NotaRepository notaRepository;
     private final AvaliacaoRepository avaliacaoRepository;
     private final MatriculaRepository matriculaRepository;
+    private final AlunoRepository alunoRepository;
 
-    private static final BigDecimal MEDIA_MINIMA_APROVACAO = new BigDecimal("6.0");
+    private static final BigDecimal MEDIA_MINIMA_APROVACAO = RegrasAcademicas.MEDIA_MINIMA_APROVACAO;
 
-    public LancamentoNotasService(NotaRepository notaRepository, AvaliacaoRepository avaliacaoRepository, MatriculaRepository matriculaRepository) {
+    public LancamentoNotasService(NotaRepository notaRepository, AvaliacaoRepository avaliacaoRepository,
+                                  MatriculaRepository matriculaRepository, AlunoRepository alunoRepository) {
         this.notaRepository = notaRepository;
         this.avaliacaoRepository = avaliacaoRepository;
         this.matriculaRepository = matriculaRepository;
+        this.alunoRepository = alunoRepository;
     }
 
     private UUID tenant() {
@@ -85,7 +90,9 @@ public class LancamentoNotasService {
 
             if (media.compareTo(MEDIA_MINIMA_APROVACAO) < 0) {
                 BigDecimal notaNecessaria = calcularNotaNecessariaRecuperacao(media);
-                String nomeAluno = "Aluno " + idAluno.toString().substring(0, 5);
+                String nomeAluno = alunoRepository.buscarPorId(tenantId, idAluno)
+                        .map(Aluno::getNome)
+                        .orElse("Aluno não encontrado");
 
                 emRecuperacao.add(new AlunoRecuperacaoDTO(idAluno, nomeAluno, media, notaNecessaria));
             }
