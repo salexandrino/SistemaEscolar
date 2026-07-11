@@ -3,10 +3,50 @@ package br.com.synge;
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
+import br.com.synge.academico.controllers.DisciplinaController;
+import br.com.synge.academico.controllers.AnoLetivoController;
+import br.com.synge.academico.controllers.SerieController;
+import br.com.synge.academico.controllers.MatrizCurricularController;
+import br.com.synge.academico.controllers.TurmaController;
+import br.com.synge.academico.controllers.AlocacaoDocenteController;
+import br.com.synge.academico.controllers.ProfessorController;
+import br.com.synge.academico.controllers.AlunoController;
+import br.com.synge.academico.controllers.GestaoPedagogicaController;
+import br.com.synge.academico.repositories.DisciplinaRepository;
+import br.com.synge.academico.repositories.AnoLetivoRepository;
+import br.com.synge.academico.repositories.SerieRepository;
+import br.com.synge.academico.repositories.SerieDisciplinaRepository;
+import br.com.synge.academico.repositories.TurmaRepository;
+import br.com.synge.academico.repositories.AnoLetivoCloneRepository;
+import br.com.synge.academico.repositories.TurmaDisciplinaProfessorRepository;
+import br.com.synge.academico.repositories.ProfessorRepository;
+import br.com.synge.academico.repositories.AlunoRepository;
+import br.com.synge.academico.repositories.MatriculaRepository;
+import br.com.synge.academico.repositories.DocumentoAlunoRepository;
+import br.com.synge.academico.repositories.HistoricoSituacaoAlunoRepository;
+import br.com.synge.academico.repositories.AvaliacaoRepository;
+import br.com.synge.academico.repositories.NotaRepository;
+import br.com.synge.academico.repositories.FrequenciaRepository;
+import br.com.synge.academico.services.DisciplinaService;
+import br.com.synge.academico.services.AnoLetivoService;
+import br.com.synge.academico.services.SerieService;
+import br.com.synge.academico.services.MatrizCurricularService;
+import br.com.synge.academico.services.TurmaService;
+import br.com.synge.academico.services.AlocacaoDocenteService;
+import br.com.synge.academico.services.ProfessorService;
+import br.com.synge.academico.services.AlunoService;
+import br.com.synge.academico.services.LancamentoNotasService;
+import br.com.synge.academico.services.FrequenciaService;
+import br.com.synge.academico.services.BoletimService;
+import br.com.synge.academico.services.media.CalculoMediaAritmetica;
 import br.com.synge.seguranca.controllers.EscolaDashboardController;
 import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
+import br.com.synge.seguranca.exceptions.AuthorizationException;
+import br.com.synge.seguranca.exceptions.ValidationException;
+import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.middlewares.AuthMiddleware;
+import br.com.synge.seguranca.middlewares.RoleBasedMiddleware;
 import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
@@ -15,6 +55,7 @@ import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.services.PasswordService;
 import br.com.synge.seguranca.services.JwtService;
+import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.config.DatabaseConfig;
 import br.com.synge.config.FlywayConfig;
 import br.com.synge.seguranca.controllers.AuthController;
@@ -23,6 +64,7 @@ import br.com.synge.seguranca.controllers.UsuarioAdminController;
 import br.com.synge.seguranca.services.AuthService;
 import br.com.synge.seguranca.services.EscolaService;
 import br.com.synge.seguranca.services.UsuarioAdminService;
+import br.com.synge.seguranca.strategies.ValidadorCpf;
 import br.com.synge.seguranca.utils.AuthUserContext;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -66,18 +108,58 @@ public class SyngeApplication {
         JwtService jwtService = new JwtService();
         SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
+        // Acadêmico
+        DisciplinaRepository disciplinaRepository = new DisciplinaRepository();
+        AnoLetivoRepository anoLetivoRepository = new AnoLetivoRepository();
+        AnoLetivoCloneRepository cloneRepository = new AnoLetivoCloneRepository();
+        SerieRepository serieRepository = new SerieRepository();
+        SerieDisciplinaRepository serieDisciplinaRepository = new SerieDisciplinaRepository();
+        TurmaRepository turmaRepository = new TurmaRepository();
+        TurmaDisciplinaProfessorRepository tdpRepository = new TurmaDisciplinaProfessorRepository();
+        ProfessorRepository professorRepository = new ProfessorRepository();
+        AlunoRepository alunoRepository = new AlunoRepository();
+        MatriculaRepository matriculaRepository = new MatriculaRepository();
+        DocumentoAlunoRepository documentoRepository = new DocumentoAlunoRepository();
+        HistoricoSituacaoAlunoRepository historicoRepository = new HistoricoSituacaoAlunoRepository();
+        AvaliacaoRepository avaliacaoRepository = new AvaliacaoRepository();
+        NotaRepository notaRepository = new NotaRepository();
+        FrequenciaRepository frequenciaRepository = new FrequenciaRepository();
 
         // 2. Inicialização dos Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         EscolaService escolaService = new EscolaService(escolaRepository);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
+        // Acadêmico
+        DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
+        AnoLetivoService anoLetivoService = new AnoLetivoService(anoLetivoRepository, cloneRepository);
+        SerieService serieService = new SerieService(serieRepository, anoLetivoRepository);
+        MatrizCurricularService matrizCurricularService = new MatrizCurricularService(serieDisciplinaRepository, serieRepository, disciplinaRepository);
+        TurmaService turmaService = new TurmaService(turmaRepository, anoLetivoRepository, serieRepository);
+        AlocacaoDocenteService alocacaoDocenteService = new AlocacaoDocenteService(tdpRepository, serieDisciplinaRepository, turmaRepository, professorRepository);
+        
+        ValidadorCpf validadorCpf = new ValidadorCpf();
+        ProfessorService professorService = new ProfessorService(professorRepository, tdpRepository, validadorCpf);
+        AlunoService alunoService = new AlunoService(alunoRepository, historicoRepository, matriculaRepository, documentoRepository, validadorCpf, turmaService);
+        LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository);
+        FrequenciaService frequenciaService = new FrequenciaService(frequenciaRepository, matriculaRepository);
+        BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, frequenciaRepository, new CalculoMediaAritmetica());
 
         // 3. Inicialização dos Controllers
         AuthController authController = new AuthController(authService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(escolaService);
         DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, templateEngine);
+        // Acadêmico
+        DisciplinaController disciplinaController = new DisciplinaController(disciplinaService);
+        AnoLetivoController anoLetivoController = new AnoLetivoController(anoLetivoService);
+        SerieController serieController = new SerieController(serieService);
+        MatrizCurricularController matrizCurricularController = new MatrizCurricularController(matrizCurricularService);
+        TurmaController turmaController = new TurmaController(turmaService);
+        AlocacaoDocenteController alocacaoDocenteController = new AlocacaoDocenteController(alocacaoDocenteService);
+        ProfessorController professorController = new ProfessorController(professorService);
+        AlunoController alunoController = new AlunoController(alunoService);
+        GestaoPedagogicaController pedagogicaController = new GestaoPedagogicaController(notasService, frequenciaService, boletimService);
 
         // 4. Configuração do Javalin 6
         Javalin app = Javalin.create(config -> {
@@ -162,11 +244,15 @@ public class SyngeApplication {
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
 
+
         // =================================================================
         // FILTROS DE SEGURANÇA (BLOQUEIO DE ÁREA RESTRITA)
         // =================================================================
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
+
+        // Proteção por papéis para APIs acadêmicas
+        app.before("/api/academico/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
 
         // =================================================================
         // ROTAS PROTEGIDAS (REQUEREM LOGIN DE SUPER ADMIN)
@@ -245,6 +331,75 @@ public class SyngeApplication {
 
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);
+
+        // =================================================================
+        // ACADÊMICO — DISCIPLINAS (APIs)
+        // =================================================================
+        app.get("/api/academico/disciplinas", disciplinaController::listar);
+        app.get("/api/academico/disciplinas/{id}", disciplinaController::obter);
+        app.post("/api/academico/disciplinas", disciplinaController::criar);
+        app.put("/api/academico/disciplinas/{id}", disciplinaController::atualizar);
+        app.delete("/api/academico/disciplinas/{id}", disciplinaController::remover);
+
+        // =================================================================
+        // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ (APIs)
+        // =================================================================
+        // Anos Letivos
+        app.get("/api/academico/anos-letivos", anoLetivoController::listar);
+        app.post("/api/academico/anos-letivos", anoLetivoController::criar);
+        app.patch("/api/academico/anos-letivos/{id}/arquivar", anoLetivoController::arquivar);
+        app.patch("/api/academico/anos-letivos/{id}/definir-ativo", anoLetivoController::definirAtivo);
+        app.get("/api/academico/anos-letivos/historico", anoLetivoController::historico);
+        app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", anoLetivoController::clonar);
+
+        // Séries
+        app.get("/api/academico/series", serieController::listarPorAno); // ?idAnoLetivo=UUID
+        app.get("/api/academico/series/{id}", serieController::obter);
+        app.post("/api/academico/series", serieController::criar);
+        app.put("/api/academico/series/{id}", serieController::atualizar);
+        app.delete("/api/academico/series/{id}", serieController::remover);
+
+        // Matriz Curricular (por Série)
+        app.get("/api/academico/series/{idSerie}/matriz", matrizCurricularController::listar);
+        app.post("/api/academico/series/{idSerie}/matriz", matrizCurricularController::definir);
+        app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", matrizCurricularController::remover);
+
+        // =================================================================
+        // ACADÊMICO — TURMAS (APIs)
+        // =================================================================
+        app.get("/api/academico/turmas", turmaController::listar); // ?idAnoLetivo=UUID&idSerie=UUID
+        app.post("/api/academico/turmas", turmaController::criar);
+        app.patch("/api/academico/turmas/{id}/encerrar", turmaController::encerrar);
+        app.get("/api/academico/turmas/{id}/capacidade", turmaController::capacidade);
+
+        // Atribuição Docente na Turma
+        app.post("/api/academico/turmas/{idTurma}/docentes", alocacaoDocenteController::atribuir);
+        app.delete("/api/academico/turmas/{idTurma}/docentes/{idDisciplina}/{idProfessor}", alocacaoDocenteController::remover);
+        
+        // Professores
+        app.get("/api/academico/professores", professorController::listar);
+        app.post("/api/academico/professores", professorController::criar);
+        app.get("/api/academico/professores/{id}", professorController::obterPorId);
+        app.put("/api/academico/professores/{id}", professorController::atualizar);
+        app.delete("/api/academico/professores/{id}", professorController::inativar);
+        app.get("/api/academico/professores/{id}/grade", professorController::consultarGrade);
+
+        // Alunos
+        app.get("/api/academico/alunos", alunoController::listar);
+        app.post("/api/academico/alunos", alunoController::criar);
+        app.get("/api/academico/alunos/{id}", alunoController::obterPorId);
+        app.put("/api/academico/alunos/{id}", alunoController::atualizar);
+        app.patch("/api/academico/alunos/{id}/situacao", alunoController::alterarSituacao);
+        app.post("/api/academico/alunos/{id}/matriculas", alunoController::matricular);
+        app.post("/api/academico/alunos/{id}/transferencias", alunoController::transferir);
+        app.get("/api/academico/alunos/{id}/documentos", alunoController::listarDocumentos);
+        app.post("/api/academico/alunos/{id}/documentos", alunoController::adicionarDocumento);
+        app.get("/api/academico/alunos/{id}/historico-escolar", alunoController::emitirHistoricoEscolar);
+
+        // Gestão Pedagógica (Notas, Frequências, Boletins)
+        app.post("/api/academico/notas", pedagogicaController::lancarNota);
+        app.post("/api/academico/frequencias", pedagogicaController::registrarFrequencia);
+        app.get("/api/academico/boletins", pedagogicaController::gerarBoletim);
         // =================================================================
         // TRATAMENTO DE EXCEÇÕES
         // =================================================================
@@ -252,9 +407,34 @@ public class SyngeApplication {
 
         app.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404);
-            Context thymeleafContext = new Context();
-            thymeleafContext.setVariable("message", e.getMessage());
-            ctx.html(templateEngine.process("errors/404", thymeleafContext));
+            if (ctx.path().startsWith("/api/")) {
+                ctx.json(Map.of("message", e.getMessage()));
+            } else {
+                Context thymeleafContext = new Context();
+                thymeleafContext.setVariable("message", e.getMessage());
+                ctx.html(templateEngine.process("errors/404", thymeleafContext));
+            }
+        });
+
+        app.exception(AuthorizationException.class, (e, ctx) -> {
+            ctx.status(403);
+            if (ctx.path().startsWith("/api/")) {
+                ctx.json(Map.of("message", e.getMessage()));
+            } else {
+                Context thymeleafContext = new Context();
+                thymeleafContext.setVariable("message", e.getMessage());
+                ctx.html(templateEngine.process("errors/403", thymeleafContext));
+            }
+        });
+
+        app.exception(ValidationException.class, (e, ctx) -> {
+            ctx.status(400);
+            ctx.json(Map.of("message", e.getMessage()));
+        });
+
+        app.exception(ConflictException.class, (e, ctx) -> {
+            ctx.status(409);
+            ctx.json(Map.of("message", e.getMessage()));
         });
 
         app.exception(Exception.class, (e, ctx) -> {
