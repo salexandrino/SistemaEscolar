@@ -19,32 +19,33 @@ public class NotaRepository extends BaseDAO {
     private static final Logger logger = LoggerFactory.getLogger(NotaRepository.class);
 
     private Nota map(ResultSet rs) throws SQLException {
-        Nota n = new Nota();
-        n.setId(rs.getObject("id", UUID.class));
-        n.setTenantId(rs.getObject("tenant_id", UUID.class));
-        n.setIdAvaliacao(rs.getObject("id_avaliacao", UUID.class));
-        n.setIdAluno(rs.getObject("id_aluno", UUID.class));
-        n.setValor(rs.getBigDecimal("valor"));
-        n.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
-        n.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
-        return n;
+        return new Nota(
+                rs.getObject("id", UUID.class),
+                rs.getObject("tenant_id", UUID.class),
+                rs.getObject("id_avaliacao", UUID.class),
+                rs.getObject("id_aluno", UUID.class),
+                rs.getBigDecimal("valor"),
+                rs.getObject("criado_em", LocalDateTime.class),
+                rs.getObject("atualizado_em", LocalDateTime.class)
+        );
     }
 
     public Nota salvar(Nota n) {
         String sql = "INSERT INTO nota (id, tenant_id, id_avaliacao, id_aluno, valor, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                     "ON CONFLICT (tenant_id, id_avaliacao, id_aluno) DO UPDATE SET valor = EXCLUDED.valor, atualizado_em = CURRENT_TIMESTAMP";
+                "ON CONFLICT (tenant_id, id_avaliacao, id_aluno) DO UPDATE SET valor = EXCLUDED.valor, atualizado_em = CURRENT_TIMESTAMP";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, n.getId() != null ? n.getId() : UUID.randomUUID());
-            ps.setObject(2, n.getTenantId());
-            ps.setObject(3, n.getIdAvaliacao());
-            ps.setObject(4, n.getIdAluno());
-            ps.setBigDecimal(5, n.getValor());
-            ps.setObject(6, n.getCriadoEm() != null ? n.getCriadoEm() : LocalDateTime.now());
-            ps.setObject(7, n.getAtualizadoEm() != null ? n.getAtualizadoEm() : LocalDateTime.now());
+            // CORREÇÃO: Acesso aos métodos do record (n.id(), n.tenantId(), etc.)
+            ps.setObject(1, n.id() != null ? n.id() : UUID.randomUUID());
+            ps.setObject(2, n.tenantId());
+            ps.setObject(3, n.idAvaliacao());
+            ps.setObject(4, n.idAluno());
+            ps.setBigDecimal(5, n.valor());
+            ps.setObject(6, n.criadoEm() != null ? n.criadoEm() : LocalDateTime.now());
+            ps.setObject(7, n.atualizadoEm() != null ? n.atualizadoEm() : LocalDateTime.now());
             ps.executeUpdate();
             return n;
         } catch (SQLException e) {
-            logger.error("Erro ao salvar nota aluno {}: {}", n.getIdAluno(), e.getMessage(), e);
+            logger.error("Erro ao salvar nota aluno {}: {}", n.idAluno(), e.getMessage(), e);
             throw new RuntimeException("Erro ao salvar nota.", e);
         }
     }

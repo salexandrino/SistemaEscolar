@@ -247,10 +247,21 @@ public class AlunoService {
         }).collect(Collectors.toList());
     }
 
-    public Object emitirHistoricoEscolar(UUID id) {
-        UUID tenantId = tenant();
-        Aluno a = alunoRepository.buscarPorId(tenantId, id).orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
-        return "{\"aluno\": \"" + a.getNome() + "\", \"situacao\": \"" + a.getSituacao() + "\", \"mensagem\": \"Histórico Escolar em formato JSON.\"}";
+    public br.com.synge.academico.dtos.HistoricoEscolarDTO emitirHistoricoEscolar(UUID tenantId, UUID idAluno) {
+        Aluno aluno = alunoRepository.buscarPorId(tenantId, idAluno)
+                .orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
+
+        // PREENCHIDO COM O NOVO MÉTODO:
+        List<br.com.synge.academico.dtos.HistoricoEscolarDTO.ItemMatriculaHistorico> itens =
+                matriculaRepository.buscarHistoricoMatriculas(tenantId, idAluno);
+
+        return new br.com.synge.academico.dtos.HistoricoEscolarDTO(
+                aluno.getId(),
+                aluno.getNome(),
+                aluno.getCpf(),
+                aluno.getSituacao(),
+                itens
+        );
     }
 
     public AlunoResponseDTO obterPorId(UUID id) {

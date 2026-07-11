@@ -19,7 +19,8 @@ public class CalculoMediaAritmetica implements CalculadoraMediaStrategy {
         int count = 0;
 
         for (Nota n : notas) {
-            soma = soma.add(n.getValor());
+            // Se Nota for um Record, mude para: n.valor()
+            soma = soma.add(n.valor());
             count++;
         }
 

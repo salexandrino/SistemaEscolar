@@ -114,4 +114,26 @@ document.addEventListener('DOMContentLoaded', function() {
         applyMoneyMask(input);
     });
 
+    const toggleSenhaElements = document.querySelectorAll('[data-toggle-senha]');
+    toggleSenhaElements.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector('i');
+
+            if (input && input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+
+                setTimeout(function() {
+                    input.type = 'password';
+                    icon.classList.replace('bi-eye', 'bi-eye-slash');
+                }, 3000);
+            } else if (input) {
+                input.type = 'password';
+                icon.replace('bi-eye', 'bi-eye-slash');
+            }
+        });
+    });
+
 });

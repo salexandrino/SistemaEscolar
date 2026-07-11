@@ -3,6 +3,7 @@ package br.com.synge.academico.services;
 import br.com.synge.academico.dtos.AnoLetivoResponseDTO;
 import br.com.synge.academico.dtos.CriarAnoLetivoDTO;
 import br.com.synge.academico.models.AnoLetivo;
+import br.com.synge.academico.repositories.AnoLetivoCloneRepository;
 import br.com.synge.academico.repositories.AnoLetivoRepository;
 import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.exceptions.NotFoundException;

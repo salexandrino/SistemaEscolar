@@ -107,4 +107,70 @@ public class MatriculaRepository extends BaseDAO {
         }
         return lista;
     }
+
+    /**
+     * NOVO MÉTODO: Busca os IDs dos alunos que possuem matrícula ATIVA na turma informada.
+     */
+    public List<UUID> listarAlunosAtivosPorTurma(UUID tenantId, UUID idTurma) {
+        String sql = "SELECT id_aluno FROM matricula WHERE tenant_id = ? AND id_turma = ? AND status = 'ATIVA'";
+        List<UUID> alunos = new ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, tenantId);
+            ps.setObject(2, idTurma);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    alunos.add(rs.getObject("id_aluno", UUID.class));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar IDs dos alunos ativos da turma {}: {}", idTurma, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar alunos ativos da turma.", e);
+        }
+        return alunos;
+    }
+
+    /**
+     * NOVO MÉTODO: Busca o histórico completo de matrículas de um aluno
+     * fazendo JOIN com a tabela de turma e ano_letivo para montar os itens do histórico.
+     */
+    public List<br.com.synge.academico.dtos.HistoricoEscolarDTO.ItemMatriculaHistorico> buscarHistoricoMatriculas(UUID tenantId, UUID idAluno) {
+        String sql = "SELECT m.id_turma, t.nome AS nome_turma, al.ano AS ano_letivo, m.status AS situacao_na_turma, m.atualizado_em " +
+                "FROM matricula m " +
+                "JOIN turma t ON m.id_turma = t.id AND m.tenant_id = t.tenant_id " +
+                "JOIN ano_letivo al ON t.id_ano_letivo = al.id AND t.tenant_id = al.tenant_id " +
+                "WHERE m.tenant_id = ? AND m.id_aluno = ? " +
+                "ORDER BY al.ano DESC, m.data_matricula DESC";
+
+        List<br.com.synge.academico.dtos.HistoricoEscolarDTO.ItemMatriculaHistorico> historico = new ArrayList<>();
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, tenantId);
+            ps.setObject(2, idAluno);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    UUID idTurma = rs.getObject("id_turma", UUID.class);
+                    String nomeTurma = rs.getString("nome_turma");
+                    String anoLetivo = rs.getString("ano_letivo");
+                    String situacaoNaTurma = rs.getString("situacao_na_turma");
+                    Timestamp atualizadoEmTs = rs.getTimestamp("atualizado_em");
+                    java.time.LocalDateTime dataAlteracao = atualizadoEmTs != null ? atualizadoEmTs.toLocalDateTime() : null;
+
+                    // Instancia o record ou classe interna do DTO conforme definido
+                    historico.add(new br.com.synge.academico.dtos.HistoricoEscolarDTO.ItemMatriculaHistorico(
+                            idTurma,
+                            nomeTurma,
+                            anoLetivo,
+                            situacaoNaTurma,
+                            dataAlteracao
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar histórico de matrículas do aluno {}: {}", idAluno, e.getMessage(), e);
+            throw new RuntimeException("Erro ao buscar histórico escolar.", e);
+        }
+
+        return historico;
+    }
 }

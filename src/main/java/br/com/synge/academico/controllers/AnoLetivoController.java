@@ -4,6 +4,8 @@ import br.com.synge.academico.dtos.AnoLetivoResponseDTO;
 import br.com.synge.academico.dtos.CriarAnoLetivoDTO;
 import br.com.synge.academico.services.AnoLetivoService;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus; // IMPORT INCLUÍDO
+import java.time.LocalDate; // IMPORT INCLUÍDO
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,6 @@ public class AnoLetivoController {
         UUID idOrigem = UUID.fromString(ctx.pathParam("id"));
         UUID idDestino = UUID.fromString(ctx.pathParam("destinoId"));
         service.clonarConfiguracoes(idOrigem, idDestino);
-        ctx.status(HttpStatus.NO_CONTENT_204);
+        ctx.status(HttpStatus.NO_CONTENT);
     }
 }

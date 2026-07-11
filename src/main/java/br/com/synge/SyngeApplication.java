@@ -1,17 +1,10 @@
 package br.com.synge;
 
+import br.com.synge.academico.controllers.*;
+import br.com.synge.academico.services.*;
 import br.com.synge.administrativo.controllers.DashboardController;
 import br.com.synge.administrativo.repositories.DashboardRepository;
 import br.com.synge.administrativo.services.DashboardService;
-import br.com.synge.academico.controllers.DisciplinaController;
-import br.com.synge.academico.controllers.AnoLetivoController;
-import br.com.synge.academico.controllers.SerieController;
-import br.com.synge.academico.controllers.MatrizCurricularController;
-import br.com.synge.academico.controllers.TurmaController;
-import br.com.synge.academico.controllers.AlocacaoDocenteController;
-import br.com.synge.academico.controllers.ProfessorController;
-import br.com.synge.academico.controllers.AlunoController;
-import br.com.synge.academico.controllers.GestaoPedagogicaController;
 import br.com.synge.academico.repositories.DisciplinaRepository;
 import br.com.synge.academico.repositories.AnoLetivoRepository;
 import br.com.synge.academico.repositories.SerieRepository;
@@ -26,20 +19,7 @@ import br.com.synge.academico.repositories.DocumentoAlunoRepository;
 import br.com.synge.academico.repositories.HistoricoSituacaoAlunoRepository;
 import br.com.synge.academico.repositories.AvaliacaoRepository;
 import br.com.synge.academico.repositories.NotaRepository;
-import br.com.synge.academico.repositories.FrequenciaRepository;
-import br.com.synge.academico.services.DisciplinaService;
-import br.com.synge.academico.services.AnoLetivoService;
-import br.com.synge.academico.services.SerieService;
-import br.com.synge.academico.services.MatrizCurricularService;
-import br.com.synge.academico.services.TurmaService;
-import br.com.synge.academico.services.AlocacaoDocenteService;
-import br.com.synge.academico.services.ProfessorService;
-import br.com.synge.academico.services.AlunoService;
-import br.com.synge.academico.services.LancamentoNotasService;
-import br.com.synge.academico.services.FrequenciaService;
-import br.com.synge.academico.services.BoletimService;
 import br.com.synge.academico.services.media.CalculoMediaAritmetica;
-import br.com.synge.seguranca.controllers.EscolaDashboardController;
 import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.exceptions.AuthorizationException;
@@ -49,8 +29,6 @@ import br.com.synge.seguranca.middlewares.AuthMiddleware;
 import br.com.synge.seguranca.middlewares.RoleBasedMiddleware;
 import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
 import br.com.synge.seguranca.models.AuthUser;
-import br.com.synge.seguranca.models.Escola;
-import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.services.PasswordService;
@@ -67,6 +45,7 @@ import br.com.synge.seguranca.services.UsuarioAdminService;
 import br.com.synge.seguranca.strategies.ValidadorCpf;
 import br.com.synge.seguranca.utils.AuthUserContext;
 import io.javalin.Javalin;
+import io.javalin.apibuilder.ApiBuilder;
 import io.javalin.http.staticfiles.Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +57,9 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import br.com.synge.financeiro.controllers.*;
+import br.com.synge.financeiro.repositories.*;
+import br.com.synge.financeiro.services.*;
 
 public class SyngeApplication {
 
@@ -89,7 +71,6 @@ public class SyngeApplication {
         try {
             DatabaseConfig.init();
             System.out.println("Banco inicializado!");
-            // Deixa o FlywayConfig (ajustado com baseline 0) cuidar de tudo de forma limpa!
             FlywayConfig.migrate();
             logger.info("Banco de dados inicializado com sucesso.");
         } catch (Exception e) {
@@ -123,7 +104,9 @@ public class SyngeApplication {
         HistoricoSituacaoAlunoRepository historicoRepository = new HistoricoSituacaoAlunoRepository();
         AvaliacaoRepository avaliacaoRepository = new AvaliacaoRepository();
         NotaRepository notaRepository = new NotaRepository();
-        FrequenciaRepository frequenciaRepository = new FrequenciaRepository();
+        AvaliacaoService avaliacaoService = new AvaliacaoService(avaliacaoRepository);
+        AvaliacaoController avaliacaoController = new AvaliacaoController(avaliacaoService);
+        // CORRIGIDO: Removido FrequenciaRepository
 
         // 2. Inicialização dos Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
@@ -137,13 +120,13 @@ public class SyngeApplication {
         MatrizCurricularService matrizCurricularService = new MatrizCurricularService(serieDisciplinaRepository, serieRepository, disciplinaRepository);
         TurmaService turmaService = new TurmaService(turmaRepository, anoLetivoRepository, serieRepository);
         AlocacaoDocenteService alocacaoDocenteService = new AlocacaoDocenteService(tdpRepository, serieDisciplinaRepository, turmaRepository, professorRepository);
-        
+
         ValidadorCpf validadorCpf = new ValidadorCpf();
         ProfessorService professorService = new ProfessorService(professorRepository, tdpRepository, validadorCpf);
         AlunoService alunoService = new AlunoService(alunoRepository, historicoRepository, matriculaRepository, documentoRepository, validadorCpf, turmaService);
         LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository);
-        FrequenciaService frequenciaService = new FrequenciaService(frequenciaRepository, matriculaRepository);
-        BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, frequenciaRepository, new CalculoMediaAritmetica());
+        // CORRIGIDO: Removido FrequenciaService e ajustado construtor do BoletimService
+        BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, new CalculoMediaAritmetica());
 
         // 3. Inicialização dos Controllers
         AuthController authController = new AuthController(authService);
@@ -159,7 +142,28 @@ public class SyngeApplication {
         AlocacaoDocenteController alocacaoDocenteController = new AlocacaoDocenteController(alocacaoDocenteService);
         ProfessorController professorController = new ProfessorController(professorService);
         AlunoController alunoController = new AlunoController(alunoService);
-        GestaoPedagogicaController pedagogicaController = new GestaoPedagogicaController(notasService, frequenciaService, boletimService);
+        // CORRIGIDO: Construtor aceita apenas notasService e boletimService
+        GestaoPedagogicaController pedagogicaController = new GestaoPedagogicaController(notasService, boletimService);
+    // 1. Inicialização de Repositories
+        MensalidadeRepository mensalidadeRepository = new MensalidadeRepository();
+        ParcelaRepository parcelaRepository = new ParcelaRepository();
+        DescontoRepository descontoRepository = new DescontoRepository();
+        PagamentoRepository pagamentoRepository = new PagamentoRepository();
+
+        // 2. Inicialização dos Services
+        MensalidadeService mensalidadeService = new MensalidadeService(mensalidadeRepository, descontoRepository, pagamentoRepository);
+        ParcelamentoService parcelamentoService = new ParcelamentoService(parcelaRepository, mensalidadeRepository);
+        InadimplenciaService inadimplenciaService = new InadimplenciaService(mensalidadeRepository);
+        RelatorioFinanceiroService relatorioFinanceiroService = new RelatorioFinanceiroService(mensalidadeRepository);
+
+        // 3. Inicialização dos Controllers
+        MensalidadeController mensalidadeController = new MensalidadeController(mensalidadeService, parcelamentoService);
+        RelatorioFinanceiroController relatorioFinanceiroController = new RelatorioFinanceiroController(inadimplenciaService, relatorioFinanceiroService);
+// No bloco de inicialização de Services:
+        AlertaService alertaService = new AlertaService(mensalidadeRepository);
+
+        // No bloco de inicialização de Controllers:
+        AlertaController alertaController = new AlertaController(alertaService);
 
         // 4. Configuração do Javalin 6
         Javalin app = Javalin.create(config -> {
@@ -179,14 +183,9 @@ public class SyngeApplication {
             });
         });
 
-        // Middleware de Autenticação Global (Apenas detecta o token, não bloqueia rotas)
         app.before(new AuthMiddleware(jwtService));
 
-        // =================================================================
-        // ROTAS PÚBLICAS (NÃO REQUEREM LOGIN)
-        // =================================================================
-
-        // Rota Ping (Exigência do Professor - Mantida 100% pública)
+        // Rota Ping
         app.get("/ping", ctx -> {
             ctx.status(200).json(Map.of(
                     "status", "ok",
@@ -225,8 +224,6 @@ public class SyngeApplication {
 
         app.get("/cadastro", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-            // Antes mandava uma lista vazia fixa — agora busca as escolas ativas de
-            // verdade, pra aparecerem no dropdown do formulário de auto-cadastro.
             context.setVariable("escolas", escolaRepository.findAllAtivas());
             ctx.html(templateEngine.process("auth/cadastro", context));
         });
@@ -244,37 +241,40 @@ public class SyngeApplication {
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
 
-
-        // =================================================================
-        // FILTROS DE SEGURANÇA (BLOQUEIO DE ÁREA RESTRITA)
-        // =================================================================
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
-        // Proteção por papéis para APIs acadêmicas
+// ... antes do bloco de rotas ...
         app.before("/api/academico/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
 
-        // =================================================================
-        // ROTAS PROTEGIDAS (REQUEREM LOGIN DE SUPER ADMIN)
-        // =================================================================
+        // SOLUÇÃO DEFINITIVA: Mapeamento linear direto na instância 'app' (Livre de erros de versão do Javalin)
+        app.post("/api/academico/avaliacoes", avaliacaoController::criar);
+        app.get("/api/academico/avaliacoes", avaliacaoController::listar);
+        app.get("/api/academico/avaliacoes/{id}", avaliacaoController::obterPorId); // mude para ::obter se der erro de assinatura no controller
+        app.put("/api/academico/avaliacoes/{id}", avaliacaoController::atualizar);
+        app.delete("/api/academico/avaliacoes/{id}", avaliacaoController::remover);
+
+        // Novas rotas da Gestão Pedagógica (Recuperação e Simulador) mapeadas de forma direta
+        app.post("/api/academico/notas", pedagogicaController::lancarNota);
+        app.get("/api/academico/notas/recuperacao", pedagogicaController::recuperacao);
+        app.get("/api/academico/notas/recuperacao/{mediaAtual}/nota-necessaria", pedagogicaController::notaNecessaria);
+        app.post("/api/academico/notas/simulador", pedagogicaController::simulador);
+        app.get("/api/academico/boletins", pedagogicaController::gerarBoletim);
 
         // Dashboard Home
-        app.get("/dashboard", dashboardController::dashboard);
-
-        // Gestão de Escolas (Páginas HTML)
+        app.get("/dashboard", dashboardController::dashboard);       // Gestão de Escolas
         app.get("/dashboard/escolas", escolaController::exibirPaginaListagem);
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
-// --- GESTÃO DE USUÁRIOS ---
+
+        // Gestão de Usuários
         app.get("/dashboard/usuarios", dashboardController::usuarios);
         app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
-        // =================================================================
-        // APIs E ROTAS DE CONTEXTO
-        // =================================================================
+
         app.get("/area-logada", ctx -> {
             try {
                 AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -293,7 +293,7 @@ public class SyngeApplication {
             }
         });
 
-        // API de Usuários (JSON / Formulários HTML)
+        // API de Usuários
         app.get("/users", usuarioAdminController::listar);
         app.get("/users/{id}", usuarioAdminController::buscarPorId);
         app.put("/users/{id}", usuarioAdminController::atualizar);
@@ -301,17 +301,9 @@ public class SyngeApplication {
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
-// 🔥 ADICIONE ESTAS ROTAS ABAIXO PARA SUPORTAR OS BOTÕES DO DASHBOARD:
         app.post("/users/{id}/inativar", usuarioAdminController::inativar);
         app.post("/users/{id}/approve", usuarioAdminController::aprovar);
-
-        // =================================================================
-// APIs E ROTAS DE CONTEXTO (No SyngeApplication.java)
-// =================================================================
-
-// ... (outras rotas) ...
-
-// API de Escolas (Suporta requisições JSON da API E formulários HTML do Dashboard)
+        // API de Escolas
         app.post("/escolas", escolaController::criarEscola);
         app.patch("/escolas/{id}", escolaController::atualizarEscola);
         app.post("/escolas/{id}", escolaController::atualizarEscola);
@@ -321,30 +313,23 @@ public class SyngeApplication {
         app.get("/escolas/{id}", escolaController::obterEscola);
         app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
 
-// 🟢 Rotas de Ativação (Compatível com API e com cliques de botões HTML)
         app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
-        app.post("/escolas/{id}/ativar", escolaController::ativarEscola);     // 🔥 Aceita o clique de ativar do HTML
+        app.post("/escolas/{id}/ativar", escolaController::ativarEscola);
 
-// 🔴 Rotas de Inativação (Compatível com API e com cliques de botões HTML)
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
-        app.post("/escolas/{id}/inativar", escolaController::inativarEscola);   // 🔥 Aceita o clique de inativar do HTML
+        app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
 
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);
 
-        // =================================================================
-        // ACADÊMICO — DISCIPLINAS (APIs)
-        // =================================================================
+        // ACADÊMICO — DISCIPLINAS
         app.get("/api/academico/disciplinas", disciplinaController::listar);
         app.get("/api/academico/disciplinas/{id}", disciplinaController::obter);
         app.post("/api/academico/disciplinas", disciplinaController::criar);
         app.put("/api/academico/disciplinas/{id}", disciplinaController::atualizar);
         app.delete("/api/academico/disciplinas/{id}", disciplinaController::remover);
 
-        // =================================================================
-        // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ (APIs)
-        // =================================================================
-        // Anos Letivos
+        // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ
         app.get("/api/academico/anos-letivos", anoLetivoController::listar);
         app.post("/api/academico/anos-letivos", anoLetivoController::criar);
         app.patch("/api/academico/anos-letivos/{id}/arquivar", anoLetivoController::arquivar);
@@ -353,29 +338,27 @@ public class SyngeApplication {
         app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", anoLetivoController::clonar);
 
         // Séries
-        app.get("/api/academico/series", serieController::listarPorAno); // ?idAnoLetivo=UUID
+        app.get("/api/academico/series", serieController::listarPorAno);
         app.get("/api/academico/series/{id}", serieController::obter);
         app.post("/api/academico/series", serieController::criar);
         app.put("/api/academico/series/{id}", serieController::atualizar);
         app.delete("/api/academico/series/{id}", serieController::remover);
 
-        // Matriz Curricular (por Série)
+        // Matriz Curricular
         app.get("/api/academico/series/{idSerie}/matriz", matrizCurricularController::listar);
         app.post("/api/academico/series/{idSerie}/matriz", matrizCurricularController::definir);
         app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", matrizCurricularController::remover);
 
-        // =================================================================
-        // ACADÊMICO — TURMAS (APIs)
-        // =================================================================
-        app.get("/api/academico/turmas", turmaController::listar); // ?idAnoLetivo=UUID&idSerie=UUID
+        // ACADÊMICO — TURMAS
+        app.get("/api/academico/turmas", turmaController::listar);
         app.post("/api/academico/turmas", turmaController::criar);
         app.patch("/api/academico/turmas/{id}/encerrar", turmaController::encerrar);
         app.get("/api/academico/turmas/{id}/capacidade", turmaController::capacidade);
 
-        // Atribuição Docente na Turma
+        // Atribuição Docente
         app.post("/api/academico/turmas/{idTurma}/docentes", alocacaoDocenteController::atribuir);
         app.delete("/api/academico/turmas/{idTurma}/docentes/{idDisciplina}/{idProfessor}", alocacaoDocenteController::remover);
-        
+
         // Professores
         app.get("/api/academico/professores", professorController::listar);
         app.post("/api/academico/professores", professorController::criar);
@@ -396,13 +379,28 @@ public class SyngeApplication {
         app.post("/api/academico/alunos/{id}/documentos", alunoController::adicionarDocumento);
         app.get("/api/academico/alunos/{id}/historico-escolar", alunoController::emitirHistoricoEscolar);
 
-        // Gestão Pedagógica (Notas, Frequências, Boletins)
-        app.post("/api/academico/notas", pedagogicaController::lancarNota);
-        app.post("/api/academico/frequencias", pedagogicaController::registrarFrequencia);
-        app.get("/api/academico/boletins", pedagogicaController::gerarBoletim);
-        // =================================================================
+        // Gestão Pedagógica (Apenas Notas e Boletins)
+
+        // MÓDULO FINANCEIRO — PROTEÇÃO POR PERFIL
+        app.before("/api/financeiro/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
+
+        // Rotas de Mensalidades e Transações
+        app.post("/api/financeiro/mensalidades", mensalidadeController::cadastrar);
+        app.post("/api/financeiro/mensalidades/descontos", mensalidadeController::aplicarDesconto);
+        app.post("/api/financeiro/mensalidades/pagamentos", mensalidadeController::registrarPagamento);
+        app.post("/api/financeiro/mensalidades/parcelar", mensalidadeController::parcelar);
+        app.get("/api/financeiro/mensalidades/aluno/{idAluno}", mensalidadeController::listarPorAluno);
+
+        // Rotas de Relatórios, Fluxo de Caixa e Inadimplência
+        app.get("/api/financeiro/relatorios/devedores", relatorioFinanceiroController::listarDevedores);
+        app.get("/api/financeiro/relatorios/previsao-fluxo", relatorioFinanceiroController::obterPrevisaoEFluxo);
+        // SISTEMA DE ALERTAS
+        // SISTEMA DE ALERTAS
+        app.before("/api/alertas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
+        app.get("/api/alertas", alertaController::obterAlertas);
+
+
         // TRATAMENTO DE EXCEÇÕES
-        // =================================================================
         app.exception(AuthenticationException.class, (e, ctx) -> ctx.redirect("/super-admin/login"));
 
         app.exception(NotFoundException.class, (e, ctx) -> {
@@ -465,14 +463,14 @@ public class SyngeApplication {
         return Map.of(
                 "showAnnouncement", true,
                 "resources", List.of(
-                        Map.of("icon", "bi-mortarboard", "title", "Gestão Acadêmica", "items", List.of("Alunos", "Professores", "Notas", "Frequência", "Boletins")),
+                        Map.of("icon", "bi-mortarboard", "title", "Gestão Acadêmica", "items", List.of("Alunos", "Professores", "Notas", "Boletins")),
                         Map.of("icon", "bi-cash-coin", "title", "Gestão Financeira", "items", List.of("Mensalidades", "Inadimplência", "Fluxo de caixa", "Parcelamentos")),
                         Map.of("icon", "bi-chat-dots", "title", "Comunicação", "items", List.of("Avisos", "Notificações", "Comunicados")),
                         Map.of("icon", "bi-bar-chart", "title", "Relatórios Inteligentes", "items", List.of("Indicadores", "Gráficos", "Exportação em PDF")),
                         Map.of("icon", "bi-shield-lock", "title", "Segurança", "items", List.of("Criptografia", "Logs", "Backup", "Permissões"))
                 ),
                 "modules", List.of(
-                        Map.of("icon", "bi-journal-check", "title", "Acadêmico", "slug", "academico", "description", "Controle matrículas, turmas, notas, frequência e boletins em uma rotina integrada."),
+                        Map.of("icon", "bi-journal-check", "title", "Acadêmico", "slug", "academico", "description", "Controle matrículas, turmas, notas e boletins em uma rotina integrada."),
                         Map.of("icon", "bi-wallet2", "title", "Financeiro", "slug", "financeiro", "description", "Acompanhe mensalidades, recebíveis, inadimplência e fluxo de caixa com clareza."),
                         Map.of("icon", "bi-building-gear", "title", "Administrativo", "slug", "administrativo", "description", "Organize cadastros, usuários, permissões e processos internos da instituição."),
                         Map.of("icon", "bi-diagram-3", "title", "Multi Tenant", "slug", "multi-tenant", "description", "Gerencie múltiplas escolas com isolamento de dados e configurações por unidade."),

@@ -1,46 +1,54 @@
 package br.com.synge.academico.controllers;
 
-import br.com.synge.academico.dtos.LancamentoFrequenciaDTO;
 import br.com.synge.academico.dtos.LancamentoNotaDTO;
+import br.com.synge.academico.dtos.SimulacaoNotaDTO;
 import br.com.synge.academico.services.BoletimService;
-import br.com.synge.academico.services.FrequenciaService;
 import br.com.synge.academico.services.LancamentoNotasService;
+import br.com.synge.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
-import org.eclipse.jetty.http.HttpStatus;
 
+import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 public class GestaoPedagogicaController {
 
-    private final LancamentoNotasService notasService;
-    private final FrequenciaService frequenciaService;
+    private final LancamentoNotasService lancamentoNotasService;
     private final BoletimService boletimService;
 
-    public GestaoPedagogicaController(LancamentoNotasService notasService, 
-                                      FrequenciaService frequenciaService, 
-                                      BoletimService boletimService) {
-        this.notasService = notasService;
-        this.frequenciaService = frequenciaService;
+    public GestaoPedagogicaController(LancamentoNotasService lancamentoNotasService, BoletimService boletimService) {
+        this.lancamentoNotasService = lancamentoNotasService;
         this.boletimService = boletimService;
     }
 
     public void lancarNota(Context ctx) {
         LancamentoNotaDTO dto = ctx.bodyAsClass(LancamentoNotaDTO.class);
-        notasService.lancar(dto);
-        ctx.status(HttpStatus.NO_CONTENT_204);
-    }
-
-    public void registrarFrequencia(Context ctx) {
-        LancamentoFrequenciaDTO dto = ctx.bodyAsClass(LancamentoFrequenciaDTO.class);
-        frequenciaService.registrar(dto);
-        ctx.status(HttpStatus.NO_CONTENT_204);
+        lancamentoNotasService.lancar(dto);
+        ctx.status(201).json(Map.of("message", "Nota lançada com sucesso."));
     }
 
     public void gerarBoletim(Context ctx) {
+        UUID tenantId = AuthUserContext.getAuthUser().getTenantId();
+        UUID idTurma = UUID.fromString(ctx.queryParam("idTurma"));
         UUID idAluno = UUID.fromString(ctx.queryParam("idAluno"));
+        ctx.json(boletimService.gerarBoletim(tenantId, idTurma, idAluno));
+    }
+
+    public void recuperacao(Context ctx) {
+        UUID tenantId = AuthUserContext.getAuthUser().getTenantId();
         UUID idTurma = UUID.fromString(ctx.queryParam("idTurma"));
         UUID idDisciplina = UUID.fromString(ctx.queryParam("idDisciplina"));
-        
-        ctx.json(boletimService.gerarBoletim(idAluno, idTurma, idDisciplina));
+        ctx.json(lancamentoNotasService.identificarAlunosEmRecuperacao(tenantId, idTurma, idDisciplina));
+    }
+
+    public void notaNecessaria(Context ctx) {
+        BigDecimal mediaAtual = new BigDecimal(ctx.pathParam("mediaAtual"));
+        BigDecimal necessaria = lancamentoNotasService.calcularNotaNecessariaRecuperacao(mediaAtual);
+        ctx.json(Map.of("notaNecessaria", necessaria));
+    }
+
+    public void simulador(Context ctx) {
+        SimulacaoNotaDTO dto = ctx.bodyAsClass(SimulacaoNotaDTO.class);
+        ctx.json(lancamentoNotasService.simularNota(dto.mediaAtual(), dto.notaHipotetica()));
     }
 }

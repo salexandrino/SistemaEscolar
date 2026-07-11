@@ -18,18 +18,21 @@ public class CalculoMediaPonderada implements CalculadoraMediaStrategy {
             return BigDecimal.ZERO;
         }
 
+        // CORREÇÃO: Avaliacao::id em vez de Avaliacao::getId
         Map<UUID, Avaliacao> mapAv = avaliacoes.stream()
-                .collect(Collectors.toMap(Avaliacao::getId, a -> a));
+                .collect(Collectors.toMap(Avaliacao::id, a -> a, (e, s) -> e));
 
         BigDecimal somaPesos = BigDecimal.ZERO;
         BigDecimal somaPonderada = BigDecimal.ZERO;
 
         for (Nota n : notas) {
-            Avaliacao av = mapAv.get(n.getIdAvaliacao());
+            // CORREÇÃO: n.idAvaliacao() em vez de n.getIdAvaliacao()
+            Avaliacao av = mapAv.get(n.idAvaliacao());
             if (av != null) {
-                BigDecimal peso = av.getPeso() != null ? av.getPeso() : BigDecimal.ONE;
+                // CORREÇÃO: av.peso() e n.valor() sem o prefixo "get"
+                BigDecimal peso = av.peso() != null ? av.peso() : BigDecimal.ONE;
                 somaPesos = somaPesos.add(peso);
-                somaPonderada = somaPonderada.add(n.getValor().multiply(peso));
+                somaPonderada = somaPonderada.add(n.valor().multiply(peso));
             }
         }
 
