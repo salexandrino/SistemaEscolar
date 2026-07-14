@@ -55,7 +55,7 @@ public class AuthController {
 
             String jwt = authService.autenticar(loginDTO.getCpf(), loginDTO.getSenha());
             CookieUtil.addJwtCookie(ctx, jwt);
-            ctx.redirect("/");
+            ctx.redirect("/hub");
 
             logger.info("Usuário {} logado com sucesso.", loginDTO.getCpf().replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
 

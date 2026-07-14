@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Painel Escolar - SYNGE</title>
+</head>
+<body>
+
+<div th:fragment="content">
+
+    <!-- Definição das permissões por perfil de forma segura no Thymeleaf -->
+    <th:block th:with="
+        perfilStr=${usuarioLogado != null ? #strings.toString(usuarioLogado.perfil) : ''},
+        isGestor=${perfilStr == 'GESTOR' or perfilStr == 'SUPER_ADMIN'},
+        isSecretaria=${perfilStr == 'SECRETARIA'},
+        isProfessor=${perfilStr == 'PROFESSOR'},
+
+        hasAcessoPeriodos=${isGestor or isSecretaria},
+        hasAcessoSeries=${isGestor or isSecretaria},
+        hasAcessoTurmas=${isGestor or isSecretaria or isProfessor},
+        hasAcessoAlunos=${isGestor or isSecretaria or isProfessor},
+        hasAcessoDiario=${isProfessor or isGestor},
+        hasAcessoBoletim=${isProfessor or isGestor}
+    ">
+
+        <!-- Cabeçalho de Boas-vindas -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-dark mb-1">
+                    Olá, <span th:text="${usuarioLogado != null ? usuarioLogado.nomeCompleto : 'Colaborador'}">Usuário</span>! 👋
+                </h2>
+                <p class="text-muted small mb-0">
+                    Bem-vindo ao portal da escola: <strong class="text-success" th:text="${escolaNome != null ? schoolNome : 'Sua Instituição'}">Nome da Escola</strong>
+                </p>
+            </div>
+            <div class="bg-white px-3 py-2 rounded shadow-sm border small text-end">
+                <span class="badge bg-success mb-1" th:text="${usuarioLogado != null ? usuarioLogado.perfil : 'PERFIL'}">PERFIL</span>
+                <div class="text-muted" th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">14/07/2026</div>
+            </div>
+        </div>
+
+        <!-- Alerta Informativo dependendo do perfil -->
+        <div class="alert alert-info border-0 shadow-sm mb-4 d-flex align-items-center gap-3">
+            <i class="bi bi-info-circle-fill fs-3"></i>
+            <div>
+                <span class="fw-bold d-block">Perfil de Acesso Confirmado</span>
+                <span class="small text-muted">Você está logado como colaborador técnico. Suas permissões e recursos visíveis abaixo correspondem ao seu cargo na instituição.</span>
+            </div>
+        </div>
+
+        <!-- Cards de Funcionalidades do Hub -->
+        <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-grid-fill me-2"></i>Painel Acadêmico</h5>
+
+        <div class="row g-3">
+            <!-- Card 1: Anos Letivos -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoPeriodos ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-calendar-event fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Anos Letivos</h5>
+                            <p class="card-text text-muted small">Gerencie os períodos letivos da escola, datas de início, fim e recessos.</p>
+                        </div>
+                        <a th:href="${hasAcessoPeriodos ? '/dashboard/escola/anos-letivos' : '#'}"
+                           th:classappend="${!hasAcessoPeriodos ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoPeriodos ? 'Acessar Períodos' : 'Acesso Restrito'}">Acessar Períodos</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Séries e Disciplinas -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoSeries ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-journal-text fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Séries & Matérias</h5>
+                            <p class="card-text text-muted small">Cadastre as séries letivas (ex: 1º Ano, 2º Ano) e as disciplinas vinculadas.</p>
+                        </div>
+                        <a th:href="${hasAcessoSeries ? '/dashboard/escola/series' : '#'}"
+                           th:classappend="${!hasAcessoSeries ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoSeries ? 'Configurar Séries' : 'Acesso Restrito'}">Configurar Séries</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Turmas -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoTurmas ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-collection fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Turmas</h5>
+                            <p class="card-text text-muted small">Distribua os alunos nas turmas criadas e atribua os professores responsáveis.</p>
+                        </div>
+                        <a th:href="${hasAcessoTurmas ? '/dashboard/escola/turmas' : '#'}"
+                           th:classappend="${!hasAcessoTurmas ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoTurmas ? 'Gerenciar Turmas' : 'Acesso Restrito'}">Gerenciar Turmas</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Alunos -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoAlunos ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-people fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Alunos</h5>
+                            <p class="card-text text-muted small">Matricule novos alunos, consulte fichas cadastrais, telefones de responsáveis e histórico.</p>
+                        </div>
+                        <a th:href="${hasAcessoAlunos ? '/dashboard/escola/alunos' : '#'}"
+                           th:classappend="${!hasAcessoAlunos ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoAlunos ? 'Consultar Alunos' : 'Acesso Restrito'}">Consultar Alunos</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Diário de Classe (Atualizado para Verde) -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoDiario ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-check2-square fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Diário de Classe</h5>
+                            <p class="card-text text-muted small">Lançamento de presenças diárias, faltas e registros de conteúdos ministrados.</p>
+                        </div>
+                        <a th:href="${hasAcessoDiario ? '/dashboard/escola/frequencia' : '#'}"
+                           th:classappend="${!hasAcessoDiario ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoDiario ? 'Fazer Chamada' : 'Acesso Restrito'}">Fazer Chamada</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Notas e Avaliações (Atualizado para Verde) -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 transition-all"
+                     th:style="${!hasAcessoBoletim ? 'filter: grayscale(1); opacity: 0.65; pointer-events: none;' : ''}">
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="bg-success-subtle text-success rounded p-3 d-inline-block mb-3">
+                                <i class="bi bi-journal-bookmark fs-3"></i>
+                            </div>
+                            <h5 class="card-title fw-bold">Boletins & Notas</h5>
+                            <p class="card-text text-muted small">Lançamento de notas por bimestre/trimestre e fechamento das médias finais.</p>
+                        </div>
+                        <a th:href="${hasAcessoBoletim ? '/dashboard/escola/notas' : '#'}"
+                           th:classappend="${!hasAcessoBoletim ? 'btn-secondary disabled' : 'btn-outline-success'}"
+                           class="btn btn-sm w-100 mt-3">
+                            <span th:text="${hasAcessoBoletim ? 'Digitar Notas' : 'Acesso Restrito'}">Digitar Notas</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </th:block>
+
+</div>
+
+</body>
+</html>

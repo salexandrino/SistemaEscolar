@@ -232,6 +232,36 @@ public class SyngeApplication {
             Context context = new Context(ctx.req().getLocale());
             ctx.html(templateEngine.process("auth/esqueci-senha", context));
         });
+        app.get("/hub", ctx -> {
+            try {
+                AuthUser currentUser = AuthUserContext.getAuthUser();
+
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                Context context = new Context(ctx.req().getLocale());
+
+                // 1. Resolvemos o problema do usuário com o Map fake que deu certo!
+                Map<String, Object> usuarioFake = Map.of(
+                        "nomeCompleto", "Usuário Logado",
+                        "perfil", currentUser.getPerfil(),
+                        "cpf", currentUser.getCpf()
+                );
+                context.setVariable("usuarioLogado", usuarioFake);
+
+                // 2. SOLUÇÃO DO NOVO ERRO: Definimos que o "conteúdo" dinâmico que o layout master-escola
+                // espera na linha 63 é a página do hub!
+                context.setVariable("content", "dashboard/escolas/hub");
+
+                // 3. Renderizamos o layout principal, que agora vai saber carregar o hub lá dentro!
+                ctx.html(templateEngine.process("layouts/master-escola", context));
+
+            } catch (Exception e) {
+                ctx.redirect("/login");
+            }
+        });
 
         // Endpoints de Ações de Autenticação
         app.post("/auth/forgot-password", authController::forgotPassword);
