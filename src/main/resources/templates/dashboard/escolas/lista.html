@@ -19,8 +19,10 @@
                 <p class="mb-1 small">
                     Copie esta senha agora — ela <strong>não</strong> ficará visível novamente.
                     Repasse ao Gestor e peça que troque no primeiro acesso.
+                    <strong>O login é feito com o CPF, não com o e-mail</strong> — repasse os dois.
                 </p>
                 <div class="d-flex align-items-center gap-2 mt-2">
+                    <span class="badge bg-light text-dark border">CPF (login): <span th:text="${gestorCpfGerado}"></span></span>
                     <span class="badge bg-light text-dark border">E-mail: <span th:text="${gestorEmailGerado}"></span></span>
                     <span class="badge bg-light text-dark border">Senha temporária: <code th:text="${gestorSenhaGerada}"></code></span>
                 </div>
@@ -113,6 +115,25 @@
                                    title="Editar Cadastro">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+
+                                <button th:if="${escola.status == 'ATIVA'}" type="button"
+                                        class="btn btn-sm btn-outline-danger" title="Inativar Escola"
+                                        th:attr="data-escola-id=${escola.id}"
+                                        onclick="confirmarEExecutarEscola(this.dataset.escolaId, 'inativar', 'Tem certeza que deseja inativar esta escola? Os usuários dela não conseguirão mais fazer login.')">
+                                    <i class="bi bi-slash-circle"></i>
+                                </button>
+                                <button th:unless="${escola.status == 'ATIVA'}" type="button"
+                                        class="btn btn-sm btn-outline-success" title="Reativar Escola"
+                                        th:attr="data-escola-id=${escola.id}"
+                                        onclick="confirmarEExecutarEscola(this.dataset.escolaId, 'ativar', 'Tem certeza que deseja reativar esta escola?')">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>
+                                <button th:unless="${escola.status == 'ATIVA'}" type="button"
+                                        class="btn btn-sm btn-danger" title="Excluir Definitivamente"
+                                        th:attr="data-escola-id=${escola.id}"
+                                        onclick="confirmarExclusaoEscola(this.dataset.escolaId)">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
                             </div>
                         </td>
 
@@ -123,6 +144,43 @@
         </div>
 
     </div>
+
+    <script>
+        async function confirmarEExecutarEscola(id, acao, mensagemConfirmacao) {
+            if (!window.confirm(mensagemConfirmacao)) return;
+            try {
+                const response = await fetch('/escolas/' + id + '/' + acao, { method: 'POST' });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.message || 'Não foi possível concluir a ação.');
+                }
+            } catch (e) {
+                alert('Erro de conexão ao tentar executar a ação.');
+            }
+        }
+
+        async function confirmarExclusaoEscola(id) {
+            const digitado = window.prompt(
+                'ATENÇÃO: isso exclui a escola DEFINITIVAMENTE e não pode ser desfeito.\n' +
+                'Só é permitido se não houver aluno/turma/mensalidade vinculados.\n\n' +
+                'Digite EXCLUIR para confirmar:'
+            );
+            if (digitado !== 'EXCLUIR') return;
+            try {
+                const response = await fetch('/escolas/' + id + '/excluir', { method: 'DELETE' });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.message || 'Não foi possível excluir a escola.');
+                }
+            } catch (e) {
+                alert('Erro de conexão ao tentar excluir a escola.');
+            }
+        }
+    </script>
 
 </div>
 

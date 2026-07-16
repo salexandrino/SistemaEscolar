@@ -275,7 +275,35 @@ public class SyngeApplication {
         app.before("/dashboard/*", superAdminAuth);
 
 // ... antes do bloco de rotas ...
-        app.before("/api/academico/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
+        // ATENÇÃO: não usamos mais um único "/api/academico/*" bloqueando PROFESSOR de tudo.
+        // Antes disso, o professor não conseguia nem lançar a própria nota. Agora cada área
+        // acadêmica tem sua própria regra de acesso:
+
+        // Áreas de uso do professor no dia a dia: avaliações, notas/recuperação/simulador,
+        // boletim e a própria grade de aulas. Secretaria/Gestor/Super Admin continuam com acesso total a essas também.
+        RoleBasedMiddleware academicoDocente = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA, Perfil.PROFESSOR);
+        app.before("/api/academico/avaliacoes", academicoDocente);
+        app.before("/api/academico/avaliacoes/*", academicoDocente);
+        app.before("/api/academico/notas", academicoDocente);
+        app.before("/api/academico/notas/*", academicoDocente);
+        app.before("/api/academico/boletins", academicoDocente);
+        app.before("/api/academico/professores/{id}/grade", academicoDocente);
+
+        // Áreas administrativas/estruturais (matrícula, turma, matriz curricular, disciplinas,
+        // séries, ano letivo, alocação docente, CRUD de professor): só quem organiza a escola.
+        RoleBasedMiddleware academicoAdministrativo = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA);
+        app.before("/api/academico/disciplinas", academicoAdministrativo);
+        app.before("/api/academico/disciplinas/*", academicoAdministrativo);
+        app.before("/api/academico/anos-letivos", academicoAdministrativo);
+        app.before("/api/academico/anos-letivos/*", academicoAdministrativo);
+        app.before("/api/academico/series", academicoAdministrativo);
+        app.before("/api/academico/series/*", academicoAdministrativo);
+        app.before("/api/academico/turmas", academicoAdministrativo);
+        app.before("/api/academico/turmas/*", academicoAdministrativo);
+        app.before("/api/academico/professores", academicoAdministrativo);
+        app.before("/api/academico/professores/{id}", academicoAdministrativo);
+        app.before("/api/academico/alunos", academicoAdministrativo);
+        app.before("/api/academico/alunos/*", academicoAdministrativo);
 
         // SOLUÇÃO DEFINITIVA: Mapeamento linear direto na instância 'app' (Livre de erros de versão do Javalin)
         app.post("/api/academico/avaliacoes", avaliacaoController::criar);
@@ -331,6 +359,9 @@ public class SyngeApplication {
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
         app.patch("/users/{id}/unlock", usuarioAdminController::desbloquear);
         app.post("/users/{id}/unlock", usuarioAdminController::desbloquear);
+        app.patch("/users/{id}/reativar", usuarioAdminController::reativar);
+        app.post("/users/{id}/reativar", usuarioAdminController::reativar);
+        app.delete("/users/{id}/excluir", usuarioAdminController::excluir);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
         app.post("/users/{id}/inativar", usuarioAdminController::inativar);
@@ -350,6 +381,7 @@ public class SyngeApplication {
 
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
         app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
+        app.delete("/escolas/{id}/excluir", escolaController::excluirEscola);
 
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);

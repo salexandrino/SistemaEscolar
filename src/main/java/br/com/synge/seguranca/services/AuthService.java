@@ -54,8 +54,11 @@ public class AuthService {
 
     public String autenticar(String cpf, String senha) {
         ValidationUtil.validarCpfComStrategy(cpf);
+        // Mesma normalização usada ao salvar (Usuario.setCpf): sem isso, um CPF
+        // digitado/mascarado de forma diferente da que foi gravado nunca dá match.
+        String cpfNormalizado = ValidationUtil.extractNumbers(cpf);
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpf);
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpfNormalizado);
         if (optionalUsuario.isEmpty()) {
             logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
             throw new AuthenticationException("CPF não cadastrado. Por favor, crie uma conta para continuar.");

@@ -157,7 +157,7 @@ public class EscolaService {
         logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
                 escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
 
-        return new CriarEscolaResponseDTO(escolaSalva, gestor.getEmail(), senhaGerada);
+        return new CriarEscolaResponseDTO(escolaSalva, gestor.getEmail(), gestor.getCpf(), senhaGerada);
     }
 
     /**
@@ -350,6 +350,36 @@ public class EscolaService {
         logger.info("Escola inativada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
 
         return escola;
+    }
+
+    /**
+     * Exclui de fato a escola (hard delete) — diferente de inativarEscola(),
+     * que só marca status = INATIVA. Trava de segurança dupla:
+     * 1) só permite excluir se a escola já estiver INATIVA;
+     * 2) bloqueia se houver aluno/turma/mensalidade vinculados, para não
+     *    apagar silenciosamente dados acadêmicos/financeiros reais.
+     * Remove primeiro os usuários do tenant (FK usuario.tenant_id -> escola.id)
+     * e só então a escola.
+     */
+    public void excluirEscola(UUID id, AuthUser authUser) {
+        verificarPermissaoMaster(authUser);
+
+        Escola escola = escolaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
+
+        if (!"INATIVA".equals(escola.getStatus())) {
+            throw new BusinessException("Só é possível excluir definitivamente uma escola que já esteja inativa. Inative-a primeiro.");
+        }
+
+        if (escolaRepository.possuiDadosVinculados(escola.getId())) {
+            throw new BusinessException("Não é possível excluir: existem alunos, turmas ou mensalidades vinculados a esta escola. " +
+                    "Excluir apagaria esses dados de forma definitiva e irreversível.");
+        }
+
+        usuarioRepository.deleteAllByTenant(escola.getId());
+        escolaRepository.delete(escola.getId());
+
+        logger.warn("Escola excluida DEFINITIVAMENTE: {} (ID: {}) por {}", escola.getNome(), escola.getId(), authUser.getCpf());
     }
     private void validarDados(CriarEscolaDTO dto) {
 
