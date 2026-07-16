@@ -1,1 +1,386 @@
-<!-- TODO: implementar -->
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+<head>
+    <title>SYNGE - Anos Letivos</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <!-- Restrição de Visualização Geral da Tela -->
+    <div th:if="${currentUser.perfil.hasPermission('ACADEMICO_VIEW')}" class="container-fluid p-0">
+
+        <!-- Breadcrumb e Título -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a th:href="${'/dashboard'}" class="text-success text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item text-muted">Acadêmico</li>
+                        <li class="breadcrumb-item active" aria-current="page">Anos Letivos</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 fw-bold text-dark mb-0">Anos Letivos</h1>
+            </div>
+
+            <!-- Botão de Criação (Condicional por Permissão) -->
+            <button th:if="${currentUser.perfil.hasPermission('ACADEMICO_CREATE')}"
+                    class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalNovoAno">
+                <i class="bi bi-plus-lg"></i> Novo Ano Letivo
+            </button>
+        </div>
+
+        <!-- Container de Alertas Bootstrap -->
+        <div id="containerAlerta" class="mb-4"></div>
+
+        <!-- Bloco 1: Anos Letivos Ativos / Correntes -->
+        <div class="card shadow-sm border-0 mb-4 rounded-3">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold text-dark mb-0">Anos Letivos Ativos</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">ANO</th>
+                        <th>DATA INÍCIO</th>
+                        <th>DATA FIM</th>
+                        <th>SITUAÇÃO</th>
+                        <th class="text-end pe-4">AÇÕES</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaAtivos">
+                    <!-- Renderizado via JS Fetch -->
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Carregando anos letivos ativos...
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bloco 2: Histórico de Anos Encerrados (Abas ou Bloco Separado) -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold text-muted mb-0">Histórico de Anos Encerrados / Arquivados</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">ANO</th>
+                        <th>DATA INÍCIO</th>
+                        <th>DATA FIM</th>
+                        <th>SITUAÇÃO</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaHistorico">
+                    <!-- Renderizado via JS Fetch -->
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">Carregando histórico...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal 1: Criar Novo Ano Letivo -->
+        <div th:if="${currentUser.perfil.hasPermission('ACADEMICO_CREATE')}"
+             class="modal fade" id="modalNovoAno" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title fw-bold">Criar Novo Ano Letivo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formNovoAno">
+                        <div class="modal-body py-3">
+                            <div class="mb-3">
+                                <label for="inputAno" class="form-label fw-semibold">Ano de Exercício</label>
+                                <input type="number" class="form-control" id="inputAno" placeholder="Ex: 2027" required min="2020" max="2100">
+                                <div class="form-text">O novo ano letivo será criado com status inicial "ATIVO".</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar Ano Letivo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Clonar Estrutura -->
+        <div class="modal fade" id="modalClonarEstrutura" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title fw-bold">Clonar Estrutura Acadêmica</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formClonar">
+                        <input type="hidden" id="clonarOrigemId">
+                        <div class="modal-body py-3">
+                            <p class="small text-muted mb-3">Isso irá copiar séries, matérias e grades curriculares deste ano letivo de origem para o ano selecionado abaixo.</p>
+                            <div class="mb-3">
+                                <label for="selectDestino" class="form-label fw-semibold">Ano de Destino</label>
+                                <select class="form-select" id="selectDestino" required>
+                                    <option value="" disabled selected>Escolha o ano destino...</option>
+                                    <!-- Populado via JS -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Clonar Estrutura</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Mensagem de bloqueio caso não tenha permissão de visualização -->
+    <div th:unless="${currentUser.perfil.hasPermission('ACADEMICO_VIEW')}" class="container-fluid text-center py-5">
+        <div class="py-5">
+            <i class="bi bi-shield-lock text-danger display-1 mb-3"></i>
+            <h3 class="fw-bold">Acesso Negado</h3>
+            <p class="text-muted">Você não tem permissão para visualizar as configurações de Anos Letivos.</p>
+        </div>
+    </div>
+
+    <!-- Variáveis de Contexto de Permissão para Uso no JavaScript -->
+    <script th:inline="javascript">
+        const canEdit = /*[[${currentUser.perfil.hasPermission('ACADEMICO_EDIT')}]]*/ false;
+    </script>
+
+    <!-- JavaScript Lógico de Controle -->
+    <script>
+        let anosLetivosCache = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+
+            // Interceptadores de Formulário
+            const formNovoAno = document.getElementById('formNovoAno');
+            if (formNovoAno) {
+                formNovoAno.addEventListener('submit', criarAnoLetivo);
+            }
+            document.getElementById('formClonar').addEventListener('submit', executarClonagem);
+        });
+
+        // Função utilitária de Alerta Bootstrap (Padrão do projeto)
+        function mostrarAlerta(mensagem, tipo = 'success') {
+            const container = document.getElementById('containerAlerta');
+            container.innerHTML = `
+                <div class="alert alert-${tipo} alert-dismissible fade show shadow-sm border-0 d-flex align-items-center" role="alert">
+                    <i class="bi bi-${tipo === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2 fs-5"></i>
+                    <div>${mensagem}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        }
+
+        // Formatação amigável de datas LocalDate (yyyy-MM-dd para dd/MM/yyyy)
+        function formatarData(dataStr) {
+            if (!dataStr) return '--/--/----';
+            const partes = dataStr.split('-');
+            if (partes.length !== 3) return dataStr;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        // GET de dados das APIs de listagem
+        async function carregarDados() {
+            try {
+                const [resAtivos, resHistorico] = await Promise.all([
+                    fetch('/api/academico/anos-letivos'),
+                    fetch('/api/academico/anos-letivos/historico')
+                ]);
+
+                if (!resAtivos.ok || !resHistorico.ok) throw new Error('Falha ao carregar registros.');
+
+                const ativos = await resAtivos.json();
+                const historico = await resHistorico.json();
+
+                // Armazena no cache global para popular o modal de clonagem
+                anosLetivosCache = [...ativos, ...historico];
+
+                renderizarTabelaAtivos(ativos);
+                renderizarTabelaHistorico(historico);
+
+            } catch (error) {
+                mostrarAlerta('Erro de conexão ao buscar anos letivos.', 'danger');
+            }
+        }
+
+        function renderizarTabelaAtivos(lista) {
+            const tbody = document.getElementById('tabelaAtivos');
+            if (!lista.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">Nenhum ano letivo ativo cadastrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(item => {
+                let botoesAcao = '';
+                if (canEdit) {
+                    botoesAcao = `
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="abrirModalClonar('${item.id}', ${item.ano})">
+                            <i class="bi bi-copy me-1"></i> Clonar para...
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="arquivarAno('${item.id}')">
+                            <i class="bi bi-archive me-1"></i> Arquivar
+                        </button>
+                    `;
+                }
+
+                return `
+                    <tr>
+                        <td class="ps-4 fw-semibold text-dark">${item.ano}</td>
+                        <td>${formatarData(item.dataInicio)}</td>
+                        <td>${formatarData(item.dataFim)}</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1.5">ATIVO</span></td>
+                        <td class="text-end pe-4">${botoesAcao || '<span class="text-muted small">-</span>'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderizarTabelaHistorico(lista) {
+            const tbody = document.getElementById('tabelaHistorico');
+            if (!lista.length) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Nenhum registro no histórico.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(item => `
+                <tr>
+                    <td class="ps-4 text-muted">${item.ano}</td>
+                    <td class="text-muted">${formatarData(item.dataInicio)}</td>
+                    <td class="text-muted">${formatarData(item.dataFim)}</td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1.5">ARQUIVADO</span>
+                            ${canEdit ? `<button class="btn btn-sm btn-light border py-1" onclick="definirAtivo('${item.id}')">Ativar</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // POST /api/academico/anos-letivos
+        async function criarAnoLetivo(e) {
+            e.preventDefault();
+            const anoInput = document.getElementById('inputAno').value;
+
+            try {
+                const response = await fetch('/api/academico/anos-letivos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ano: parseInt(anoInput) })
+                });
+
+                if (response.ok) {
+                    mostrarAlerta(`Ano letivo ${anoInput} criado com sucesso!`, 'success');
+                    document.getElementById('formNovoAno').reset();
+
+                    // Fecha o modal via API nativa do Bootstrap
+                    bootstrap.Modal.getInstance(document.getElementById('modalNovoAno')).hide();
+                    carregarDados();
+                } else {
+                    const errText = await response.text();
+                    mostrarAlerta(`Erro ao criar: ${errText || 'verifique os dados.'}`, 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Erro de conexão ao salvar novo ano.', 'danger');
+            }
+        }
+
+        // PATCH /api/academico/anos-letivos/{id}/arquivar
+        async function arquivarAno(id) {
+            if (!confirm("Tem certeza que deseja arquivar este ano letivo?")) return;
+            try {
+                const response = await fetch(`/api/academico/anos-letivos/${id}/arquivar`, {
+                    method: 'PATCH'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Ano letivo arquivado com sucesso!', 'success');
+                    carregarDados();
+                } else {
+                    mostrarAlerta('Erro ao arquivar ano letivo.', 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Falha de rede ao tentar arquivar.', 'danger');
+            }
+        }
+
+        // PATCH /api/academico/anos-letivos/{id}/definir-ativo
+        async function definirAtivo(id) {
+            try {
+                const response = await fetch(`/api/academico/anos-letivos/${id}/definir-ativo`, {
+                    method: 'PATCH'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Ano letivo reativado com sucesso!', 'success');
+                    carregarDados();
+                } else {
+                    mostrarAlerta('Erro ao reativar ano letivo.', 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Falha de rede ao tentar ativar.', 'danger');
+            }
+        }
+
+        // Abertura dinâmica do modal de clonagem
+        function abrirModalClonar(idOrigem, anoOrigem) {
+            document.getElementById('clonarOrigemId').value = idOrigem;
+
+            const select = document.getElementById('selectDestino');
+            select.innerHTML = '<option value="" disabled selected>Escolha o ano destino...</option>';
+
+            // Filtra o próprio ano de origem das opções do dropdown
+            const destinosValidos = anosLetivosCache.filter(item => item.id !== idOrigem);
+
+            destinosValidos.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.ano} (${item.situacao})`;
+                select.appendChild(option);
+            });
+
+            new bootstrap.Modal(document.getElementById('modalClonarEstrutura')).show();
+        }
+
+        // POST /api/academico/anos-letivos/{id}/clonar-para/{destinoId}
+        async function executarClonagem(e) {
+            e.preventDefault();
+            const origemId = document.getElementById('clonarOrigemId').value;
+            const destinoId = document.getElementById('selectDestino').value;
+
+            try {
+                const response = await fetch(`/api/academico/anos-letivos/${origemId}/clonar-para/${destinoId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('Estrutura clonada com sucesso para o ano selecionado!', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('modalClonarEstrutura')).hide();
+                    carregarDados();
+                } else {
+                    mostrarAlerta('Falha ao processar clonagem estrutural.', 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Falha de rede ao enviar solicitação de clonagem.', 'danger');
+            }
+        }
+    </script>
+
+</div>
+</body>
+</html>

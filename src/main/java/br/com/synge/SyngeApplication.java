@@ -243,7 +243,6 @@ public class SyngeApplication {
 
                 Context context = new Context(ctx.req().getLocale());
 
-                // 1. Resolvemos o problema do usuário com o Map fake que deu certo!
                 Map<String, Object> usuarioFake = Map.of(
                         "nomeCompleto", "Usuário Logado",
                         "perfil", currentUser.getPerfil(),
@@ -251,12 +250,11 @@ public class SyngeApplication {
                 );
                 context.setVariable("usuarioLogado", usuarioFake);
 
-                // 2. SOLUÇÃO DO NOVO ERRO: Definimos que o "conteúdo" dinâmico que o layout master-escola
-                // espera na linha 63 é a página do hub!
-                context.setVariable("content", "dashboard/escolas/hub");
+                // Força o charset UTF-8 para garantir acentos perfeitos
+                ctx.contentType("text/html; charset=utf-8");
 
-                // 3. Renderizamos o layout principal, que agora vai saber carregar o hub lá dentro!
-                ctx.html(templateEngine.process("layouts/master-escola", context));
+                // Renderiza DIRETAMENTE a tela do hub (o arquivo HTML se encarregará do layout)
+                ctx.html(templateEngine.process("dashboard/escolas/hub", context));
 
             } catch (Exception e) {
                 ctx.redirect("/login");
@@ -304,7 +302,17 @@ public class SyngeApplication {
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
+/// ACADÊMICO — TELA DE ANOS LETIVOS (Ajustado para fora do /dashboard)
+        app.get("/escola/anos-letivos", ctx -> {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
 
+            Map<String, Object> model = Map.of(
+                    "content", "dashboard/academico/anos-letivos/index",
+                    "currentUser", currentUser
+            );
+
+            ctx.html(templateEngine.process("layouts/master-admin", new org.thymeleaf.context.Context(ctx.req().getLocale(), model)));
+        });
         app.get("/area-logada", ctx -> {
             try {
                 AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -414,6 +422,8 @@ public class SyngeApplication {
         // Gestão Pedagógica (Apenas Notas e Boletins)
 
         // MÓDULO FINANCEIRO — PROTEÇÃO POR PERFIL
+        // PROTEÇÃO DE ROTAS ESCOLARES — GESTÃO ACADÊMICA (TELAS)
+        app.before("/escola/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
         app.before("/api/financeiro/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
 
         // Rotas de Mensalidades e Transações
