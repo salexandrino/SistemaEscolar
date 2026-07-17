@@ -29,10 +29,12 @@ import br.com.synge.seguranca.middlewares.AuthMiddleware;
 import br.com.synge.seguranca.middlewares.RoleBasedMiddleware;
 import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
 import br.com.synge.seguranca.models.AuthUser;
+import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.services.PasswordService;
 import br.com.synge.seguranca.services.JwtService;
+import br.com.synge.seguranca.services.EmailService;
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.config.DatabaseConfig;
 import br.com.synge.config.FlywayConfig;
@@ -112,7 +114,8 @@ public class SyngeApplication {
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
-        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
+        EmailService emailService = new EmailService();
+        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService, emailService);
         // Acadêmico
         DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
         AnoLetivoService anoLetivoService = new AnoLetivoService(anoLetivoRepository, cloneRepository);
@@ -232,6 +235,10 @@ public class SyngeApplication {
             Context context = new Context(ctx.req().getLocale());
             ctx.html(templateEngine.process("auth/esqueci-senha", context));
         });
+        app.get("/redefinir-senha", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            ctx.html(templateEngine.process("auth/redefinir-senha", context));
+        });
         app.get("/hub", ctx -> {
             try {
                 AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -243,20 +250,30 @@ public class SyngeApplication {
 
                 Context context = new Context(ctx.req().getLocale());
 
-                Map<String, Object> usuarioFake = Map.of(
-                        "nomeCompleto", "Usuário Logado",
+                // Antes, esse mapa era hardcoded com "Usuário Logado" fixo, um placeholder
+                // que nunca tinha sido trocado pelo usuário real. Agora busca o nome de
+                // verdade de quem está logado.
+                String nomeCompleto = usuarioRepository.findById(currentUser.getUserId())
+                        .map(Usuario::getNomeCompleto)
+                        .orElse("Usuário");
+                Map<String, Object> usuarioLogadoView = Map.of(
+                        "nomeCompleto", nomeCompleto,
                         "perfil", currentUser.getPerfil(),
                         "cpf", currentUser.getCpf()
                 );
-                context.setVariable("usuarioLogado", usuarioFake);
+                context.setVariable("usuarioLogado", usuarioLogadoView);
 
-                // Força o charset UTF-8 para garantir acentos perfeitos
-                ctx.contentType("text/html; charset=utf-8");
+                context.setVariable("content", "dashboard/escolas/hub");
 
-                // Renderiza DIRETAMENTE a tela do hub (o arquivo HTML se encarregará do layout)
-                ctx.html(templateEngine.process("dashboard/escolas/hub", context));
+                ctx.html(templateEngine.process("layouts/master-escola", context));
 
             } catch (Exception e) {
+                // ANTES: esse catch engolia qualquer erro (NPE, erro de template, etc.)
+                // e mandava o usuário de volta pro /login SEM NENHUMA mensagem — o login
+                // parecia "não funcionar" mesmo quando a autenticação tinha dado certo.
+                // Agora loga o erro de verdade, pra dar pra diagnosticar o que quebrou.
+                logger.error("Erro ao renderizar /hub para o usuário logado: {}", e.getMessage(), e);
+                ctx.sessionAttribute("errorMessage", "Ocorreu um erro ao carregar o painel. Tente novamente ou contate o suporte.");
                 ctx.redirect("/login");
             }
         });
@@ -330,17 +347,7 @@ public class SyngeApplication {
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
-/// ACADÊMICO — TELA DE ANOS LETIVOS (Ajustado para fora do /dashboard)
-        app.get("/escola/anos-letivos", ctx -> {
-            AuthUser currentUser = AuthUserContext.getAuthUser();
 
-            Map<String, Object> model = Map.of(
-                    "content", "dashboard/academico/anos-letivos/index",
-                    "currentUser", currentUser
-            );
-
-            ctx.html(templateEngine.process("layouts/master-admin", new org.thymeleaf.context.Context(ctx.req().getLocale(), model)));
-        });
         app.get("/area-logada", ctx -> {
             try {
                 AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -454,8 +461,6 @@ public class SyngeApplication {
         // Gestão Pedagógica (Apenas Notas e Boletins)
 
         // MÓDULO FINANCEIRO — PROTEÇÃO POR PERFIL
-        // PROTEÇÃO DE ROTAS ESCOLARES — GESTÃO ACADÊMICA (TELAS)
-        app.before("/escola/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
         app.before("/api/financeiro/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
 
         // Rotas de Mensalidades e Transações

@@ -232,8 +232,11 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             usuario.setId(UUID.randomUUID());
             usuario.setCriadoEm(LocalDateTime.now());
             usuario.setAtualizadoEm(LocalDateTime.now());
-            usuario.setAtivo(false); // PENDENTE_APROVACAO
-            usuario.setBloqueado(false);
+            // NÃO decidir ativo/bloqueado aqui: quem chama este método já define o
+            // valor correto antes (AuthService.register() põe false para auto-cadastro
+            // público; EscolaService.cadastrarEscola() põe true para o Gestor criado
+            // junto com a escola). Forçar aqui sempre para false quebrava o Gestor,
+            // que nunca conseguia logar mesmo já devendo nascer ativo.
             usuario.setTentativasLogin(0);
 
             // Ensure tenantId is set on entity

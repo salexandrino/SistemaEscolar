@@ -25,15 +25,17 @@ public class AuthService {
     private final EscolaRepository escolaRepository;
     private final PasswordService passwordService;
     private final JwtService jwtService;
+    private final EmailService emailService;
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
     private final Random random = new Random();
 
-    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService) {
+    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.escolaRepository = escolaRepository;
         this.passwordService = passwordService;
         this.jwtService = jwtService;
+        this.emailService = emailService;
 
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
@@ -229,9 +231,8 @@ public class AuthService {
 
             try {
                 usuarioRepository.update(usuario);
-                logger.info("Código de recuperação gerado para usuário {}. Código: {}", usuario.getEmail(), recoveryCode);
-                // Em ambiente de desenvolvimento, imprimimos o código no console para testes
-                System.out.println("CÓDIGO DE RECUPERAÇÃO PARA " + usuario.getEmail() + ": " + recoveryCode);
+                logger.info("Código de recuperação gerado para usuário {}.", usuario.getEmail());
+                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryCode);
             } catch (Exception e) {
                 logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
