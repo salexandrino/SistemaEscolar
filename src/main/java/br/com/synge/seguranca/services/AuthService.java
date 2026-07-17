@@ -1,5 +1,6 @@
 package br.com.synge.seguranca.services;
 
+import br.com.synge.seguranca.dtos.AlterarSenhaPropriaDTO;
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.seguranca.exceptions.*;
 import br.com.synge.seguranca.models.AuthUser;
@@ -303,5 +304,32 @@ public class AuthService {
         );
 
         return token;
+    }
+
+    public void alterarSenhaPropria(UUID usuarioId, UUID tenantId, AlterarSenhaPropriaDTO dto) {
+        if (!dto.getNovaSenha().equals(dto.getConfirmacaoNovaSenha())) {
+            throw new ValidationException("As senhas não conferem.");
+        }
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+
+        if (!passwordService.verificar(dto.getSenhaAtual(), usuario.getSenhaHash())) {
+            throw new AuthorizationException("Senha atual incorreta.");
+        }
+
+        ValidationUtil.validatePasswordComplexity(dto.getNovaSenha());
+
+        String novoHash = passwordService.hash(dto.getNovaSenha());
+        usuario.setSenhaHash(novoHash);
+
+        // O prompt pede "persiste via usuarioRepository.updateCadastro(usuario)" mas esse método
+        // atualiza a data e outros campos, e especificamente a senha? Espera, o updateCadastro atualiza
+        // (escola_id, nome_completo, email, cpf, telefone, atualizado_em). Não atualiza senha_hash!
+        // No passo anterior vimos o repositório. O repositório tem updatePassword(UUID id, UUID tenantId, String newPasswordHash).
+        // Vou usar o updatePassword do repository que é feito para isso.
+        usuarioRepository.updatePassword(usuarioId, tenantId, novoHash);
+        
+        logger.info("Usuário {} alterou a própria senha com sucesso.", usuarioId);
     }
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Meu Perfil - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Minha Conta</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Alterar Senha</h5>
+                </div>
+                <div class="card-body">
+                    <div id="mensagem-alerta" class="alert d-none" role="alert"></div>
+
+                    <form id="form-alterar-senha">
+                        <div class="mb-3">
+                            <label for="senhaAtual" class="form-label">Senha Atual</label>
+                            <input type="password" class="form-control" id="senhaAtual" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="novaSenha" class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control" id="novaSenha" required>
+                            <div class="form-text">Mínimo de 8 caracteres, contendo pelo menos uma letra maiúscula, uma minúscula e um número.</div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="confirmacaoNovaSenha" class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" class="form-control" id="confirmacaoNovaSenha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-submit">Salvar Nova Senha</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Meus Dados</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nome:</strong> <span th:text="${usuarioLogado != null ? usuarioLogado.nomeCompleto : '-'}">-</span></p>
+                    <p><strong>E-mail:</strong> <span th:text="${usuarioLogado != null ? usuarioLogado.email : '-'}">-</span></p>
+                    <p><strong>Cargo/Perfil:</strong> <span class="badge bg-secondary text-uppercase" th:text="${usuarioLogado != null ? usuarioLogado.perfil : '-'}">-</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form-alterar-senha').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const senhaAtual = document.getElementById('senhaAtual').value;
+            const novaSenha = document.getElementById('novaSenha').value;
+            const confirmacaoNovaSenha = document.getElementById('confirmacaoNovaSenha').value;
+            const alerta = document.getElementById('mensagem-alerta');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            if(novaSenha !== confirmacaoNovaSenha) {
+                mostrarAlerta('As novas senhas não conferem.', 'danger');
+                return;
+            }
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'Salvando...';
+
+            fetch('/auth/change-password', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    senhaAtual: senhaAtual,
+                    novaSenha: novaSenha,
+                    confirmacaoNovaSenha: confirmacaoNovaSenha
+                })
+            })
+            .then(response => response.json().then(data => ({status: response.status, body: data})))
+            .then(result => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Salvar Nova Senha';
+
+                if (result.status === 200) {
+                    mostrarAlerta('Senha alterada com sucesso! Você será redirecionado.', 'success');
+                    document.getElementById('form-alterar-senha').reset();
+                    setTimeout(() => {
+                        window.location.href = '/hub';
+                    }, 2000);
+                } else {
+                    mostrarAlerta(result.body.message || 'Erro ao alterar a senha.', 'danger');
+                }
+            })
+            .catch(erro => {
+                console.error(erro);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Salvar Nova Senha';
+                mostrarAlerta('Ocorreu um erro interno. Tente novamente mais tarde.', 'danger');
+            });
+        });
+
+        function mostrarAlerta(mensagem, tipo) {
+            const alerta = document.getElementById('mensagem-alerta');
+            alerta.className = `alert alert-\${tipo} mb-4`;
+            alerta.innerText = mensagem;
+        }
+    </script>
+</div>
+</body>
+</html>

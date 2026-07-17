@@ -6,6 +6,7 @@ import br.com.synge.seguranca.dtos.LoginDTO;
 import br.com.synge.seguranca.dtos.RegisterDTO;
 import br.com.synge.seguranca.dtos.RegisterResponseDTO;
 import br.com.synge.seguranca.dtos.ResetPasswordDTO;
+import br.com.synge.seguranca.dtos.AlterarSenhaPropriaDTO;
 import br.com.synge.seguranca.exceptions.AuthenticationException;
 import br.com.synge.seguranca.exceptions.AuthorizationException;
 import br.com.synge.seguranca.exceptions.BusinessException;
@@ -247,6 +248,35 @@ public class AuthController {
             logger.warn("Falha ao executar redefinição de senha: {}", e.getMessage());
         } catch (Exception e) {
             logger.error("Erro crítico inesperado durante a redefinição de senha", e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
+        }
+    }
+
+    public void changePassword(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            AlterarSenhaPropriaDTO dto = ctx.bodyAsClass(AlterarSenhaPropriaDTO.class);
+
+            authService.alterarSenhaPropria(currentUser.getUserId(), currentUser.getTenantId(), dto);
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Senha alterada com sucesso."));
+            logger.info("Senha alterada com sucesso para o usuário [ID: {}].", currentUser.getUserId());
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha de autorização na troca de senha: {}", e.getMessage());
+        } catch (ValidationException | NotFoundException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha de validação na troca de senha: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Erro inesperado durante a alteração de senha do usuário logado", e);
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }

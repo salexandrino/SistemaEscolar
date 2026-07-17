@@ -79,23 +79,23 @@
     <!-- Links de Navegação -->
     <ul class="nav nav-pills flex-column mb-auto gap-1">
         <li class="nav-item">
-            <a href="/dashboard/escola" class="nav-link active">
+            <a href="/hub" class="nav-link active">
                 <i class="bi bi-grid-1x2-fill me-2"></i> Painel Inicial
             </a>
         </li>
         <li>
-            <a href="/dashboard/escola/turmas" class="nav-link">
+            <a href="/portal/turmas" class="nav-link">
                 <i class="bi bi-collection-fill me-2"></i> Minhas Turmas
             </a>
         </li>
         <li>
-            <a href="/dashboard/escola/alunos" class="nav-link">
+            <a href="/portal/alunos" class="nav-link">
                 <i class="bi bi-people-fill me-2"></i> Alunos
             </a>
         </li>
         <li>
-            <a href="/dashboard/escola/notas" class="nav-link">
-                <i class="bi bi-journal-bookmark-fill me-2"></i> Notas & Faltas
+            <a href="/portal/notas" class="nav-link">
+                <i class="bi bi-journal-bookmark-fill me-2"></i> Notas
             </a>
         </li>
     </ul>
@@ -103,12 +103,18 @@
 
     <!-- Rodapé da Sidebar: Menu Dropdown do Usuário -->
     <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle fs-5 me-2"></i>
-            <strong th:text="${usuarioLogado != null ? usuarioLogado.nomeCompleto : 'Carregando...'}">Nome do Usuário</strong>
+        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle w-100" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong class="text-truncate" style="max-width: 150px;">Meu Perfil</strong>
         </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item py-2 text-white text-decoration-none d-block" href="/logout"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser">
+            <li><a class="dropdown-item" href="/portal/perfil">Minha Conta</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form action="/auth/logout" method="post">
+                    <button type="submit" class="dropdown-item text-danger">Sair</button>
+                </form>
+            </li>
         </ul>
     </div>
 </div>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Notas & Avaliações - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Notas & Avaliações</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="alert('Simulador de notas a ser implementado')">
+                <i class="bi bi-calculator me-1"></i> Simulador
+            </button>
+            <button class="btn btn-primary" onclick="alert('Funcionalidade de lançamento a ser implementada')">
+                <i class="bi bi-pencil-square me-1"></i> Lançar Notas
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Avaliações Recentes -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 mb-4 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">Avaliações</h6>
+                    <button class="btn btn-sm btn-outline-success" onclick="alert('Criar avaliação a ser implementado')">
+                        <i class="bi bi-plus"></i> Nova
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="lista-avaliacoes">
+                        <div class="p-3 text-center text-muted">Carregando avaliações...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de Ações Rápidas de Notas -->
+        <div class="col-md-7">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold"><i class="bi bi-journal-check me-2 text-primary"></i>Boletins</h6>
+                            <p class="text-muted small mb-3">Gere e visualize os boletins dos alunos consolidados por período.</p>
+                            <button class="btn btn-sm btn-primary w-100" onclick="alert('Gerar Boletim a ser implementado. Chama GET /api/academico/boletins')">Acessar Boletins</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="fw-bold"><i class="bi bi-life-preserver me-2 text-warning"></i>Recuperação</h6>
+                            <p class="text-muted small mb-3">Identifique alunos aptos à recuperação e calcule a nota necessária.</p>
+                            <button class="btn btn-sm btn-warning w-100" onclick="alert('Recuperação a ser implementada. Chama GET /api/academico/notas/recuperacao')">Ver Painel de Recuperação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', carregarAvaliacoes);
+
+        function carregarAvaliacoes() {
+            fetch('/api/academico/avaliacoes')
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao carregar avaliações');
+                    return response.json();
+                })
+                .then(dados => renderizarAvaliacoes(dados))
+                .catch(erro => {
+                    console.error(erro);
+                    document.getElementById('lista-avaliacoes').innerHTML =
+                        `<div class="p-3 text-center text-danger">Erro ao carregar dados. ${erro.message}</div>`;
+                });
+        }
+
+        function renderizarAvaliacoes(dados) {
+            const lista = document.getElementById('lista-avaliacoes');
+            lista.innerHTML = '';
+
+            if (!dados || dados.length === 0) {
+                lista.innerHTML = '<div class="p-3 text-center text-muted">Nenhuma avaliação encontrada.</div>';
+                return;
+            }
+
+            dados.forEach(aval => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item';
+                item.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-bold">\${aval.nome}</h6>
+                            <small class="text-muted">Turma: \${aval.turmaId || 'Geral'} | Peso: \${aval.peso || 1}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">\${aval.valorMaximo || 10} pts</span>
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+        }
+    </script>
+</div>
+</body>
+</html>

@@ -44,7 +44,7 @@
             <i class="bi bi-info-circle-fill fs-3 text-green-primary"></i>
             <div>
                 <span class="fw-bold d-block text-dark">Perfil de Acesso Confirmado</span>
-                <span class="small text-muted">Você está logado como colaborador técnico. Suas permissões e recursos visíveis abaixo correspondem ao seu cargo na instituição.</span>
+                <span class="small text-muted">Você está logado como <strong class="text-uppercase" th:text="${usuarioLogado != null ? usuarioLogado.perfil : 'colaborador técnico'}">perfil</strong>. Suas permissões e recursos visíveis abaixo correspondem ao seu cargo na instituição.</span>
             </div>
         </div>
 
@@ -64,8 +64,8 @@
                             <h5 class="card-title fw-bold">Anos Letivos</h5>
                             <p class="card-text text-muted small">Gerencie os períodos letivos da escola, datas de início, fim e recessos.</p>
                         </div>
-                        <!-- URL CORRIGIDA PARA APONTAR PARA O ACADÊMICO -->
-                        <a th:href="${hasAcessoPeriodos ? '/escola/anos-letivos' : '#'}"                           th:classappend="${!hasAcessoPeriodos} ? 'btn-secondary disabled' : 'btn-primary'"
+                        <!-- URL CORRIGIDA PARA APONTAR PARA O DASHBOARD ESCOLA -->
+                        <a th:href="${hasAcessoPeriodos ? '/portal/anos-letivos' : '#'}"                           th:classappend="${!hasAcessoPeriodos} ? 'btn-secondary disabled' : 'btn-primary'"
                            class="btn btn-sm w-100 mt-3 text-white">
                             <span th:text="${hasAcessoPeriodos ? 'Acessar Períodos' : 'Acesso Restrito'}">Acessar Períodos</span>
                         </a>
@@ -85,7 +85,7 @@
                             <h5 class="card-title fw-bold">Séries & Matérias</h5>
                             <p class="card-text text-muted small">Cadastre as séries letivas (ex: 1º Ano, 2º Ano) e as disciplinas vinculadas.</p>
                         </div>
-                        <a th:href="${hasAcessoSeries ? '/dashboard/escola/series' : '#'}"
+                        <a th:href="${hasAcessoSeries ? '/portal/series' : '#'}"
                            th:classappend="${!hasAcessoSeries} ? 'btn-secondary disabled' : 'btn-primary'"
                            class="btn btn-sm w-100 mt-3 text-white">
                             <span th:text="${hasAcessoSeries ? 'Configurar Séries' : 'Acesso Restrito'}">Configurar Séries</span>
@@ -106,7 +106,7 @@
                             <h5 class="card-title fw-bold">Turmas</h5>
                             <p class="card-text text-muted small">Distribua os alunos nas turmas criadas e atribua os professores responsáveis.</p>
                         </div>
-                        <a th:href="${hasAcessoTurmas ? '/dashboard/escola/turmas' : '#'}"
+                        <a th:href="${hasAcessoTurmas ? '/portal/turmas' : '#'}"
                            th:classappend="${!hasAcessoTurmas} ? 'btn-secondary disabled' : 'btn-primary'"
                            class="btn btn-sm w-100 mt-3 text-white">
                             <span th:text="${hasAcessoTurmas ? 'Gerenciar Turmas' : 'Acesso Restrito'}">Gerenciar Turmas</span>
@@ -127,7 +127,7 @@
                             <h5 class="card-title fw-bold">Alunos</h5>
                             <p class="card-text text-muted small">Matricule novos alunos, consulte fichas cadastrais, telefones de responsáveis e histórico.</p>
                         </div>
-                        <a th:href="${hasAcessoAlunos ? '/dashboard/escola/alunos' : '#'}"
+                        <a th:href="${hasAcessoAlunos ? '/portal/alunos' : '#'}"
                            th:classappend="${!hasAcessoAlunos} ? 'btn-secondary disabled' : 'btn-primary'"
                            class="btn btn-sm w-100 mt-3 text-white">
                             <span th:text="${hasAcessoAlunos ? 'Consultar Alunos' : 'Acesso Restrito'}">Consultar Alunos</span>
@@ -136,26 +136,7 @@
                 </div>
             </div>
 
-            <!-- Card 5: Diário de Classe -->
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0 transition-all"
-                     th:classappend="${!hasAcessoDiario} ? 'acesso-bloqueado' : ''">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="icon-box rounded p-3 d-inline-block mb-3">
-                                <i class="bi bi-check2-square fs-3"></i>
-                            </div>
-                            <h5 class="card-title fw-bold">Diário de Classe</h5>
-                            <p class="card-text text-muted small">Lançamento de presenças diárias, faltas e registros de conteúdos ministrados.</p>
-                        </div>
-                        <a th:href="${hasAcessoDiario ? '/dashboard/escola/frequencia' : '#'}"
-                           th:classappend="${!hasAcessoDiario} ? 'btn-secondary disabled' : 'btn-primary'"
-                           class="btn btn-sm w-100 mt-3 text-white">
-                            <span th:text="${hasAcessoDiario ? 'Fazer Chamada' : 'Acesso Restrito'}">Fazer Chamada</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Card 6: Notas e Avaliações -->
             <div class="col-md-4">
@@ -169,7 +150,7 @@
                             <h5 class="card-title fw-bold">Boletins & Notas</h5>
                             <p class="card-text text-muted small">Lançamento de notas por bimestre/trimestre e fechamento das médias finais.</p>
                         </div>
-                        <a th:href="${hasAcessoBoletim ? '/dashboard/escola/notas' : '#'}"
+                        <a th:href="${hasAcessoBoletim ? '/portal/notas' : '#'}"
                            th:classappend="${!hasAcessoBoletim} ? 'btn-secondary disabled' : 'btn-primary'"
                            class="btn btn-sm w-100 mt-3 text-white">
                             <span th:text="${hasAcessoBoletim ? 'Digitar Notas' : 'Acesso Restrito'}">Digitar Notas</span>
