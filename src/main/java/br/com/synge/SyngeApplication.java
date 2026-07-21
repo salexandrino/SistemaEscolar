@@ -317,36 +317,43 @@ public class SyngeApplication {
         // Rotas UI do Portal da Escola (Dashboard Gestor)
         app.get("/portal/anos-letivos", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/anos-letivos");
             ctx.html(templateEngine.process("dashboard/escola/anos-letivos", context));
         });
 
         app.get("/portal/disciplinas", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/academico/disciplinas/index");
             ctx.html(templateEngine.process("dashboard/academico/disciplinas/index", context));
         });
 
         app.get("/portal/series", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/series");
             ctx.html(templateEngine.process("dashboard/escola/series", context));
         });
 
         app.get("/portal/turmas", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/turmas");
             ctx.html(templateEngine.process("dashboard/escola/turmas", context));
         });
 
         app.get("/portal/alunos", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/alunos");
             ctx.html(templateEngine.process("dashboard/escola/alunos", context));
         });
 
         app.get("/portal/notas", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/notas");
             ctx.html(templateEngine.process("dashboard/escola/notas", context));
         });
 
         app.get("/portal/perfil", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "portal/perfil");
             ctx.html(templateEngine.process("portal/perfil", context));
         });
 
