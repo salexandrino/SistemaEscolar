@@ -1,1 +1,185 @@
-<!-- TODO: implementar -->
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html}">
+<head>
+    <title>SYNGE - Disciplinas</title>
+</head>
+<body>
+<div th:fragment="content">
+
+    <div class="container-fluid p-0">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a th:href="${'/dashboard'}" class="text-success text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item text-muted">Acadêmico</li>
+                        <li class="breadcrumb-item active">Disciplinas</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 fw-bold text-dark mb-0">Gestão de Disciplinas</h1>
+            </div>
+
+            <button class="btn btn-success d-flex align-items-center gap-2 shadow-sm"
+                    data-bs-toggle="modal" data-bs-target="#modalNovaDisciplina">
+                <i class="bi bi-plus-lg"></i> Nova Disciplina
+            </button>
+        </div>
+
+        <!-- Alertas -->
+        <div id="containerAlerta" class="mb-4"></div>
+
+        <!-- Tabela -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="fw-bold text-dark mb-0">Disciplinas Cadastradas</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">NOME DA DISCIPLINA</th>
+                        <th>CÓDIGO / SIGLA</th>
+                        <th>ÁREA DO CONHECIMENTO</th>
+                        <th class="text-end pe-4">AÇÕES</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaDisciplinas">
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            Carregando disciplinas...
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal: Nova Disciplina -->
+        <div class="modal fade" id="modalNovaDisciplina" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title fw-bold">Cadastrar Nova Disciplina</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="formNovaDisciplina">
+                        <div class="modal-body py-3">
+                            <div class="mb-3">
+                                <label for="nomeDisciplina" class="form-label fw-semibold">Nome da Disciplina</label>
+                                <input type="text" class="form-control" id="nomeDisciplina" placeholder="Ex: Matemática, História" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="siglaDisciplina" class="form-label fw-semibold">Sigla / Código</label>
+                                <input type="text" class="form-control" id="siglaDisciplina" placeholder="Ex: MAT, HIS" maxlength="10">
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top-0">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar Disciplina</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Lógico -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDisciplinas();
+            document.getElementById('formNovaDisciplina').addEventListener('submit', criarDisciplina);
+        });
+
+        function mostrarAlerta(mensagem, tipo = 'success') {
+            const container = document.getElementById('containerAlerta');
+            container.innerHTML = `
+                <div class="alert alert-${tipo} alert-dismissible fade show shadow-sm border-0 d-flex align-items-center" role="alert">
+                    <i class="bi bi-${tipo === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2 fs-5"></i>
+                    <div>${mensagem}</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        async function carregarDisciplinas() {
+            try {
+                const response = await fetch('/api/academico/disciplinas');
+                if (!response.ok) throw new Error('Falha ao carregar disciplinas.');
+
+                const lista = await response.json();
+                renderizarTabela(lista);
+            } catch (error) {
+                mostrarAlerta('Erro de conexão ao buscar disciplinas.', 'danger');
+            }
+        }
+
+        function renderizarTabela(lista) {
+            const tbody = document.getElementById('tabelaDisciplinas');
+            if (!lista.length) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Nenhuma disciplina cadastrada.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(item => `
+                <tr>
+                    <td class="ps-4 fw-semibold text-dark">${item.nome || item.descricao}</td>
+                    <td><span class="badge bg-light text-dark border">${item.sigla || item.codigo || '-'}</span></td>
+                    <td class="text-muted">${item.areaConhecimento || 'Geral'}</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-danger" onclick="excluirDisciplina('${item.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function criarDisciplina(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nomeDisciplina').value;
+            const sigla = document.getElementById('siglaDisciplina').value;
+
+            try {
+                const response = await fetch('/api/academico/disciplinas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, sigla })
+                });
+
+                if (response.ok) {
+                    mostrarAlerta(`Disciplina "${nome}" cadastrada com sucesso!`, 'success');
+                    document.getElementById('formNovaDisciplina').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('modalNovaDisciplina')).hide();
+                    carregarDisciplinas();
+                } else {
+                    mostrarAlerta('Erro ao cadastrar disciplina.', 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Erro de conexão ao salvar disciplina.', 'danger');
+            }
+        }
+
+        async function excluirDisciplina(id) {
+            if (!confirm("Deseja realmente excluir esta disciplina?")) return;
+            try {
+                const response = await fetch(`/api/academico/disciplinas/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    mostrarAlerta('Disciplina removida com sucesso!', 'success');
+                    carregarDisciplinas();
+                } else {
+                    mostrarAlerta('Não foi possível excluir a disciplina.', 'danger');
+                }
+            } catch (error) {
+                mostrarAlerta('Erro de conexão ao excluir.', 'danger');
+            }
+        }
+    </script>
+
+</div>
+</body>
+</html>
