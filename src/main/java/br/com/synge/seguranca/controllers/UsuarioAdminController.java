@@ -170,6 +170,28 @@ public class UsuarioAdminController {
         }
     }
 
+    public void desbloquear(Context ctx) {
+        try {
+            UUID id = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            usuarioAdminService.desbloquear(id, currentUser);
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Usuario desbloqueado com sucesso."));
+        } catch (AuthenticationException | AuthorizationException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao desbloquear usuario: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Erro ao desbloquear usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+            logger.warn("ID de usuario invalido: {}", e.getMessage());
+        } catch (Exception e) {
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao desbloquear usuario.");
+            logger.error("Erro inesperado ao desbloquear usuario: {}", e.getMessage(), e);
+        }
+    }
+
     public void alterarPerfil(Context ctx) {
         try {
             UUID id = UUID.fromString(ctx.pathParam("id"));

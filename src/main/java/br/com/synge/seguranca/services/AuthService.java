@@ -110,13 +110,26 @@ public class AuthService {
             usuarioRepository.update(usuario);
         }
     }
-
     public void register(Usuario usuario) {
+
+        // 🛡️ Validação preventiva de nulos antes de efetuar operações de string
+        if (usuario == null) {
+            throw new ValidationException("Dados de cadastro inválidos.");
+        }
+        if (usuario.getSenhaHash() == null || usuario.getSenhaHash().isBlank()) {
+            throw new ValidationException("A senha é obrigatória.");
+        }
+        if (usuario.getNomeCompleto() == null || usuario.getNomeCompleto().isBlank()) {
+            throw new ValidationException("O nome completo é obrigatório.");
+        }
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new ValidationException("O e-mail é obrigatório.");
+        }
 
         usuario.setNomeCompleto(usuario.getNomeCompleto().trim());
         usuario.setEmail(usuario.getEmail().trim().toLowerCase());
-        usuario.setCpf(usuario.getCpf().trim());
-        usuario.setTelefone(usuario.getTelefone().trim());
+        usuario.setCpf(usuario.getCpf() != null ? usuario.getCpf().trim() : "");
+        usuario.setTelefone(usuario.getTelefone() != null ? usuario.getTelefone().trim() : "");
 
         ValidationUtil.validateNomeCompleto(usuario.getNomeCompleto());
         ValidationUtil.validateEmail(usuario.getEmail());
@@ -140,30 +153,40 @@ public class AuthService {
         if (usuario.getPerfil() == Perfil.SUPER_ADMIN) {
             throw new AuthorizationException("Não é permitido cadastrar usuários com o perfil " + usuario.getPerfil().name() + " via este endpoint.");
         }
+        // GESTOR nasce junto com a escola (EscolaService.cadastrarEscola), nunca via
+        // auto-cadastro público — evita que qualquer pessoa vire administradora de
+        // uma escola que não é dela.
+        if (usuario.getPerfil() == Perfil.GESTOR) {
+            throw new AuthorizationException("O perfil de Gestor é criado automaticamente no cadastro da escola e não está disponível para auto-cadastro.");
+        }
 
         // Escola
         if (usuario.getEscolaId() == null) {
             throw new ValidationException("Escola é obrigatória.");
         }
-        Optional<Escola> escola = escolaRepository.findById(usuario.getEscolaId());
-        if (escola.isEmpty() || !"ATIVA".equals(escola.get().getStatus())) {
+        Optional<Escola> escolaOptional = escolaRepository.findById(usuario.getEscolaId());
+        if (escolaOptional.isEmpty() || !"ATIVA".equals(escolaOptional.get().getStatus())) {
             throw new NotFoundException("Escola não encontrada ou inativa.");
         }
 
-        // Criptografar senha
-        usuario.setSenhaHash(passwordService.hash(usuario.getSenhaHash())); // Agora senhaHash é o hash
+        usuario.setSenhaHash(passwordService.hash(usuario.getSenhaHash()));
 
-        // Status inicial
-        usuario.setAtivo(false); // PENDENTE_APROVACAO
+        // 🔐 Todo auto-cadastro público nasce pendente de aprovação por um Gestor
+        // da escola (GESTOR e SUPER_ADMIN já foram bloqueados acima e nunca chegam aqui).
+        usuario.setAtivo(false);
         usuario.setBloqueado(false);
         usuario.setTentativasLogin(0);
         usuario.setCriadoEm(LocalDateTime.now());
         usuario.setAtualizadoEm(LocalDateTime.now());
 
         usuarioRepository.save(usuario, usuario.getTenantId());
-        logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
-    }
 
+        if (usuario.isAtivo()) {
+            logger.info("Usuário {} cadastrado e ATIVO pronto para uso.", usuario.getCpfMascarado());
+        } else {
+            logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
+        }
+    }
     public void approveUser(UUID userId, UUID tenantId, AuthUser approver) {
         // 1. Verificar se o aprovador tem permissão (GESTOR)
         if (approver.getPerfil() != Perfil.GESTOR) {

@@ -2,6 +2,7 @@ package br.com.synge.seguranca.services;
 
 import br.com.synge.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.synge.seguranca.dtos.CriarEscolaDTO;
+import br.com.synge.seguranca.dtos.CriarEscolaResponseDTO;
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.seguranca.exceptions.AuthorizationException;
 import br.com.synge.seguranca.exceptions.BusinessException;
@@ -10,11 +11,15 @@ import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.models.Escola;
+import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.EscolaRepository;
+import br.com.synge.seguranca.repositories.UsuarioRepository;
 import br.com.synge.seguranca.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +28,14 @@ public class EscolaService {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaService.class);
     private final EscolaRepository escolaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordService passwordService;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
-    public EscolaService(EscolaRepository escolaRepository) {
+    public EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository, PasswordService passwordService) {
         this.escolaRepository = escolaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordService = passwordService;
     }
 
     /**
@@ -88,14 +98,22 @@ public class EscolaService {
     /**
      * Cadastra uma nova escola.
      */
-    public Escola cadastrarEscola(CriarEscolaDTO dto, AuthUser authUser) {
+    public CriarEscolaResponseDTO cadastrarEscola(CriarEscolaDTO dto, AuthUser authUser) {
 
         verificarPermissaoMaster(authUser);
 
         validarDados(dto);
 
+        if (dto.getCpfResponsavel() == null || dto.getCpfResponsavel().isBlank()) {
+            throw new ValidationException("CPF do responsável (futuro Gestor) é obrigatório.");
+        }
+        ValidationUtil.validarCpfComStrategy(dto.getCpfResponsavel());
+
         if (escolaRepository.findByCnpj(dto.getCnpj()).isPresent()) {
             throw new ConflictException("CNPJ já cadastrado.");
+        }
+        if (usuarioRepository.existsByEmail(dto.getEmailResponsavel())) {
+            throw new ConflictException("Já existe um usuário cadastrado com o e-mail do responsável.");
         }
 
         Escola escola = new Escola();
@@ -112,7 +130,65 @@ public class EscolaService {
         escola.setEmailResponsavel(dto.getEmailResponsavel());
         escola.setStatus("ATIVA");
 
-        return escolaRepository.save(escola);
+        Escola escolaSalva = escolaRepository.save(escola);
+
+        // Cria o primeiro Gestor da escola já ativo — é o Super Admin quem está
+        // autorizando isso ao criar a escola, então não passa pelo fluxo de
+        // auto-cadastro público (que nunca oferece o perfil GESTOR).
+        String senhaGerada = gerarSenhaTemporaria();
+
+        Usuario gestor = new Usuario();
+        gestor.setNomeCompleto(dto.getNomeResponsavel());
+        gestor.setCpf(dto.getCpfResponsavel());
+        gestor.setEmail(dto.getEmailResponsavel().trim().toLowerCase());
+        gestor.setTelefone(dto.getTelefoneResponsavel());
+        gestor.setSenhaHash(passwordService.hash(senhaGerada));
+        gestor.setPerfil(Perfil.GESTOR);
+        gestor.setTenantId(escolaSalva.getId());
+        gestor.setEscolaId(escolaSalva.getId());
+        gestor.setAtivo(true);
+        gestor.setBloqueado(false);
+        gestor.setTentativasLogin(0);
+        gestor.setCriadoEm(LocalDateTime.now());
+        gestor.setAtualizadoEm(LocalDateTime.now());
+
+        usuarioRepository.save(gestor, escolaSalva.getId());
+
+        logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
+                escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
+
+        return new CriarEscolaResponseDTO(escolaSalva, gestor.getEmail(), senhaGerada);
+    }
+
+    /**
+     * Gera uma senha temporária que já atende a política de complexidade
+     * (maiúscula, minúscula, número, caractere especial, 12 caracteres).
+     * O Super Admin repassa essa senha ao Gestor, que deve trocá-la no
+     * primeiro acesso (ver observação no controller/response).
+     */
+    private String gerarSenhaTemporaria() {
+        String maiusculas = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        String minusculas = "abcdefghijkmnpqrstuvwxyz";
+        String numeros = "23456789";
+        String especiais = "!@#$%&*";
+        String todos = maiusculas + minusculas + numeros + especiais;
+
+        StringBuilder senha = new StringBuilder();
+        senha.append(maiusculas.charAt(RANDOM.nextInt(maiusculas.length())));
+        senha.append(minusculas.charAt(RANDOM.nextInt(minusculas.length())));
+        senha.append(numeros.charAt(RANDOM.nextInt(numeros.length())));
+        senha.append(especiais.charAt(RANDOM.nextInt(especiais.length())));
+        for (int i = 0; i < 8; i++) {
+            senha.append(todos.charAt(RANDOM.nextInt(todos.length())));
+        }
+
+        // embaralha pra não ficar previsível (maiúscula sempre na posição 0, etc.)
+        List<Character> caracteres = new java.util.ArrayList<>();
+        for (char c : senha.toString().toCharArray()) caracteres.add(c);
+        java.util.Collections.shuffle(caracteres, RANDOM);
+        StringBuilder embaralhada = new StringBuilder();
+        caracteres.forEach(embaralhada::append);
+        return embaralhada.toString();
     }
 
     /**

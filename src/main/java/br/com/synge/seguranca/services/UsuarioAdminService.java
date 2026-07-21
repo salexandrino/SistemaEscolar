@@ -95,6 +95,26 @@ public class UsuarioAdminService {
         logger.info("Perfil do usuario ID {} atualizado administrativamente.", id);
     }
 
+    /**
+     * Desbloqueia uma conta que foi bloqueada automaticamente após
+     * exceder o número máximo de tentativas de login (ver AuthService).
+     * Sem este método não havia NENHUMA forma de reverter o bloqueio a
+     * não ser alterando o banco de dados diretamente.
+     */
+    public void desbloquear(UUID id, AuthUser currentUser) {
+        validarUsuarioAutenticado(currentUser);
+        Usuario usuario = buscarParaAlteracao(id, currentUser);
+
+        if (!usuario.isBloqueado()) {
+            throw new BusinessException("Usuario nao esta bloqueado.");
+        }
+
+        usuario.setBloqueado(false);
+        usuario.setTentativasLogin(0);
+        usuarioRepository.update(usuario);
+        logger.info("Usuario ID {} desbloqueado administrativamente por {}.", id, currentUser.getCpf());
+    }
+
     public void inativar(UUID id, AuthUser currentUser) {
         validarUsuarioAutenticado(currentUser);
         Usuario usuario = buscarParaAlteracao(id, currentUser);

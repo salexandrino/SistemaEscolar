@@ -27,17 +27,19 @@ public class FlywayConfig {
                     .dataSource(dbUrl, dbUser, dbPassword)
                     .locations("classpath:db/migration")
                     .baselineOnMigrate(true)
-                    .baselineVersion("0")      // 🔥 Banco novo => aplica TUDO a partir da V1
-                    .validateOnMigrate(true)   // 🔥 Reativado conforme instrução do professor
+                    .baselineVersion("0")
+                    .validateOnMigrate(true)
+                    // 🛠️ ADICIONE APENAS ESTA LINHA ABAIXO:
+                    .outOfOrder(true)          // 🔥 Permite que a V4 e V5 rodem mesmo se a V6+ já existir
                     .load();
 
             logger.info("Aplicando as migrações na nuvem...");
-            flyway.migrate(); // 🔥 Cria as tabelas oficialmente
+            flyway.migrate();
 
             logger.info("Flyway migrations aplicadas com sucesso.");
         } catch (Exception e) {
             logger.error("FALHA CRÍTICA NO FLYWAY: {}", e.getMessage(), e);
-            throw new RuntimeException(e); // Garante que se der erro, você veja o motivo real nos logs
+            throw new RuntimeException(e);
         }
     }
 }

@@ -110,11 +110,22 @@
                 </div>
 
                 <h5 class="text-primary mt-3 mb-3">Dados do Responsável</h5>
+                <p class="text-muted small mb-3">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Esta pessoa se torna automaticamente o <strong>Gestor</strong> da escola, com
+                    acesso administrativo completo. Uma senha temporária será gerada e exibida
+                    uma única vez após o cadastro.
+                </p>
 
                 <div class="row">
                     <div class="col-md-4 mb-4">
                         <label class="form-label">Nome do Responsável</label>
-                        <input type="text" name="nomeResponsavel" class="form-control" placeholder="Nome completo">
+                        <input type="text" name="nomeResponsavel" class="form-control" placeholder="Nome completo" required>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label class="form-label">CPF do Responsável</label>
+                        <input type="text" name="cpfResponsavel" id="cpfResponsavel" class="form-control" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" required>
                     </div>
 
                     <div class="col-md-4 mb-4">
@@ -124,7 +135,7 @@
 
                     <div class="col-md-4 mb-4">
                         <label class="form-label">Email do Responsável</label>
-                        <input type="email" name="emailResponsavel" class="form-control" placeholder="responsavel@email.com">
+                        <input type="email" name="emailResponsavel" class="form-control" placeholder="responsavel@email.com" required>
                     </div>
                 </div>
 

@@ -13,6 +13,7 @@ public class CriarEscolaDTO {
     private String estado;
     private String cep;
     private String nomeResponsavel;
+    private String cpfResponsavel;
     private String telefoneResponsavel;
     private String emailResponsavel;
 
@@ -113,6 +114,14 @@ public class CriarEscolaDTO {
 
     public void setNomeResponsavel(String nomeResponsavel) {
         this.nomeResponsavel = nomeResponsavel;
+    }
+
+    public String getCpfResponsavel() {
+        return cpfResponsavel;
+    }
+
+    public void setCpfResponsavel(String cpfResponsavel) {
+        this.cpfResponsavel = cpfResponsavel;
     }
 
     public String getTelefoneResponsavel() {

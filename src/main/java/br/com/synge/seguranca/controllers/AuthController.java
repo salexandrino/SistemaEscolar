@@ -97,72 +97,68 @@ public class AuthController {
             ctx.redirect("/super-admin/login");
         }
     }
-
     public void register(Context ctx) {
         try {
-            Usuario usuario;
+            Usuario usuario = new Usuario();
 
-            // Se a requisição vier do formulário HTML convencional, preenche o modelo manualmente
-            if (ctx.formParamMap() != null && !ctx.formParamMap().isEmpty()) {
-                usuario = new Usuario();
-                usuario.setNomeCompleto(ctx.formParam("nomeCompleto"));
+            // 1. Verifica se a requisição é baseada em formulário tradicional HTML (URL Encoded)
+            if (ctx.contentType() != null && ctx.contentType().contains("application/x-www-form-urlencoded")) {
+                usuario.setNomeCompleto(ctx.formParam("nomeCompleto") != null ? ctx.formParam("nomeCompleto") : ctx.formParam("nome"));
                 usuario.setEmail(ctx.formParam("email"));
                 usuario.setCpf(ctx.formParam("cpf"));
                 usuario.setTelefone(ctx.formParam("telefone"));
+                usuario.setSenhaHash(ctx.formParam("senha"));
+                usuario.setConfirmacaoSenha(ctx.formParam("confirmacaoSenha"));
 
-                // 🔐 CAPTURA DA SENHA E DA CONFIRMAÇÃO DE SENHA:
-                String senha = ctx.formParam("senha");
-                usuario.setSenhaHash(senha);
-
-                String confirmacao = ctx.formParam("confirmacaoSenha");
-                usuario.setConfirmacaoSenha(confirmacao); // 🌟 FALTAVA EXATAMENTE ESTA LINHA!
-
-                // Mapeia o Perfil selecionado (PROFESSOR, GESTOR, SECRETARIA)
                 String perfilParam = ctx.formParam("perfil");
                 if (perfilParam != null && !perfilParam.isBlank()) {
-                    try {
-                        usuario.setPerfil(br.com.synge.seguranca.enums.Perfil.valueOf(perfilParam));
-                    } catch (IllegalArgumentException e) {
-                        logger.warn("Perfil inválido recebido do formulário: {}", perfilParam);
-                    }
+                    usuario.setPerfil(br.com.synge.seguranca.enums.Perfil.valueOf(perfilParam));
                 }
 
-                // Mapeia a Escola selecionada
-                String escolaIdParam = ctx.formParam("escolaId");
+                String escolaIdParam = ctx.formParam("escolaId") != null ? ctx.formParam("escolaId") : ctx.formParam("escola");
                 if (escolaIdParam != null && !escolaIdParam.isBlank()) {
                     usuario.setEscolaId(UUID.fromString(escolaIdParam));
                 }
+            } else {
+                // 2. Se for JSON (Envio via JavaScript fetch), usa o DTO mapeado
+                br.com.synge.seguranca.dtos.UsuarioRegistroDTO dto = ctx.bodyAsClass(br.com.synge.seguranca.dtos.UsuarioRegistroDTO.class);
 
-                // Se houver lógica de Tenant herdada do administrador logado
+                usuario.setNomeCompleto(dto.getNomeCompleto());
+                usuario.setEmail(dto.getEmail());
+                usuario.setCpf(dto.getCpf());
+                usuario.setTelefone(dto.getTelefone());
+                usuario.setSenhaHash(dto.getSenha());
+                usuario.setConfirmacaoSenha(dto.getConfirmacaoSenha());
+
+                if (dto.getPerfil() != null && !dto.getPerfil().isBlank()) {
+                    usuario.setPerfil(br.com.synge.seguranca.enums.Perfil.valueOf(dto.getPerfil()));
+                }
+                if (dto.getEscolaId() != null && !dto.getEscolaId().isBlank()) {
+                    usuario.setEscolaId(UUID.fromString(dto.getEscolaId()));
+                }
+            }
+
+            try {
                 AuthUser currentUser = AuthUserContext.getAuthUser();
                 if (currentUser != null) {
                     usuario.setTenantId(currentUser.getTenantId());
                 }
-
-            } else {
-                // Mantém o comportamento original caso a requisição venha via JSON (Postman/API REST)
-                usuario = ctx.bodyAsClass(Usuario.class);
+            } catch (Exception e) {
+                // Auto-cadastro sem sessão ativa
             }
 
-            // Executa a sua regra de negócio existente do AuthService
+            // Executa a regra de negócio limpando a assinatura antiga
             authService.register(usuario);
 
-            // REDIRECIONAMENTO SEGURO: Se o usuário foi cadastrado pela tela, volta para a listagem
-            if (ctx.formParamMap() != null && !ctx.formParamMap().isEmpty()) {
-                ctx.redirect("/dashboard/usuarios");
-                return;
-            }
-
-            ctx.status(HttpStatus.CREATED);
-            ctx.json(Map.of("message", "Usuário cadastrado com sucesso."));
+            ctx.status(201).json(Map.of("message", "Usuário cadastrado com sucesso."));
 
         } catch (br.com.synge.seguranca.exceptions.ValidationException |
                  br.com.synge.seguranca.exceptions.ConflictException e) {
-            responderErro(ctx, HttpStatus.BAD_REQUEST, e.getMessage());
+            ctx.status(400).json(Map.of("message", e.getMessage()));
             logger.warn("Aviso de negócio ao registrar usuário: {}", e.getMessage());
         } catch (Exception e) {
             logger.error("Erro crítico e inesperado durante o registro de usuário", e);
-            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
+            ctx.status(500).json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
     }
 
