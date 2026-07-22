@@ -10,6 +10,7 @@ import br.com.synge.academico.repositories.DocumentoAlunoRepository;
 import br.com.synge.academico.repositories.HistoricoSituacaoAlunoRepository;
 import br.com.synge.academico.repositories.MatriculaRepository;
 import br.com.synge.academico.services.estados.SituacaoAluno;
+import br.com.synge.academico.services.observers.AlunoSituacaoObserver;
 import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.exceptions.ValidationException;
@@ -21,6 +22,7 @@ import br.com.synge.config.DatabaseConfig;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +35,8 @@ public class AlunoService {
     private final DocumentoAlunoRepository documentoRepository;
     private final ValidadorCpf validadorCpf;
     private final TurmaService turmaService;
+    private final List<AlunoSituacaoObserver> observers = new ArrayList<>();
+
 
     public AlunoService(AlunoRepository alunoRepository,
                         HistoricoSituacaoAlunoRepository historicoRepository,
@@ -96,6 +100,10 @@ public class AlunoService {
         return toDto(criado);
     }
 
+    public void adicionarObserver(AlunoSituacaoObserver observer) {
+        observers.add(observer);
+    }
+
     public AlunoResponseDTO atualizar(UUID id, AtualizarAlunoDTO dto) {
         if (dto == null || dto.getNome() == null || dto.getNome().isBlank()) throw new ValidationException("Nome é obrigatório.");
         UUID tenantId = tenant();
@@ -133,6 +141,11 @@ public class AlunoService {
         }
 
         alunoRepository.atualizarSituacao(tenantId, id, nova.name());
+
+        // dispara os observers em vez de fazer tudo aqui dentro
+        for (AlunoSituacaoObserver observer : observers) {
+            observer.aoMudarSituacao(a, atual, nova);
+        }
 
         HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
         h.setId(UUID.randomUUID());

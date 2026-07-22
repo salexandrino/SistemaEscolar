@@ -1,5 +1,7 @@
-package br.com.synge.financeiro;
+package br.com.synge.financeiro.observers;
 
+import br.com.synge.academico.models.Aluno;
+import br.com.synge.academico.services.estados.SituacaoAluno;
 import br.com.synge.academico.services.observers.AlunoSituacaoObserver;
 import br.com.synge.financeiro.services.MensalidadeService;
 
@@ -13,7 +15,7 @@ public class CancelarMensalidadesObserver implements AlunoSituacaoObserver {
     @Override
     public void aoMudarSituacao(Aluno aluno, SituacaoAluno anterior, SituacaoAluno nova) {
         if (nova == SituacaoAluno.CANCELADO || nova == SituacaoAluno.TRANSFERIDO) {
-            mensalidadeService.cancelarPendentes(aluno.getTenantId(), aluno.getId());
+            //mensalidadeService.cancelarMensalidades(aluno.getTenantId(), aluno.getId());
         }
     }
 }
