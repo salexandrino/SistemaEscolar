@@ -556,7 +556,6 @@ public class SyngeApplication {
         app.get("/api/financeiro/relatorios/devedores", relatorioFinanceiroController::listarDevedores);
         app.get("/api/financeiro/relatorios/previsao-fluxo", relatorioFinanceiroController::obterPrevisaoEFluxo);
         // SISTEMA DE ALERTAS
-        // SISTEMA DE ALERTAS
         app.before("/api/alertas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
         app.get("/api/alertas", alertaController::obterAlertas);
 
@@ -650,4 +649,4 @@ public class SyngeApplication {
                 )
         );
     }
-}git status
+}
