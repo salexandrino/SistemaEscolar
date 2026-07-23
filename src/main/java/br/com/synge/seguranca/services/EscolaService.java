@@ -381,6 +381,36 @@ public class EscolaService {
 
         logger.warn("Escola excluida DEFINITIVAMENTE: {} (ID: {}) por {}", escola.getNome(), escola.getId(), authUser.getCpf());
     }
+    /**
+     * Exclui uma escola (soft delete: status → EXCLUIDA).
+     * Apenas SUPER_ADMIN pode executar esta operação.
+     */
+    public void deletarEscola(UUID id, AuthUser authUser) {
+        verificarPermissaoMaster(authUser);
+
+        Escola escola = escolaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
+
+        if ("EXCLUIDA".equals(escola.getStatus())) {
+            throw new BusinessException("Esta escola já foi excluída.");
+        }
+
+        // Inativa todos os usuários vinculados antes de excluir a escola
+        List<Usuario> usuarios = usuarioRepository.findAll()
+                .stream()
+                .filter(u -> id.equals(u.getEscolaId()))
+                .toList();
+
+        for (Usuario u : usuarios) {
+            if (u.isAtivo()) {
+                usuarioRepository.inactivate(u.getId(), u.getTenantId());
+            }
+        }
+
+        escolaRepository.delete(id);
+        logger.info("Escola excluída: {} (ID: {}) por {}", escola.getNome(), id, authUser.getCpf());
+    }
+
     private void validarDados(CriarEscolaDTO dto) {
 
         ValidationUtil.validateTamanho(dto.getNome(), 3, 150, "Nome da escola");

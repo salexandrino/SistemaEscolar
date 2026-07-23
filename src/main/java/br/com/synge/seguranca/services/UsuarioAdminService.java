@@ -160,6 +160,23 @@ public class UsuarioAdminService {
         logger.info("Usuario ID {} excluido definitivamente por {}.", id, currentUser.getCpf());
     }
 
+    /**
+     * Exclui um usuário (soft delete: inativa a conta permanentemente).
+     * SUPER_ADMIN pode excluir qualquer usuário.
+     * GESTOR só pode excluir usuários do seu próprio tenant.
+     */
+    public void deletar(UUID id, AuthUser currentUser) {
+        validarUsuarioAutenticado(currentUser);
+        Usuario usuario = buscarParaAlteracao(id, currentUser);
+
+        if (!usuario.isAtivo()) {
+            throw new BusinessException("Usuário já está inativo.");
+        }
+
+        usuarioRepository.inactivate(usuario.getId(), usuario.getTenantId());
+        logger.info("Usuario ID {} excluído (soft delete) por {}.", id, currentUser.getCpf());
+    }
+
     private Usuario buscarParaAlteracao(UUID id, AuthUser currentUser) {
         if (isMaster(currentUser)) {
             return usuarioRepository.findById(id)

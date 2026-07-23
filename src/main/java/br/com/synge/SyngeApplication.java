@@ -420,6 +420,7 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
+        app.post("/dashboard/escolas/{id}/deletar", escolaController::deletarEscola);
 
         // Gestão de Usuários
         app.get("/dashboard/usuarios", dashboardController::usuarios);
@@ -427,6 +428,7 @@ public class SyngeApplication {
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
+        app.post("/dashboard/usuarios/{id}/deletar", usuarioAdminController::deletar);
 
         app.get("/area-logada", ctx -> {
             try {
@@ -648,4 +650,4 @@ public class SyngeApplication {
                 )
         );
     }
-}
+}git status

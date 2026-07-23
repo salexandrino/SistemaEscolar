@@ -259,6 +259,38 @@ public class UsuarioAdminController {
         }
     }
 
+    /**
+     * POST /dashboard/usuarios/{id}/deletar - Exclui (inativa) um usuário
+     */
+    public void deletar(Context ctx) {
+        try {
+            UUID id = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            usuarioAdminService.deletar(id, currentUser);
+
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/usuarios");
+                return;
+            }
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Usuário excluído com sucesso."));
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao excluir usuario: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Erro ao excluir usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+        } catch (Exception e) {
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao excluir usuario.");
+            logger.error("Erro inesperado ao excluir usuario: {}", e.getMessage(), e);
+        }
+    }
+
     private Map<String, Object> usuarioToMap(Usuario usuario) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", usuario.getId());

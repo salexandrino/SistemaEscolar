@@ -515,6 +515,47 @@ public class EscolaController {
         }
     }
 
+    /**
+     * POST /dashboard/escolas/{id}/deletar - Exclui uma escola (soft delete)
+     * Usa POST pois formulários HTML não suportam DELETE nativamente.
+     */
+    public void deletarEscola(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
+            escolaService.deletarEscola(escolaId, currentUser);
+
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/escolas");
+                return;
+            }
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Escola excluída com sucesso."));
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha ao excluir escola: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Erro ao excluir escola: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            ctx.json(Map.of("message", "ID de escola inválido."));
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao excluir escola: {}", e.getMessage(), e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("message", "Erro interno ao excluir escola."));
+        }
+    }
+
     public void exibirPaginaListagem(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();

@@ -8,6 +8,7 @@
 <body>
 
 <div th:fragment="content">
+
     <nav class="breadcrumb-admin mb-4">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
@@ -41,28 +42,39 @@
                         <th>CPF</th>
                         <th>Perfil</th>
                         <th>Status</th>
-                        <th class="text-end pe-4" width="150">Ações</th>
+                        <th class="text-end pe-4" width="170">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="usuario : ${usuarios}">
-                        <td class="ps-4 fw-semibold text-dark" th:text="${usuario.nomeCompleto}">Nome do Usuário</td>
+                        <td class="ps-4 fw-semibold text-dark" th:text="${usuario.nomeCompleto}">Nome</td>
                         <td th:text="${usuario.email}">email@exemplo.com</td>
                         <td th:text="${usuario.cpf}">000.000.000-00</td>
                         <td>
-                            <span class="badge bg-secondary px-2 py-1.5" th:text="${usuario.perfil}">Perfil</span>
+                            <span class="badge bg-secondary px-2 py-1" th:text="${usuario.perfil}">Perfil</span>
                         </td>
                         <td>
                             <span class="badge bg-success" th:if="${usuario.aprovado}">Ativo</span>
                             <span class="badge bg-danger" th:unless="${usuario.aprovado}">Inativo</span>
                         </td>
-                        <td>
-                            <a th:href="'/dashboard/usuarios/visualizar/' + ${usuario.id}" class="btn btn-primary btn-sm">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a th:href="'/dashboard/usuarios/editar/' + ${usuario.id}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-1">
+                                <a th:href="'/dashboard/usuarios/visualizar/' + ${usuario.id}"
+                                   class="btn btn-sm btn-outline-secondary" title="Visualizar">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a th:href="'/dashboard/usuarios/editar/' + ${usuario.id}"
+                                   class="btn btn-sm btn-warning text-dark" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger"
+                                        title="Excluir Usuário"
+                                        th:attr="data-id=${usuario.id}, data-nome=${usuario.nomeCompleto}"
+                                        onclick="abrirModalDeletarUsuario(this)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(usuarios)}">
@@ -75,6 +87,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Confirmação — DENTRO do fragment para o Thymeleaf não descartar -->
+    <div class="modal fade" id="modalDeletarUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1">Você está prestes a excluir o usuário:</p>
+                    <p class="fw-bold fs-5 text-danger" id="nomeUsuarioDeletar">—</p>
+                    <p class="text-muted small mb-0">
+                        O usuário será inativado e não poderá mais acessar o sistema.
+                        Não pode ser desfeita pela interface.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="formDeletarUsuario" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Sim, excluir
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalDeletarUsuario(btn) {
+            var id   = btn.getAttribute('data-id');
+            var nome = btn.getAttribute('data-nome');
+            document.getElementById('nomeUsuarioDeletar').textContent = nome;
+            document.getElementById('formDeletarUsuario').action = '/dashboard/usuarios/' + id + '/deletar';
+            var modal = new bootstrap.Modal(document.getElementById('modalDeletarUsuario'));
+            modal.show();
+        }
+    </script>
+
 </div>
 
 </body>
