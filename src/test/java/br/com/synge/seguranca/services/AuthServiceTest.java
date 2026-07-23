@@ -103,8 +103,7 @@ public class AuthServiceTest {
 
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(superAdminFake));
         when(passwordService.verificar("senha_antiga", superAdminFake.getSenhaHash())).thenReturn(true);
-        when(passwordService.criptografar("NovaSenha@123")).thenReturn("$2a$10$NovoHashGerado");
-
+        when(passwordService.hash("NovaSenha@123")).thenReturn("$2a$10$NovoHashGerado");
         // WHEN
         assertDoesNotThrow(() -> {
             authService.alterarSenhaPropria(usuarioId, tenantId, dto);
@@ -142,7 +141,7 @@ public class AuthServiceTest {
             authService.alterarSenhaPropria(usuarioId, tenantId, dto);
         });
 
-        verify(passwordService, never()).criptografar(any());
+        verify(passwordService, never()).hash(any());
         verify(usuarioRepository, never()).updatePassword(any(), any(), any());
     }
 }
