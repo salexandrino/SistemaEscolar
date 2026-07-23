@@ -23,8 +23,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     @Override
     public List<Escola> findAll() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
-                     "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em FROM escola ORDER BY nome ASC";
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em FROM escola ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -46,8 +46,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     public List<Escola> findAllAtivas() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
-                     "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -69,8 +69,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     public List<Escola> findAllInativas() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
-                     "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'INATIVA' ORDER BY nome ASC";
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'INATIVA' ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -93,8 +93,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     @Override
     public Optional<Escola> findById(UUID id) {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
-                     "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE id = ?";
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -141,9 +141,9 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     @Override
     public Escola save(Escola escola) {
         String sql = "INSERT INTO escola (id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, " +
-                     "numero, complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                     "email_responsavel, status, criado_em, atualizado_em) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "numero, complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -191,9 +191,9 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     @Override
     public void update(Escola escola) {
         String sql = "UPDATE escola SET nome = ?, cnpj = ?, email_institucional = ?, telefone = ?, " +
-                     "endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, cep = ?, " +
-                     "nome_responsavel = ?, telefone_responsavel = ?, email_responsavel = ?, status = ?, " +
-                     "atualizado_em = ? WHERE id = ?";
+                "endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, cep = ?, " +
+                "nome_responsavel = ?, telefone_responsavel = ?, email_responsavel = ?, status = ?, " +
+                "atualizado_em = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -225,6 +225,51 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
         } catch (SQLException e) {
             logger.error("Erro ao atualizar escola {}: {}", escola.getNome(), e.getMessage(), e);
             throw new RuntimeException("Erro ao atualizar escola.", e);
+        }
+    }
+
+    /**
+     * Verifica se a escola tem dados acadêmicos/financeiros reais (aluno,
+     * turma, mensalidade) antes de permitir exclusão definitiva. Consulta
+     * direta via SQL para não criar dependência de seguranca -> academico/financeiro.
+     */
+    public boolean possuiDadosVinculados(UUID tenantId) {
+        String sql = "SELECT " +
+                "(SELECT COUNT(1) FROM aluno WHERE tenant_id = ?) + " +
+                "(SELECT COUNT(1) FROM turma WHERE tenant_id = ?) + " +
+                "(SELECT COUNT(1) FROM mensalidade WHERE tenant_id = ?) AS total";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, tenantId);
+            stmt.setObject(2, tenantId);
+            stmt.setObject(3, tenantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getLong("total") > 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar dados vinculados da escola {}: {}", tenantId, e.getMessage(), e);
+            // Falha ao verificar: por segurança, assume que HÁ dados vinculados e bloqueia a exclusão.
+            return true;
+        }
+    }
+
+    /**
+     * Exclui de fato o registro da escola (hard delete). Chamar só depois de
+     * já ter removido os usuarios desse tenant (usuario.tenant_id tem FK para
+     * escola(id)), senão o banco recusa por violação de integridade referencial.
+     */
+    public void delete(UUID id) {
+        String sql = "DELETE FROM escola WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, id);
+            int linhas = stmt.executeUpdate();
+            if (linhas == 0) {
+                throw new RuntimeException("Nenhuma escola encontrada para excluir.");
+            }
+            logger.info("Escola ID {} excluida definitivamente.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao excluir escola {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao excluir escola. Verifique se ainda existem dados vinculados.", e);
         }
     }
 

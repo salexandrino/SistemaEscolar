@@ -125,6 +125,58 @@ public class UsuarioAdminService {
         logger.info("Usuario ID {} inativado administrativamente.", id);
     }
 
+    /**
+     * Reverte a inativação. Sem este método, uma vez inativado o usuário
+     * nunca mais poderia ser reativado pela tela/API — só mexendo direto no banco.
+     */
+    public void reativar(UUID id, AuthUser currentUser) {
+        validarUsuarioAutenticado(currentUser);
+        Usuario usuario = buscarParaAlteracao(id, currentUser);
+        if (usuario.isAtivo()) {
+            throw new BusinessException("Usuario ja esta ativo.");
+        }
+        usuarioRepository.activate(usuario.getId(), usuario.getTenantId());
+        logger.info("Usuario ID {} reativado administrativamente.", id);
+    }
+
+    /**
+     * Exclui de fato o usuário (hard delete) — diferente de inativar(), que só
+     * marca ativo=false. Só permitido para usuário já inativo, como trava de
+     * segurança: evita apagar por engano uma conta em uso, sem antes ter
+     * passado pela etapa de inativação (que ainda é reversível).
+     */
+    public void excluir(UUID id, AuthUser currentUser) {
+        validarUsuarioAutenticado(currentUser);
+        Usuario usuario = buscarParaAlteracao(id, currentUser);
+
+        if (currentUser.getUserId().equals(id)) {
+            throw new BusinessException("Você não pode excluir o próprio usuário.");
+        }
+        if (usuario.isAtivo()) {
+            throw new BusinessException("Só é possível excluir definitivamente um usuário que já esteja inativo. Inative-o primeiro.");
+        }
+
+        usuarioRepository.deleteHard(usuario.getId(), usuario.getTenantId());
+        logger.info("Usuario ID {} excluido definitivamente por {}.", id, currentUser.getCpf());
+    }
+
+    /**
+     * Exclui um usuário (soft delete: inativa a conta permanentemente).
+     * SUPER_ADMIN pode excluir qualquer usuário.
+     * GESTOR só pode excluir usuários do seu próprio tenant.
+     */
+    public void deletar(UUID id, AuthUser currentUser) {
+        validarUsuarioAutenticado(currentUser);
+        Usuario usuario = buscarParaAlteracao(id, currentUser);
+
+        if (!usuario.isAtivo()) {
+            throw new BusinessException("Usuário já está inativo.");
+        }
+
+        usuarioRepository.inactivate(usuario.getId(), usuario.getTenantId());
+        logger.info("Usuario ID {} excluído (soft delete) por {}.", id, currentUser.getCpf());
+    }
+
     private Usuario buscarParaAlteracao(UUID id, AuthUser currentUser) {
         if (isMaster(currentUser)) {
             return usuarioRepository.findById(id)
@@ -150,9 +202,10 @@ public class UsuarioAdminService {
     }
 
     private void validarConflitos(Usuario usuario, AtualizarUsuarioDTO dto, AuthUser currentUser) {
+        String cpfNormalizado = ValidationUtil.extractNumbers(dto.getCpf());
         Optional<Usuario> usuarioComCpf = isMaster(currentUser)
-                ? usuarioRepository.findByCpf(dto.getCpf())
-                : usuarioRepository.findByCpf(dto.getCpf(), currentUser.getTenantId());
+                ? usuarioRepository.findByCpf(cpfNormalizado)
+                : usuarioRepository.findByCpf(cpfNormalizado, currentUser.getTenantId());
         if (usuarioComCpf.isPresent() && !usuarioComCpf.get().getId().equals(usuario.getId())) {
             throw new ConflictException("CPF ja cadastrado.");
         }

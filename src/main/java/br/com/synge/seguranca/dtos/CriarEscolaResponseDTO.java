@@ -12,11 +12,13 @@ public class CriarEscolaResponseDTO {
 
     private final Escola escola;
     private final String emailGestor;
+    private final String cpfGestor;
     private final String senhaGeradaGestor;
 
-    public CriarEscolaResponseDTO(Escola escola, String emailGestor, String senhaGeradaGestor) {
+    public CriarEscolaResponseDTO(Escola escola, String emailGestor, String cpfGestor, String senhaGeradaGestor) {
         this.escola = escola;
         this.emailGestor = emailGestor;
+        this.cpfGestor = cpfGestor;
         this.senhaGeradaGestor = senhaGeradaGestor;
     }
 
@@ -26,6 +28,10 @@ public class CriarEscolaResponseDTO {
 
     public String getEmailGestor() {
         return emailGestor;
+    }
+
+    public String getCpfGestor() {
+        return cpfGestor;
     }
 
     public String getSenhaGeradaGestor() {

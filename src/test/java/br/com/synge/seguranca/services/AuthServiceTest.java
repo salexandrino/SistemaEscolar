@@ -1,7 +1,10 @@
 package br.com.synge.seguranca.services;
 
+import br.com.synge.seguranca.dtos.AlterarSenhaPropriaDTO;
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.seguranca.exceptions.AuthenticationException;
+import br.com.synge.seguranca.exceptions.AuthorizationException;
+import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,5 +91,58 @@ public class AuthServiceTest {
 
         // Garante que o gerador de token NUNCA foi chamado
         verify(jwtService, never()).gerarToken(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve alterar a senha própria com sucesso")
+    void deveAlterarSenhaPropriaComSucesso() {
+        // GIVEN
+        UUID usuarioId = superAdminFake.getId();
+        UUID tenantId = UUID.randomUUID();
+        AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO("senha_antiga", "NovaSenha@123", "NovaSenha@123");
+
+        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(superAdminFake));
+        when(passwordService.verificar("senha_antiga", superAdminFake.getSenhaHash())).thenReturn(true);
+        when(passwordService.criptografar("NovaSenha@123")).thenReturn("$2a$10$NovoHashGerado");
+
+        // WHEN
+        assertDoesNotThrow(() -> {
+            authService.alterarSenhaPropria(usuarioId, tenantId, dto);
+        });
+
+        // THEN
+        verify(usuarioRepository, times(1)).updatePassword(usuarioId, tenantId, "$2a$10$NovoHashGerado");
+    }
+
+    @Test
+    @DisplayName("Deve lançar ValidationException se confirmação de senha não bater")
+    void deveLancarExcecaoSeConfirmacaoNaoBater() {
+        UUID usuarioId = superAdminFake.getId();
+        UUID tenantId = UUID.randomUUID();
+        AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO("senha_antiga", "NovaSenha@123", "SenhaDiferente@123");
+
+        assertThrows(ValidationException.class, () -> {
+            authService.alterarSenhaPropria(usuarioId, tenantId, dto);
+        });
+
+        verify(usuarioRepository, never()).findById(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar AuthorizationException se senha atual estiver incorreta")
+    void deveLancarExcecaoSeSenhaAtualIncorreta() {
+        UUID usuarioId = superAdminFake.getId();
+        UUID tenantId = UUID.randomUUID();
+        AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO("senha_errada", "NovaSenha@123", "NovaSenha@123");
+
+        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(superAdminFake));
+        when(passwordService.verificar("senha_errada", superAdminFake.getSenhaHash())).thenReturn(false);
+
+        assertThrows(AuthorizationException.class, () -> {
+            authService.alterarSenhaPropria(usuarioId, tenantId, dto);
+        });
+
+        verify(passwordService, never()).criptografar(any());
+        verify(usuarioRepository, never()).updatePassword(any(), any(), any());
     }
 }

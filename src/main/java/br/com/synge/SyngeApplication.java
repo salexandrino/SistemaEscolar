@@ -1,65 +1,96 @@
 package br.com.synge;
 
-import br.com.synge.academico.controllers.*;
-import br.com.synge.academico.services.*;
-import br.com.synge.administrativo.controllers.DashboardController;
-import br.com.synge.administrativo.repositories.DashboardRepository;
-import br.com.synge.administrativo.services.DashboardService;
-import br.com.synge.academico.repositories.DisciplinaRepository;
-import br.com.synge.academico.repositories.AnoLetivoRepository;
-import br.com.synge.academico.repositories.SerieRepository;
-import br.com.synge.academico.repositories.SerieDisciplinaRepository;
-import br.com.synge.academico.repositories.TurmaRepository;
-import br.com.synge.academico.repositories.AnoLetivoCloneRepository;
-import br.com.synge.academico.repositories.TurmaDisciplinaProfessorRepository;
-import br.com.synge.academico.repositories.ProfessorRepository;
-import br.com.synge.academico.repositories.AlunoRepository;
-import br.com.synge.academico.repositories.MatriculaRepository;
-import br.com.synge.academico.repositories.DocumentoAlunoRepository;
-import br.com.synge.academico.repositories.HistoricoSituacaoAlunoRepository;
-import br.com.synge.academico.repositories.AvaliacaoRepository;
-import br.com.synge.academico.repositories.NotaRepository;
-import br.com.synge.academico.services.media.CalculoMediaAritmetica;
-import br.com.synge.seguranca.exceptions.AuthenticationException;
-import br.com.synge.seguranca.exceptions.NotFoundException;
-import br.com.synge.seguranca.exceptions.AuthorizationException;
-import br.com.synge.seguranca.exceptions.ValidationException;
-import br.com.synge.seguranca.exceptions.ConflictException;
-import br.com.synge.seguranca.middlewares.AuthMiddleware;
-import br.com.synge.seguranca.middlewares.RoleBasedMiddleware;
-import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
-import br.com.synge.seguranca.models.AuthUser;
-import br.com.synge.seguranca.repositories.UsuarioRepository;
-import br.com.synge.seguranca.repositories.EscolaRepository;
-import br.com.synge.seguranca.services.PasswordService;
-import br.com.synge.seguranca.services.JwtService;
-import br.com.synge.seguranca.enums.Perfil;
-import br.com.synge.config.DatabaseConfig;
-import br.com.synge.config.FlywayConfig;
-import br.com.synge.seguranca.controllers.AuthController;
-import br.com.synge.seguranca.controllers.EscolaController;
-import br.com.synge.seguranca.controllers.UsuarioAdminController;
-import br.com.synge.seguranca.services.AuthService;
-import br.com.synge.seguranca.services.EscolaService;
-import br.com.synge.seguranca.services.UsuarioAdminService;
-import br.com.synge.seguranca.strategies.ValidadorCpf;
-import br.com.synge.seguranca.utils.AuthUserContext;
-import io.javalin.Javalin;
-import io.javalin.apibuilder.ApiBuilder;
-import io.javalin.http.staticfiles.Location;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.sql.SQLException;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import br.com.synge.financeiro.controllers.*;
-import br.com.synge.financeiro.repositories.*;
-import br.com.synge.financeiro.services.*;
+import br.com.synge.academico.controllers.AlocacaoDocenteController;
+import br.com.synge.academico.controllers.AlunoController;
+import br.com.synge.academico.controllers.AnoLetivoController;
+import br.com.synge.academico.controllers.AvaliacaoController;
+import br.com.synge.academico.controllers.DisciplinaController;
+import br.com.synge.academico.controllers.GestaoPedagogicaController;
+import br.com.synge.academico.controllers.MatrizCurricularController;
+import br.com.synge.academico.controllers.ProfessorController;
+import br.com.synge.academico.controllers.SerieController;
+import br.com.synge.academico.controllers.TurmaController;
+import br.com.synge.academico.repositories.AlunoRepository;
+import br.com.synge.academico.repositories.AnoLetivoCloneRepository;
+import br.com.synge.academico.repositories.AnoLetivoRepository;
+import br.com.synge.academico.repositories.AvaliacaoRepository;
+import br.com.synge.academico.repositories.DisciplinaRepository;
+import br.com.synge.academico.repositories.DocumentoAlunoRepository;
+import br.com.synge.academico.repositories.HistoricoSituacaoAlunoRepository;
+import br.com.synge.academico.repositories.MatriculaRepository;
+import br.com.synge.academico.repositories.NotaRepository;
+import br.com.synge.academico.repositories.ProfessorRepository;
+import br.com.synge.academico.repositories.SerieDisciplinaRepository;
+import br.com.synge.academico.repositories.SerieRepository;
+import br.com.synge.academico.repositories.TurmaDisciplinaProfessorRepository;
+import br.com.synge.academico.repositories.TurmaRepository;
+import br.com.synge.academico.services.AlocacaoDocenteService;
+import br.com.synge.academico.services.AlunoService;
+import br.com.synge.academico.services.AnoLetivoService;
+import br.com.synge.academico.services.AvaliacaoService;
+import br.com.synge.academico.services.BoletimService;
+import br.com.synge.academico.services.DisciplinaService;
+import br.com.synge.academico.services.LancamentoNotasService;
+import br.com.synge.academico.services.MatrizCurricularService;
+import br.com.synge.academico.services.ProfessorService;
+import br.com.synge.academico.services.SerieService;
+import br.com.synge.academico.services.TurmaService;
+import br.com.synge.academico.services.media.CalculoMediaAritmetica;
+import br.com.synge.administrativo.controllers.DashboardController;
+import br.com.synge.administrativo.repositories.DashboardRepository;
+import br.com.synge.administrativo.services.DashboardService;
+import br.com.synge.config.DatabaseConfig;
+import br.com.synge.config.FlywayConfig;
+import br.com.synge.financeiro.controllers.AlertaController;
+import br.com.synge.financeiro.controllers.MensalidadeController;
+import br.com.synge.financeiro.controllers.RelatorioFinanceiroController;
+import br.com.synge.financeiro.repositories.DescontoRepository;
+import br.com.synge.financeiro.repositories.MensalidadeRepository;
+import br.com.synge.financeiro.repositories.PagamentoRepository;
+import br.com.synge.financeiro.repositories.ParcelaRepository;
+import br.com.synge.financeiro.services.AlertaService;
+import br.com.synge.financeiro.services.InadimplenciaService;
+import br.com.synge.financeiro.services.MensalidadeService;
+import br.com.synge.financeiro.services.ParcelamentoService;
+import br.com.synge.financeiro.services.RelatorioFinanceiroService;
+import br.com.synge.seguranca.controllers.AuthController;
+import br.com.synge.seguranca.controllers.EscolaController;
+import br.com.synge.seguranca.controllers.UsuarioAdminController;
+import br.com.synge.seguranca.enums.Perfil;
+import br.com.synge.seguranca.exceptions.AuthenticationException;
+import br.com.synge.seguranca.exceptions.AuthorizationException;
+import br.com.synge.seguranca.exceptions.ConflictException;
+import br.com.synge.seguranca.exceptions.NotFoundException;
+import br.com.synge.seguranca.exceptions.ValidationException;
+import br.com.synge.seguranca.middlewares.AuthMiddleware;
+import br.com.synge.seguranca.middlewares.RoleBasedMiddleware;
+import br.com.synge.seguranca.middlewares.SuperAdminMiddleware;
+import br.com.synge.seguranca.models.AuthUser;
+import br.com.synge.seguranca.models.Escola;
+import br.com.synge.seguranca.models.Usuario;
+import br.com.synge.seguranca.repositories.EscolaRepository;
+import br.com.synge.seguranca.repositories.UsuarioRepository;
+import br.com.synge.seguranca.services.AuthService;
+import br.com.synge.seguranca.services.EmailService;
+import br.com.synge.seguranca.services.EscolaService;
+import br.com.synge.seguranca.services.JwtService;
+import br.com.synge.seguranca.services.PasswordService;
+import br.com.synge.seguranca.services.UsuarioAdminService;
+import br.com.synge.seguranca.strategies.ValidadorCpf;
+import br.com.synge.seguranca.utils.AuthUserContext;
+import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 
 public class SyngeApplication {
 
@@ -112,7 +143,8 @@ public class SyngeApplication {
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
         UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
-        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService);
+        EmailService emailService = new EmailService();
+        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService, emailService);
         // Acadêmico
         DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
         AnoLetivoService anoLetivoService = new AnoLetivoService(anoLetivoRepository, cloneRepository);
@@ -232,6 +264,98 @@ public class SyngeApplication {
             Context context = new Context(ctx.req().getLocale());
             ctx.html(templateEngine.process("auth/esqueci-senha", context));
         });
+        app.get("/redefinir-senha", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            ctx.html(templateEngine.process("auth/redefinir-senha", context));
+        });
+        app.get("/hub", ctx -> {
+            try {
+                AuthUser currentUser = AuthUserContext.getAuthUser();
+
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                Context context = new Context(ctx.req().getLocale());
+
+                Usuario usuarioReal = usuarioRepository.findById(currentUser.getUserId())
+                        .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+                
+                Escola escola = null;
+                if (currentUser.getTenantId() != null) {
+                    escola = escolaRepository.findById(currentUser.getTenantId()).orElse(null);
+                }
+
+                context.setVariable("usuarioLogado", usuarioReal);
+                context.setVariable("escolaNome", escola != null ? escola.getNome() : "Sua Instituição");
+
+                // Processa o arquivo do hub diretamente (pois ele mesmo já estende o master-escola)
+                ctx.html(templateEngine.process("dashboard/escolas/hub", context));
+            } catch (Exception e) {
+                // ANTES: esse catch engolia qualquer erro (NPE, erro de template, etc.)
+                // e mandava o usuário de volta pro /login SEM NENHUMA mensagem — o login
+                // parecia "não funcionar" mesmo quando a autenticação tinha dado certo.
+                // Agora loga o erro de verdade, pra dar pra diagnosticar o que quebrou.
+                logger.error("Erro ao renderizar /hub para o usuário logado: {}", e.getMessage(), e);
+                ctx.sessionAttribute("errorMessage", "Ocorreu um erro ao carregar o painel. Tente novamente ou contate o suporte.");
+                ctx.redirect("/login");
+            }
+        });
+
+        // Middlewares para as rotas da UI baseados em hub.html
+        RoleBasedMiddleware uiAcessoPeriodosSeries = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA);
+        RoleBasedMiddleware uiAcessoTurmasAlunos = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA, Perfil.PROFESSOR);
+        RoleBasedMiddleware uiAcessoBoletim = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.PROFESSOR);
+
+        app.before("/portal/anos-letivos", uiAcessoPeriodosSeries);
+        app.before("/portal/series", uiAcessoPeriodosSeries);
+        app.before("/portal/turmas", uiAcessoTurmasAlunos);
+        app.before("/portal/alunos", uiAcessoTurmasAlunos);
+        app.before("/portal/notas", uiAcessoBoletim);
+
+        // Rotas UI do Portal da Escola (Dashboard Gestor)
+        app.get("/portal/anos-letivos", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/anos-letivos");
+            ctx.html(templateEngine.process("dashboard/escola/anos-letivos", context));
+        });
+
+        app.get("/portal/disciplinas", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/academico/disciplinas/index");
+            ctx.html(templateEngine.process("dashboard/academico/disciplinas/index", context));
+        });
+
+        app.get("/portal/series", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/series");
+            ctx.html(templateEngine.process("dashboard/escola/series", context));
+        });
+
+        app.get("/portal/turmas", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/turmas");
+            ctx.html(templateEngine.process("dashboard/escola/turmas", context));
+        });
+
+        app.get("/portal/alunos", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/alunos");
+            ctx.html(templateEngine.process("dashboard/escola/alunos", context));
+        });
+
+        app.get("/portal/notas", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/notas");
+            ctx.html(templateEngine.process("dashboard/escola/notas", context));
+        });
+
+        app.get("/portal/perfil", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "portal/perfil");
+            ctx.html(templateEngine.process("portal/perfil", context));
+        });
 
         // Endpoints de Ações de Autenticação
         app.post("/auth/forgot-password", authController::forgotPassword);
@@ -240,12 +364,41 @@ public class SyngeApplication {
         app.post("/auth/register", authController::register);
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
+        app.patch("/auth/change-password", authController::changePassword);
 
         app.before("/dashboard", superAdminAuth);
         app.before("/dashboard/*", superAdminAuth);
 
 // ... antes do bloco de rotas ...
-        app.before("/api/academico/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA));
+        // ATENÇÃO: não usamos mais um único "/api/academico/*" bloqueando PROFESSOR de tudo.
+        // Antes disso, o professor não conseguia nem lançar a própria nota. Agora cada área
+        // acadêmica tem sua própria regra de acesso:
+
+        // Áreas de uso do professor no dia a dia: avaliações, notas/recuperação/simulador,
+        // boletim e a própria grade de aulas. Secretaria/Gestor/Super Admin continuam com acesso total a essas também.
+        RoleBasedMiddleware academicoDocente = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA, Perfil.PROFESSOR);
+        app.before("/api/academico/avaliacoes", academicoDocente);
+        app.before("/api/academico/avaliacoes/*", academicoDocente);
+        app.before("/api/academico/notas", academicoDocente);
+        app.before("/api/academico/notas/*", academicoDocente);
+        app.before("/api/academico/boletins", academicoDocente);
+        app.before("/api/academico/professores/{id}/grade", academicoDocente);
+
+        // Áreas administrativas/estruturais (matrícula, turma, matriz curricular, disciplinas,
+        // séries, ano letivo, alocação docente, CRUD de professor): só quem organiza a escola.
+        RoleBasedMiddleware academicoAdministrativo = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA);
+        app.before("/api/academico/disciplinas", academicoAdministrativo);
+        app.before("/api/academico/disciplinas/*", academicoAdministrativo);
+        app.before("/api/academico/anos-letivos", academicoAdministrativo);
+        app.before("/api/academico/anos-letivos/*", academicoAdministrativo);
+        app.before("/api/academico/series", academicoAdministrativo);
+        app.before("/api/academico/series/*", academicoAdministrativo);
+        app.before("/api/academico/turmas", academicoAdministrativo);
+        app.before("/api/academico/turmas/*", academicoAdministrativo);
+        app.before("/api/academico/professores", academicoAdministrativo);
+        app.before("/api/academico/professores/{id}", academicoAdministrativo);
+        app.before("/api/academico/alunos", academicoAdministrativo);
+        app.before("/api/academico/alunos/*", academicoAdministrativo);
 
         // SOLUÇÃO DEFINITIVA: Mapeamento linear direto na instância 'app' (Livre de erros de versão do Javalin)
         app.post("/api/academico/avaliacoes", avaliacaoController::criar);
@@ -267,6 +420,7 @@ public class SyngeApplication {
         app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
         app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
         app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
+        app.post("/dashboard/escolas/{id}/deletar", escolaController::deletarEscola);
 
         // Gestão de Usuários
         app.get("/dashboard/usuarios", dashboardController::usuarios);
@@ -274,6 +428,7 @@ public class SyngeApplication {
         app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
         app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
         app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
+        app.post("/dashboard/usuarios/{id}/deletar", usuarioAdminController::deletar);
 
         app.get("/area-logada", ctx -> {
             try {
@@ -301,6 +456,9 @@ public class SyngeApplication {
         app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
         app.patch("/users/{id}/unlock", usuarioAdminController::desbloquear);
         app.post("/users/{id}/unlock", usuarioAdminController::desbloquear);
+        app.patch("/users/{id}/reativar", usuarioAdminController::reativar);
+        app.post("/users/{id}/reativar", usuarioAdminController::reativar);
+        app.delete("/users/{id}/excluir", usuarioAdminController::excluir);
         app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
 
         app.post("/users/{id}/inativar", usuarioAdminController::inativar);
@@ -320,6 +478,7 @@ public class SyngeApplication {
 
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
         app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
+        app.delete("/escolas/{id}/excluir", escolaController::excluirEscola);
 
         app.get("/api/escolas", escolaController::listarEscolas);
         app.get("/api/escolas/{id}", escolaController::obterEscola);
@@ -491,4 +650,4 @@ public class SyngeApplication {
                 )
         );
     }
-}
+}git status

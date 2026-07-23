@@ -1,5 +1,6 @@
 package br.com.synge.seguranca.services;
 
+import br.com.synge.seguranca.dtos.AlterarSenhaPropriaDTO;
 import br.com.synge.seguranca.enums.Perfil;
 import br.com.synge.seguranca.exceptions.*;
 import br.com.synge.seguranca.models.AuthUser;
@@ -25,15 +26,17 @@ public class AuthService {
     private final EscolaRepository escolaRepository;
     private final PasswordService passwordService;
     private final JwtService jwtService;
+    private final EmailService emailService;
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
     private final Random random = new Random();
 
-    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService) {
+    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.escolaRepository = escolaRepository;
         this.passwordService = passwordService;
         this.jwtService = jwtService;
+        this.emailService = emailService;
 
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
@@ -54,8 +57,11 @@ public class AuthService {
 
     public String autenticar(String cpf, String senha) {
         ValidationUtil.validarCpfComStrategy(cpf);
+        // Mesma normalização usada ao salvar (Usuario.setCpf): sem isso, um CPF
+        // digitado/mascarado de forma diferente da que foi gravado nunca dá match.
+        String cpfNormalizado = ValidationUtil.extractNumbers(cpf);
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpf);
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpfNormalizado);
         if (optionalUsuario.isEmpty()) {
             logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
             throw new AuthenticationException("CPF não cadastrado. Por favor, crie uma conta para continuar.");
@@ -226,9 +232,8 @@ public class AuthService {
 
             try {
                 usuarioRepository.update(usuario);
-                logger.info("Código de recuperação gerado para usuário {}. Código: {}", usuario.getEmail(), recoveryCode);
-                // Em ambiente de desenvolvimento, imprimimos o código no console para testes
-                System.out.println("CÓDIGO DE RECUPERAÇÃO PARA " + usuario.getEmail() + ": " + recoveryCode);
+                logger.info("Código de recuperação gerado para usuário {}.", usuario.getEmail());
+                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryCode);
             } catch (Exception e) {
                 logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
@@ -299,5 +304,32 @@ public class AuthService {
         );
 
         return token;
+    }
+
+    public void alterarSenhaPropria(UUID usuarioId, UUID tenantId, AlterarSenhaPropriaDTO dto) {
+        if (!dto.getNovaSenha().equals(dto.getConfirmacaoNovaSenha())) {
+            throw new ValidationException("As senhas não conferem.");
+        }
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+
+        if (!passwordService.verificar(dto.getSenhaAtual(), usuario.getSenhaHash())) {
+            throw new AuthorizationException("Senha atual incorreta.");
+        }
+
+        ValidationUtil.validatePasswordComplexity(dto.getNovaSenha());
+
+        String novoHash = passwordService.hash(dto.getNovaSenha());
+        usuario.setSenhaHash(novoHash);
+
+        // O prompt pede "persiste via usuarioRepository.updateCadastro(usuario)" mas esse método
+        // atualiza a data e outros campos, e especificamente a senha? Espera, o updateCadastro atualiza
+        // (escola_id, nome_completo, email, cpf, telefone, atualizado_em). Não atualiza senha_hash!
+        // No passo anterior vimos o repositório. O repositório tem updatePassword(UUID id, UUID tenantId, String newPasswordHash).
+        // Vou usar o updatePassword do repository que é feito para isso.
+        usuarioRepository.updatePassword(usuarioId, tenantId, novoHash);
+        
+        logger.info("Usuário {} alterou a própria senha com sucesso.", usuarioId);
     }
 }

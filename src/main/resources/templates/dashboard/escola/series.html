@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Séries e Matriz Curricular - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Séries & Matriz Curricular</h2>
+        <button class="btn btn-primary" onclick="alert('Funcionalidade de criação a ser implementada')">
+            <i class="bi bi-plus-lg me-1"></i> Nova Série
+        </button>
+    </div>
+
+    <div class="row">
+        <!-- Lista de Séries -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold">Séries Cadastradas</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="lista-series">
+                        <div class="p-3 text-center text-muted">Carregando séries...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matriz Curricular da Série Selecionada -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold" id="titulo-matriz">Matriz Curricular</h6>
+                    <button class="btn btn-sm btn-outline-primary" id="btn-add-disciplina" style="display: none;" onclick="alert('Funcionalidade de adicionar disciplina a ser implementada')">
+                        <i class="bi bi-plus"></i> Adicionar Disciplina
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Disciplina</th>
+                                <th>Carga Horária</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tabela-matriz">
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Selecione uma série para ver sua matriz curricular.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', carregarSeries);
+
+        let serieSelecionadaId = null;
+
+        function carregarSeries() {
+            fetch('/api/academico/series')
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao carregar séries');
+                    return response.json();
+                })
+                .then(dados => renderizarSeries(dados))
+                .catch(erro => {
+                    console.error(erro);
+                    document.getElementById('lista-series').innerHTML =
+                        `<div class="p-3 text-center text-danger">Erro ao carregar dados. ${erro.message}</div>`;
+                });
+        }
+
+        function renderizarSeries(dados) {
+            const lista = document.getElementById('lista-series');
+            lista.innerHTML = '';
+
+            if (!dados || dados.length === 0) {
+                lista.innerHTML = '<div class="p-3 text-center text-muted">Nenhuma série encontrada.</div>';
+                return;
+            }
+
+            dados.forEach(serie => {
+                const button = document.createElement('button');
+                button.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+                button.innerHTML = `
+                    <span>\${serie.nome} <br><small class="text-muted">\${serie.etapaEnsino || ''}</small></span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                `;
+                button.onclick = () => selecionarSerie(serie.id, serie.nome, button);
+                lista.appendChild(button);
+            });
+        }
+
+        function selecionarSerie(id, nome, elemento) {
+            // Atualiza UI
+            document.querySelectorAll('#lista-series button').forEach(b => b.classList.remove('active', 'bg-light'));
+            elemento.classList.add('active', 'bg-light');
+            elemento.classList.remove('text-white'); // Ajuste pra não ficar branco no bg-light se tiver theme
+            
+            serieSelecionadaId = id;
+            document.getElementById('titulo-matriz').innerText = `Matriz Curricular - \${nome}`;
+            document.getElementById('btn-add-disciplina').style.display = 'inline-block';
+            
+            carregarMatriz(id);
+        }
+
+        function carregarMatriz(idSerie) {
+            const tbody = document.getElementById('tabela-matriz');
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">Carregando matriz...</td></tr>';
+            
+            fetch(`/api/academico/series/\${idSerie}/matriz`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao carregar matriz curricular');
+                    return response.json();
+                })
+                .then(dados => renderizarMatriz(dados))
+                .catch(erro => {
+                    console.error(erro);
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4">Erro ao carregar matriz. ${erro.message}</td></tr>`;
+                });
+        }
+
+        function renderizarMatriz(dados) {
+            const tbody = document.getElementById('tabela-matriz');
+            tbody.innerHTML = '';
+
+            if (!dados || dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Nenhuma disciplina cadastrada nesta matriz.</td></tr>';
+                return;
+            }
+
+            dados.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4 fw-medium">\${item.disciplina ? item.disciplina.nome : item.nomeDisciplina || 'Desconhecida'}</td>
+                    <td>\${item.cargaHoraria || '-'}h</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-danger" onclick="removerDisciplina('\${item.disciplinaId}')" title="Remover"><i class="bi bi-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removerDisciplina(idDisciplina) {
+            if(!serieSelecionadaId) return;
+            if(!confirm('Deseja remover esta disciplina da matriz curricular?')) return;
+            
+            fetch(`/api/academico/series/\${serieSelecionadaId}/matriz/\${idDisciplina}`, { method: 'DELETE' })
+                .then(response => {
+                    if(response.ok) carregarMatriz(serieSelecionadaId);
+                    else alert('Erro ao remover disciplina.');
+                });
+        }
+    </script>
+</div>
+</body>
+</html>

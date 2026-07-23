@@ -81,7 +81,11 @@ public class Usuario {
     }
 
     public void setCpf(String cpf) {
-        this.cpf = cpf;
+        // Normaliza para só dígitos. Sem isso, telas diferentes (login sempre manda
+        // com máscara "000.000.000-00"; cadastro de escola manda cru, sem máscara)
+        // gravavam/consultavam formatos diferentes do "mesmo" CPF, e o WHERE cpf = ?
+        // no login não batia — aparecia "CPF não cadastrado" mesmo sendo o CPF certo.
+        this.cpf = cpf != null ? cpf.replaceAll("\\D", "") : null;
     }
 
     public String getTelefone() {
@@ -247,6 +251,18 @@ public class Usuario {
         }
 
         return "***." + cpf.substring(3, 6) + ".***-**";
+    }
+
+    /**
+     * CPF completo, formatado (000.000.000-00), para exibição nas telas.
+     * O cpf em si agora é sempre gravado só com dígitos (ver setCpf), então
+     * as telas não podem mais exibir "usuario.cpf" cru sem formatação.
+     */
+    public String getCpfFormatado() {
+        if (cpf == null || cpf.length() != 11) {
+            return cpf;
+        }
+        return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9, 11);
     }
 
     public String getEmailMascarado() {

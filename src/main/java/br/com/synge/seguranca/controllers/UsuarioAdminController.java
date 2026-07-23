@@ -192,6 +192,50 @@ public class UsuarioAdminController {
         }
     }
 
+    public void reativar(Context ctx) {
+        try {
+            UUID id = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            usuarioAdminService.reativar(id, currentUser);
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Usuario reativado com sucesso."));
+        } catch (AuthenticationException | AuthorizationException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao reativar usuario: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Erro ao reativar usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+            logger.warn("ID de usuario invalido: {}", e.getMessage());
+        } catch (Exception e) {
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao reativar usuario.");
+            logger.error("Erro inesperado ao reativar usuario: {}", e.getMessage(), e);
+        }
+    }
+
+    public void excluir(Context ctx) {
+        try {
+            UUID id = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            usuarioAdminService.excluir(id, currentUser);
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Usuario excluido definitivamente com sucesso."));
+        } catch (AuthenticationException | AuthorizationException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao excluir usuario: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Erro ao excluir usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+            logger.warn("ID de usuario invalido: {}", e.getMessage());
+        } catch (Exception e) {
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao excluir usuario.");
+            logger.error("Erro inesperado ao excluir usuario: {}", e.getMessage(), e);
+        }
+    }
+
     public void alterarPerfil(Context ctx) {
         try {
             UUID id = UUID.fromString(ctx.pathParam("id"));
@@ -199,7 +243,7 @@ public class UsuarioAdminController {
             AtualizarPerfilUsuarioDTO dto = ctx.bodyAsClass(AtualizarPerfilUsuarioDTO.class);
             usuarioAdminService.alterarPerfil(id, dto, currentUser);
             ctx.status(HttpStatus.OK);
-            ctx.json(Map.of("message", "Perfil do usuario updated com sucesso."));
+            ctx.json(Map.of("message", "Perfil do usuario atualizado com sucesso."));
         } catch (AuthenticationException | AuthorizationException e) {
             responderErro(ctx, e.getStatus(), e.getMessage());
             logger.warn("Falha ao alterar perfil de usuario: {}", e.getMessage());
@@ -212,6 +256,38 @@ public class UsuarioAdminController {
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao alterar perfil de usuario.");
             logger.error("Erro inesperado ao alterar perfil de usuario: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * POST /dashboard/usuarios/{id}/deletar - Exclui (inativa) um usuário
+     */
+    public void deletar(Context ctx) {
+        try {
+            UUID id = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            usuarioAdminService.deletar(id, currentUser);
+
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/usuarios");
+                return;
+            }
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Usuário excluído com sucesso."));
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao excluir usuario: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Erro ao excluir usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+        } catch (Exception e) {
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao excluir usuario.");
+            logger.error("Erro inesperado ao excluir usuario: {}", e.getMessage(), e);
         }
     }
 

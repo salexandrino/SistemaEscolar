@@ -72,21 +72,28 @@
                 <div class="row">
                     <div class="col-md-8 mb-3">
                         <label class="form-label">Logradouro / Endereço</label>
-                        <input type="text" name="endereco" class="form-control" placeholder="Rua, Avenida, etc.">
+                        <input type="text" name="endereco" class="form-control" placeholder="Rua, Avenida, etc." required>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label class="form-label">CEP</label>
-                        <input type="text" name="cep" class="form-control" placeholder="00000-000">
+                        <input type="text" name="cep" class="form-control" placeholder="00000-000" required>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Cidade</label>
-                        <input type="text" name="cidade" class="form-control" placeholder="Cidade">
+                        <label class="form-label">Bairro</label>
+                        <input type="text" name="bairro" class="form-control" placeholder="Bairro" required>
                     </div>
 
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" name="cidade" class="form-control" placeholder="Cidade" required>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Estado (UF)</label>
                         <select name="estado" class="form-select">

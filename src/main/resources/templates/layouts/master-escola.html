@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:fragment="html(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNGE - Portal Escolar</title>
+    <!-- Bootstrap 5 e Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        /* Estrutura Física da Sidebar */
+        .sidebar {
+            min-height: 100vh;
+            width: 260px;
+            position: fixed;
+            background-color: #0a4b29; /* Verde Escuro oficial do Synge extraído do seu gráfico */
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            background-color: #f8f9fa; /* Fundo cinza claro idêntico ao painel admin */
+            min-height: 100vh;
+        }
+
+        /* Ajuste do container da Logo Oficial no Topo */
+        .logo-container-sidebar {
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        .logo-oficial-topo {
+            max-height: 100%;
+            max-width: 150px;
+            object-fit: contain;
+        }
+
+        /* Padronização dos links da Sidebar para remover os azuis do Bootstrap */
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.75) !important;
+            transition: all 0.2s ease;
+        }
+        .sidebar .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        /* Item ativo ganha o mesmo verde médio de destaque do painel admin */
+        .sidebar .nav-link.active {
+            color: #ffffff !important;
+            background-color: #198754 !important;
+            font-weight: 500;
+        }
+
+        /* Sobrescrita global para garantir que botões primários do hub usem o Verde em vez de Azul */
+        .btn-primary {
+            background-color: #198754 !important;
+            border-color: #198754 !important;
+        }
+        .btn-primary:hover {
+            background-color: #146c43 !important;
+            border-color: #13653f !important;
+        }
+        .text-green-primary {
+            color: #198754 !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar do Portal Escolar -->
+<div class="sidebar d-flex flex-column p-3">
+
+    <!-- Topo da Sidebar: Apenas a Logo Oficial (Sem textos duplicados) -->
+    <div class="logo-container-sidebar mb-4 px-2">
+        <img src="/images/logo.png" alt="SYNGE" class="logo-oficial-topo">
+    </div>
+    <hr class="border-light opacity-25">
+
+    <!-- Links de Navegação -->
+    <ul class="nav nav-pills flex-column mb-auto gap-1">
+        <li class="nav-item">
+            <a href="/hub" class="nav-link active">
+                <i class="bi bi-grid-1x2-fill me-2"></i> Painel Inicial
+            </a>
+        </li>
+        <li>
+            <a href="/portal/turmas" class="nav-link">
+                <i class="bi bi-collection-fill me-2"></i> Minhas Turmas
+            </a>
+        </li>
+        <li>
+            <a href="/portal/alunos" class="nav-link">
+                <i class="bi bi-people-fill me-2"></i> Alunos
+            </a>
+        </li>
+        <li>
+            <a href="/portal/notas" class="nav-link">
+                <i class="bi bi-journal-bookmark-fill me-2"></i> Notas
+            </a>
+        </li>
+    </ul>
+    <hr class="border-light opacity-25">
+
+    <!-- Rodapé da Sidebar: Menu Dropdown do Usuário -->
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle w-100" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong class="text-truncate" style="max-width: 150px;">Meu Perfil</strong>
+        </a>
+        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser">
+            <li><a class="dropdown-item" href="/portal/perfil">Minha Conta</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <form action="/auth/logout" method="post">
+                    <button type="submit" class="dropdown-item text-danger">Sair</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Área do Conteúdo Dinâmico -->
+<div class="main-content">
+    <div th:replace="${content}"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

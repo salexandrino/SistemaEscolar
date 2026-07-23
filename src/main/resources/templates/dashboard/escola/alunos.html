@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Consultar Alunos - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Alunos</h2>
+        <button class="btn btn-primary" onclick="alert('Funcionalidade de matrícula a ser implementada')">
+            <i class="bi bi-person-plus-fill me-1"></i> Nova Matrícula
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Nome do Aluno</th>
+                        <th>Matrícula</th>
+                        <th>Situação</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabela-alunos">
+                    <tr><td colspan="4" class="text-center py-4">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', carregarAlunos);
+
+        function carregarAlunos() {
+            fetch('/api/academico/alunos')
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro ao carregar alunos');
+                    return response.json();
+                })
+                .then(dados => renderizarTabela(dados))
+                .catch(erro => {
+                    console.error(erro);
+                    document.getElementById('tabela-alunos').innerHTML =
+                        `<tr><td colspan="4" class="text-center text-danger py-4">Erro ao carregar dados. ${erro.message}</td></tr>`;
+                });
+        }
+
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('tabela-alunos');
+            tbody.innerHTML = '';
+
+            if (!dados || dados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">Nenhum aluno encontrado.</td></tr>';
+                return;
+            }
+
+            dados.forEach(aluno => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4 fw-medium">\${aluno.nome}</td>
+                    <td>\${aluno.numeroMatricula || '-'}</td>
+                    <td>
+                        <span class="badge bg-secondary">\${aluno.situacao || 'DESCONHECIDO'}</span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm btn-outline-info me-1" onclick="verHistorico('\${aluno.id}')" title="Histórico Escolar"><i class="bi bi-file-earmark-text"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alterarSituacao('\${aluno.id}')" title="Alterar Situação"><i class="bi bi-arrow-repeat"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="transferir('\${aluno.id}')" title="Transferir"><i class="bi bi-box-arrow-right"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function verHistorico(id) {
+            alert('Emitindo Histórico Escolar para o aluno: ' + id);
+            fetch(`/api/academico/alunos/\${id}/historico-escolar`)
+                .then(res => res.ok ? res.json() : null)
+                .then(data => console.log('Histórico:', data))
+                .catch(err => console.error(err));
+        }
+
+        function alterarSituacao(id) {
+            const novaSituacao = prompt("Digite a nova situação (ex: ATIVO, INATIVO, TRANCADO):");
+            if(!novaSituacao) return;
+            fetch(`/api/academico/alunos/\${id}/situacao`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ situacao: novaSituacao })
+            }).then(response => {
+                if(response.ok) carregarAlunos();
+                else alert('Erro ao alterar situação.');
+            });
+        }
+
+        function transferir(id) {
+            if(!confirm('Deseja iniciar o processo de transferência para este aluno?')) return;
+            fetch(`/api/academico/alunos/\${id}/transferencias`, { method: 'POST' })
+                .then(response => {
+                    if(response.ok) carregarAlunos();
+                    else alert('Erro ao registrar transferência.');
+                });
+        }
+    </script>
+</div>
+</body>
+</html>

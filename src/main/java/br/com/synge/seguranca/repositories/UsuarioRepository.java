@@ -232,8 +232,11 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             usuario.setId(UUID.randomUUID());
             usuario.setCriadoEm(LocalDateTime.now());
             usuario.setAtualizadoEm(LocalDateTime.now());
-            usuario.setAtivo(false); // PENDENTE_APROVACAO
-            usuario.setBloqueado(false);
+            // NÃO decidir ativo/bloqueado aqui: quem chama este método já define o
+            // valor correto antes (AuthService.register() põe false para auto-cadastro
+            // público; EscolaService.cadastrarEscola() põe true para o Gestor criado
+            // junto com a escola). Forçar aqui sempre para false quebrava o Gestor,
+            // que nunca conseguia logar mesmo já devendo nascer ativo.
             usuario.setTentativasLogin(0);
 
             // Ensure tenantId is set on entity
@@ -411,6 +414,63 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         } catch (SQLException e) {
             logger.error("Erro ao inativar usuario ID {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Erro ao inativar usuario no banco de dados.", e);
+        }
+    }
+
+    // Simétrico ao inactivate(): antes só existia inativar, sem forma de reverter
+    // pela UI/API além de mexer direto no banco.
+    public void activate(UUID id, UUID tenantId) {
+        String sql = "UPDATE usuario SET ativo = TRUE, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(2, id);
+            stmt.setObject(3, tenantId);
+            stmt.executeUpdate();
+            logger.info("Usuario ID {} reativado.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao reativar usuario ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao reativar usuario no banco de dados.", e);
+        }
+    }
+
+    /**
+     * Exclui de fato o registro do usuário (hard delete). Diferente de
+     * inactivate()/activate(), que só alternam a flag "ativo". Não há FK
+     * apontando para usuario.id no schema atual, então é seguro no nível de banco.
+     */
+    public void deleteHard(UUID id, UUID tenantId) {
+        String sql = "DELETE FROM usuario WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, id);
+            stmt.setObject(2, tenantId);
+            int linhas = stmt.executeUpdate();
+            if (linhas == 0) {
+                throw new RuntimeException("Nenhum usuario encontrado para excluir.");
+            }
+            logger.info("Usuario ID {} excluido definitivamente.", id);
+        } catch (SQLException e) {
+            logger.error("Erro ao excluir usuario ID {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao excluir usuario no banco de dados.", e);
+        }
+    }
+
+    /**
+     * Exclui todos os usuários de um tenant. Usado ao excluir uma escola
+     * definitivamente, já que usuario.tenant_id tem FK para escola(id) —
+     * sem isso, a exclusão da escola falharia por violação de FK.
+     */
+    public void deleteAllByTenant(UUID tenantId) {
+        String sql = "DELETE FROM usuario WHERE tenant_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, tenantId);
+            int linhas = stmt.executeUpdate();
+            logger.info("{} usuario(s) excluido(s) definitivamente do tenant {}.", linhas, tenantId);
+        } catch (SQLException e) {
+            logger.error("Erro ao excluir usuarios do tenant {}: {}", tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao excluir usuarios do tenant no banco de dados.", e);
         }
     }
 

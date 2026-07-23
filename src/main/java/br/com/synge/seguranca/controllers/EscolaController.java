@@ -117,6 +117,7 @@ public class EscolaController {
             dto.setEmailInstitucional(ctx.formParam("emailInstitucional"));
             dto.setTelefone(ctx.formParam("telefone"));
             dto.setEndereco(ctx.formParam("endereco"));
+            dto.setBairro(ctx.formParam("bairro"));
             dto.setCep(ctx.formParam("cep"));
             dto.setCidade(ctx.formParam("cidade"));
             dto.setEstado(ctx.formParam("estado"));
@@ -130,6 +131,11 @@ public class EscolaController {
             // Flash de sessão só pra essa próxima requisição — a senha em texto puro
             // nunca é salva em lugar nenhum, é mostrada uma única vez pro Super Admin.
             ctx.sessionAttribute("gestorEmailGerado", resultado.getEmailGestor());
+            String cpfGestorBruto = resultado.getCpfGestor();
+            String cpfGestorFormatado = (cpfGestorBruto != null && cpfGestorBruto.length() == 11)
+                    ? cpfGestorBruto.substring(0, 3) + "." + cpfGestorBruto.substring(3, 6) + "." + cpfGestorBruto.substring(6, 9) + "-" + cpfGestorBruto.substring(9, 11)
+                    : cpfGestorBruto;
+            ctx.sessionAttribute("gestorCpfGerado", cpfGestorFormatado);
             ctx.sessionAttribute("gestorSenhaGerada", resultado.getSenhaGeradaGestor());
 
             ctx.status(201);
@@ -475,6 +481,81 @@ public class EscolaController {
         }
     }
 
+    /**
+     * DELETE /escolas/{id}/excluir - Exclui definitivamente a escola (hard delete).
+     */
+    public void excluirEscola(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
+            escolaService.excluirEscola(escolaId, currentUser);
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Escola excluída definitivamente com sucesso."));
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha na exclusão de escola: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Erro na exclusão de escola: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            ctx.json(Map.of("message", "ID de escola inválido."));
+            logger.warn("ID de escola inválido: {}", e.getMessage());
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao excluir escola: {}", e.getMessage(), e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("message", "Erro interno ao excluir escola."));
+        }
+    }
+
+    /**
+     * POST /dashboard/escolas/{id}/deletar - Exclui uma escola (soft delete)
+     * Usa POST pois formulários HTML não suportam DELETE nativamente.
+     */
+    public void deletarEscola(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+
+            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
+            escolaService.deletarEscola(escolaId, currentUser);
+
+            String referer = ctx.header("Referer");
+            if (referer != null && referer.contains("/dashboard/")) {
+                ctx.redirect("/dashboard/escolas");
+                return;
+            }
+
+            ctx.status(HttpStatus.OK);
+            ctx.json(Map.of("message", "Escola excluída com sucesso."));
+
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Falha ao excluir escola: {}", e.getMessage());
+        } catch (NotFoundException | BusinessException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("message", e.getMessage()));
+            logger.warn("Erro ao excluir escola: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST);
+            ctx.json(Map.of("message", "ID de escola inválido."));
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao excluir escola: {}", e.getMessage(), e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("message", "Erro interno ao excluir escola."));
+        }
+    }
+
     public void exibirPaginaListagem(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -489,12 +570,15 @@ public class EscolaController {
             model.put("escolas", escolas);
 
             String gestorEmail = ctx.sessionAttribute("gestorEmailGerado");
+            String gestorCpf = ctx.sessionAttribute("gestorCpfGerado");
             String gestorSenha = ctx.sessionAttribute("gestorSenhaGerada");
             if (gestorEmail != null && gestorSenha != null) {
                 model.put("gestorEmailGerado", gestorEmail);
+                model.put("gestorCpfGerado", gestorCpf);
                 model.put("gestorSenhaGerada", gestorSenha);
                 // flash: mostra só uma vez, some depois desse render
                 ctx.sessionAttribute("gestorEmailGerado", null);
+                ctx.sessionAttribute("gestorCpfGerado", null);
                 ctx.sessionAttribute("gestorSenhaGerada", null);
             }
 
