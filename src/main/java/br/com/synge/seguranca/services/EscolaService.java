@@ -14,6 +14,7 @@ import br.com.synge.seguranca.models.Escola;
 import br.com.synge.seguranca.models.Usuario;
 import br.com.synge.seguranca.repositories.EscolaRepository;
 import br.com.synge.seguranca.repositories.UsuarioRepository;
+import br.com.synge.seguranca.services.observers.EscolaCadastradaObserver;
 import br.com.synge.seguranca.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +31,21 @@ public class EscolaService {
     private final EscolaRepository escolaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordService passwordService;
+    private final List<EscolaCadastradaObserver> observers = new java.util.ArrayList<>();
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository, PasswordService passwordService) {
         this.escolaRepository = escolaRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordService = passwordService;
+    }
+
+    /**
+     * Padrão Observer (mesmo molde do AlunoService.adicionarObserver): registra
+     * quem deve ser notificado sempre que uma escola nova for cadastrada.
+     */
+    public void adicionarObserver(EscolaCadastradaObserver observer) {
+        observers.add(observer);
     }
 
     /**
@@ -156,6 +166,20 @@ public class EscolaService {
 
         logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
                 escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
+
+        // Padrão Observer: notifica quem estiver registrado (auditoria,
+        // e-mail com credenciais, etc.) sem o EscolaService precisar
+        // conhecer os detalhes de cada reação.
+        for (EscolaCadastradaObserver observer : observers) {
+            try {
+                observer.aoCadastrarEscola(escolaSalva, gestor, senhaGerada);
+            } catch (Exception e) {
+                // Um observador falhar não pode derrubar o cadastro da escola,
+                // que já foi salvo no banco antes desta notificação.
+                logger.error("Observador {} falhou ao processar cadastro de escola: {}",
+                        observer.getClass().getSimpleName(), e.getMessage(), e);
+            }
+        }
 
         return new CriarEscolaResponseDTO(escolaSalva, gestor.getEmail(), gestor.getCpf(), senhaGerada);
     }

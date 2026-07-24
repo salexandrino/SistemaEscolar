@@ -89,6 +89,28 @@ public class EmailService {
         }
     }
 
+    public void enviarCredenciaisGestor(String destinatario, String nomeGestor, String cpf, String senhaTemporaria) {
+        String assunto = "SYNGE — Acesso do Gestor criado";
+        String corpo = "Olá" + (nomeGestor != null ? ", " + nomeGestor : "") + ",\n\n"
+                + "Uma conta de Gestor foi criada para você no SYNGE.\n\n"
+                + "CPF de login: " + cpf + "\n"
+                + "Senha temporária: " + senhaTemporaria + "\n\n"
+                + "Por segurança, altere essa senha assim que fizer o primeiro acesso.\n\n"
+                + "Equipe SYNGE";
+
+        if (!configurado) {
+            logger.info("[E-MAIL SIMULADO] Para: {} | Assunto: {} | CPF: {}", destinatario, assunto, cpf);
+            return;
+        }
+
+        try {
+            enviar(destinatario, assunto, corpo);
+            logger.info("E-mail de credenciais de Gestor enviado para {}.", destinatario);
+        } catch (MessagingException e) {
+            logger.error("Falha ao enviar e-mail de credenciais para {}: {}", destinatario, e.getMessage(), e);
+        }
+    }
+
     private void enviar(String destinatario, String assunto, String corpo) throws MessagingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

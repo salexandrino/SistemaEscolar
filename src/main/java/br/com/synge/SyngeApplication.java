@@ -141,9 +141,17 @@ public class SyngeApplication {
 
         // 2. Inicialização dos Services
         DashboardService dashboardService = new DashboardService(dashboardRepository);
-        EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
-        UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         EmailService emailService = new EmailService();
+
+        EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
+        // Padrão Observer: registra quem deve ser notificado quando uma
+        // escola nova for cadastrada (mesmo molde do alunoService.adicionarObserver
+        // já usado em academico). Pra adicionar uma nova reação, basta
+        // implementar EscolaCadastradaObserver e registrar aqui.
+        escolaService.adicionarObserver(new br.com.synge.seguranca.services.observers.AuditLogEscolaObserver());
+        escolaService.adicionarObserver(new br.com.synge.seguranca.services.observers.EmailGestorObserver(emailService));
+
+        UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
         AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService, emailService);
         // Acadêmico
         DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
@@ -281,7 +289,7 @@ public class SyngeApplication {
 
                 Usuario usuarioReal = usuarioRepository.findById(currentUser.getUserId())
                         .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
-                
+
                 Escola escola = null;
                 if (currentUser.getTenantId() != null) {
                     escola = escolaRepository.findById(currentUser.getTenantId()).orElse(null);

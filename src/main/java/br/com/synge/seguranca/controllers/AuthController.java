@@ -44,8 +44,14 @@ public class AuthController {
     public void login(Context ctx) {
         try {
             LoginDTO loginDTO = new LoginDTO();
-            loginDTO.setCpf(ctx.formParam("cpf"));
-            loginDTO.setSenha(ctx.formParam("senha"));
+            // .trim() é essencial aqui: o BCrypt compara byte a byte, então um
+            // espaço em branco extra vindo de copy-paste da senha temporária
+            // (mostrada na tela pro Super Admin) já é o suficiente pra dar
+            // "CPF ou senha inválidos" mesmo com a senha certa.
+            String cpfParam = ctx.formParam("cpf");
+            String senhaParam = ctx.formParam("senha");
+            loginDTO.setCpf(cpfParam != null ? cpfParam.trim() : null);
+            loginDTO.setSenha(senhaParam != null ? senhaParam.trim() : null);
 
             if (loginDTO.getCpf() == null || loginDTO.getCpf().isBlank()) {
                 throw new ValidationException("O CPF não pode estar em branco.");
