@@ -96,7 +96,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Estado (UF)</label>
-                        <select name="estado" class="form-select">
+                        <select name="estado" class="form-select" required>
                             <option value="">Selecione...</option>
                             <option value="AC">AC</option> <option value="AL">AL</option>
                             <option value="AP">AP</option> <option value="AM">AM</option>
@@ -112,6 +112,160 @@
                             <option value="RR">RR</option> <option value="SC">SC</option>
                             <option value="SP">SP</option> <option value="SE">SE</option>
                             <option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+
+                
+                <h5 class="text-primary mt-3 mb-3">Dados do Educacenso</h5>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Código INEP</label>
+                        <input type="text" name="codigoInep" class="form-control" placeholder="00000000" maxlength="8">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Situação de Funcionamento</label>
+                        <select name="situacaoFuncionamento" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="EM_ATIVIDADE">Em Atividade</option>
+                            <option value="PARALISADA">Paralisada</option>
+                            <option value="EXTINTA">Extinta</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Dependência Administrativa</label>
+                        <select name="dependenciaAdministrativa" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="FEDERAL">Federal</option>
+                            <option value="ESTADUAL">Estadual</option>
+                            <option value="MUNICIPAL">Municipal</option>
+                            <option value="PRIVADA">Privada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data Início do Ano Letivo</label>
+                        <input type="date" name="dataInicioAnoLetivo" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data Término do Ano Letivo</label>
+                        <input type="date" name="dataTerminoAnoLetivo" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Latitude</label>
+                        <input type="text" name="latitude" class="form-control" placeholder="-00.000000">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Longitude</label>
+                        <input type="text" name="longitude" class="form-control" placeholder="-00.000000">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Zona</label>
+                        <select name="zona" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="URBANA">Urbana</option>
+                            <option value="RURAL">Rural</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Localização Diferenciada</label>
+                        <select name="localizacaoDiferenciada" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="ASSENTAMENTO">Assentamento</option>
+                            <option value="TERRA_INDIGENA">Terra Indígena</option>
+                            <option value="COMUNIDADE_QUILOMBOLA">Comunidade Quilombola</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Língua Ministrada</label>
+                        <select name="linguaMinistrada" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="PORTUGUESA">Portuguesa</option>
+                            <option value="INDIGENA">Indígena</option>
+                            <option value="BILINGUE">Bilíngue</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ato de Criação (Número)</label>
+                        <input type="text" name="regulamentacaoNumero" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ato de Criação (Data)</label>
+                        <input type="date" name="regulamentacaoData" class="form-control">
+                    </div>
+                </div>
+
+                <h5 class="text-primary mt-3 mb-3">Infraestrutura</h5>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Água</label>
+                        <select name="infraAgua" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="REDE_PUBLICA">Rede Pública</option>
+                            <option value="POCO_ARTESIANO">Poço Artesiano</option>
+                            <option value="CISTERNA">Cisterna</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Energia</label>
+                        <select name="infraEnergia" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="REDE_PUBLICA">Rede Pública</option>
+                            <option value="GERADOR">Gerador</option>
+                            <option value="INEXISTENTE">Inexistente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Esgoto</label>
+                        <select name="infraEsgoto" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="REDE_PUBLICA">Rede Pública</option>
+                            <option value="FOSSA_SEPTICA">Fossa Séptica</option>
+                            <option value="INEXISTENTE">Inexistente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Destinação de Lixo</label>
+                        <select name="infraLixo" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="COLETA_PUBLICA">Coleta Pública</option>
+                            <option value="QUEIMA">Queima</option>
+                            <option value="ENTERRA">Enterra</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Qtd Computadores</label>
+                        <input type="number" name="qtdComputadores" class="form-control" value="0">
+                    </div>
+                    <div class="col-md-4 mb-3 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="temInternet" class="form-check-input" id="temInternetCheck">
+                            <label class="form-check-label" for="temInternetCheck">Possui Internet</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tipo Banda Larga</label>
+                        <select name="tipoBandaLarga" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="FIBRA_OTICA">Fibra Ótica</option>
+                            <option value="RADIO">Rádio</option>
+                            <option value="SATELITE">Satélite</option>
                         </select>
                     </div>
                 </div>

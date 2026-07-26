@@ -125,6 +125,26 @@ public class EscolaController {
             dto.setCpfResponsavel(ctx.formParam("cpfResponsavel"));
             dto.setTelefoneResponsavel(ctx.formParam("telefoneResponsavel"));
             dto.setEmailResponsavel(ctx.formParam("emailResponsavel"));
+            dto.setCodigoInep(ctx.formParam("codigoInep"));
+            dto.setSituacaoFuncionamento(ctx.formParam("situacaoFuncionamento"));
+            if (ctx.formParam("dataInicioAnoLetivo") != null && !ctx.formParam("dataInicioAnoLetivo").isBlank()) dto.setDataInicioAnoLetivo(java.time.LocalDate.parse(ctx.formParam("dataInicioAnoLetivo")));
+            if (ctx.formParam("dataTerminoAnoLetivo") != null && !ctx.formParam("dataTerminoAnoLetivo").isBlank()) dto.setDataTerminoAnoLetivo(java.time.LocalDate.parse(ctx.formParam("dataTerminoAnoLetivo")));
+            dto.setLatitude(ctx.formParam("latitude"));
+            dto.setLongitude(ctx.formParam("longitude"));
+            dto.setZona(ctx.formParam("zona"));
+            dto.setLocalizacaoDiferenciada(ctx.formParam("localizacaoDiferenciada"));
+            dto.setDependenciaAdministrativa(ctx.formParam("dependenciaAdministrativa"));
+            dto.setRegulamentacaoNumero(ctx.formParam("regulamentacaoNumero"));
+            if (ctx.formParam("regulamentacaoData") != null && !ctx.formParam("regulamentacaoData").isBlank()) dto.setRegulamentacaoData(java.time.LocalDate.parse(ctx.formParam("regulamentacaoData")));
+            dto.setInfraAgua(ctx.formParam("infraAgua"));
+            dto.setInfraEnergia(ctx.formParam("infraEnergia"));
+            dto.setInfraEsgoto(ctx.formParam("infraEsgoto"));
+            dto.setInfraLixo(ctx.formParam("infraLixo"));
+            if (ctx.formParam("qtdComputadores") != null && !ctx.formParam("qtdComputadores").isBlank()) dto.setQtdComputadores(Integer.parseInt(ctx.formParam("qtdComputadores")));
+            dto.setTemInternet("on".equals(ctx.formParam("temInternet")) || "true".equals(ctx.formParam("temInternet")));
+            dto.setTipoBandaLarga(ctx.formParam("tipoBandaLarga"));
+            dto.setLinguaMinistrada(ctx.formParam("linguaMinistrada"));
+
 
             CriarEscolaResponseDTO resultado = escolaService.cadastrarEscola(dto, currentUser);
 
@@ -186,6 +206,26 @@ public class EscolaController {
                 dto.setTelefoneResponsavel(obterCampoForm(ctx, "telefoneResponsavel"));
                 dto.setEmailResponsavel(obterCampoForm(ctx, "emailResponsavel"));
                 dto.setStatus(obterCampoForm(ctx, "status"));
+                dto.setCodigoInep(obterCampoForm(ctx, "codigoInep"));
+                dto.setSituacaoFuncionamento(obterCampoForm(ctx, "situacaoFuncionamento"));
+                if (obterCampoForm(ctx, "dataInicioAnoLetivo") != null) dto.setDataInicioAnoLetivo(java.time.LocalDate.parse(obterCampoForm(ctx, "dataInicioAnoLetivo")));
+                if (obterCampoForm(ctx, "dataTerminoAnoLetivo") != null) dto.setDataTerminoAnoLetivo(java.time.LocalDate.parse(obterCampoForm(ctx, "dataTerminoAnoLetivo")));
+                dto.setLatitude(obterCampoForm(ctx, "latitude"));
+                dto.setLongitude(obterCampoForm(ctx, "longitude"));
+                dto.setZona(obterCampoForm(ctx, "zona"));
+                dto.setLocalizacaoDiferenciada(obterCampoForm(ctx, "localizacaoDiferenciada"));
+                dto.setDependenciaAdministrativa(obterCampoForm(ctx, "dependenciaAdministrativa"));
+                dto.setRegulamentacaoNumero(obterCampoForm(ctx, "regulamentacaoNumero"));
+                if (obterCampoForm(ctx, "regulamentacaoData") != null) dto.setRegulamentacaoData(java.time.LocalDate.parse(obterCampoForm(ctx, "regulamentacaoData")));
+                dto.setInfraAgua(obterCampoForm(ctx, "infraAgua"));
+                dto.setInfraEnergia(obterCampoForm(ctx, "infraEnergia"));
+                dto.setInfraEsgoto(obterCampoForm(ctx, "infraEsgoto"));
+                dto.setInfraLixo(obterCampoForm(ctx, "infraLixo"));
+                if (obterCampoForm(ctx, "qtdComputadores") != null) dto.setQtdComputadores(Integer.parseInt(obterCampoForm(ctx, "qtdComputadores")));
+                dto.setTemInternet("on".equals(ctx.formParam("temInternet")) || "true".equals(ctx.formParam("temInternet")));
+                dto.setTipoBandaLarga(obterCampoForm(ctx, "tipoBandaLarga"));
+                dto.setLinguaMinistrada(obterCampoForm(ctx, "linguaMinistrada"));
+
             } else {
                 // Se for uma requisição de API com JSON puro
                 dto = ctx.bodyAsClass(AtualizarEscolaDTO.class);

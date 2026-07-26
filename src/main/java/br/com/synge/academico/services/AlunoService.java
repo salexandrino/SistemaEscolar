@@ -142,20 +142,13 @@ public class AlunoService {
 
         alunoRepository.atualizarSituacao(tenantId, id, nova.name());
 
-        // dispara os observers em vez de fazer tudo aqui dentro
+        // Dispara os observers registrados (histórico, cancelamento de mensalidades, etc.)
+        // em vez de fazer tudo aqui dentro — quem grava o histórico agora é o
+        // HistoricoSituacaoObserver, registrado no SyngeApplication.
+        String motivo = dto.getMotivo() != null ? dto.getMotivo() : "Alteração manual";
         for (AlunoSituacaoObserver observer : observers) {
-            observer.aoMudarSituacao(a, atual, nova);
+            observer.aoMudarSituacao(a, atual, nova, motivo);
         }
-
-        HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
-        h.setId(UUID.randomUUID());
-        h.setTenantId(tenantId);
-        h.setIdAluno(a.getId());
-        h.setSituacaoAnterior(atual.name());
-        h.setSituacaoNova(nova.name());
-        h.setMotivo(dto.getMotivo() != null ? dto.getMotivo() : "Alteração manual");
-        h.setCriadoEm(LocalDateTime.now());
-        historicoRepository.criar(h);
     }
 
     public MatriculaResponseDTO matricular(UUID idAluno, MatricularAlunoDTO dto) {

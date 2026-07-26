@@ -69,12 +69,12 @@
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-secondary small">Cidade</label>
-                        <input type="text" class="form-control form-control-lg fs-6" name="cidade" th:value="${escola.cidade}">
+                        <input type="text" class="form-control form-control-lg fs-6" name="cidade" th:value="${escola.cidade}" required>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-secondary small">UF (Estado)</label>
-                        <select class="form-select form-select-lg fs-6" name="estado">
+                        <select class="form-select form-select-lg fs-6" name="estado" required>
                             <option value="AC" th:selected="${escola.estado=='AC'}">AC</option>
                             <option value="AL" th:selected="${escola.estado=='AL'}">AL</option>
                             <option value="AP" th:selected="${escola.estado=='AP'}">AP</option>
@@ -105,6 +105,179 @@
                         </select>
                     </div>
                 </div>
+
+                
+                    <div class="col-md-12 mt-4">
+                        <h5 class="mb-3 border-bottom pb-2 text-primary">Endereço (Complementar)</h5>
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold text-secondary small">Endereço</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="endereco" th:value="${escola.endereco}" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Número</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="numero" th:value="${escola.numero}">
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Complemento</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="complemento" th:value="${escola.complemento}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Bairro</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="bairro" th:value="${escola.bairro}" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">CEP</label>
+                        <input type="text" class="form-control form-control-lg fs-6" name="cep" th:value="${escola.cep}" required>
+                    </div>
+
+                    <div class="col-md-12 mt-4">
+                        <h5 class="mb-3 border-bottom pb-2 text-primary">Dados do Educacenso</h5>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Código INEP</label>
+                        <input type="text" name="codigoInep" class="form-control form-control-lg fs-6" maxlength="8" th:value="${escola.codigoInep}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Situação de Funcionamento</label>
+                        <select name="situacaoFuncionamento" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.situacaoFuncionamento == null || escola.situacaoFuncionamento == ''}">Selecione...</option>
+                            <option value="EM_ATIVIDADE" th:selected="${escola.situacaoFuncionamento == 'EM_ATIVIDADE'}">Em Atividade</option>
+                            <option value="PARALISADA" th:selected="${escola.situacaoFuncionamento == 'PARALISADA'}">Paralisada</option>
+                            <option value="EXTINTA" th:selected="${escola.situacaoFuncionamento == 'EXTINTA'}">Extinta</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Dependência Administrativa</label>
+                        <select name="dependenciaAdministrativa" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.dependenciaAdministrativa == null || escola.dependenciaAdministrativa == ''}">Selecione...</option>
+                            <option value="FEDERAL" th:selected="${escola.dependenciaAdministrativa == 'FEDERAL'}">Federal</option>
+                            <option value="ESTADUAL" th:selected="${escola.dependenciaAdministrativa == 'ESTADUAL'}">Estadual</option>
+                            <option value="MUNICIPAL" th:selected="${escola.dependenciaAdministrativa == 'MUNICIPAL'}">Municipal</option>
+                            <option value="PRIVADA" th:selected="${escola.dependenciaAdministrativa == 'PRIVADA'}">Privada</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Data Início do Ano Letivo</label>
+                        <input type="date" name="dataInicioAnoLetivo" class="form-control form-control-lg fs-6" th:value="${escola.dataInicioAnoLetivo}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Data Término do Ano Letivo</label>
+                        <input type="date" name="dataTerminoAnoLetivo" class="form-control form-control-lg fs-6" th:value="${escola.dataTerminoAnoLetivo}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Latitude</label>
+                        <input type="text" name="latitude" class="form-control form-control-lg fs-6" th:value="${escola.latitude}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Longitude</label>
+                        <input type="text" name="longitude" class="form-control form-control-lg fs-6" th:value="${escola.longitude}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Zona</label>
+                        <select name="zona" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.zona == null || escola.zona == ''}">Selecione...</option>
+                            <option value="URBANA" th:selected="${escola.zona == 'URBANA'}">Urbana</option>
+                            <option value="RURAL" th:selected="${escola.zona == 'RURAL'}">Rural</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Localização Diferenciada</label>
+                        <select name="localizacaoDiferenciada" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.localizacaoDiferenciada == null || escola.localizacaoDiferenciada == ''}">Selecione...</option>
+                            <option value="ASSENTAMENTO" th:selected="${escola.localizacaoDiferenciada == 'ASSENTAMENTO'}">Assentamento</option>
+                            <option value="TERRA_INDIGENA" th:selected="${escola.localizacaoDiferenciada == 'TERRA_INDIGENA'}">Terra Indígena</option>
+                            <option value="COMUNIDADE_QUILOMBOLA" th:selected="${escola.localizacaoDiferenciada == 'COMUNIDADE_QUILOMBOLA'}">Comunidade Quilombola</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Língua Ministrada</label>
+                        <select name="linguaMinistrada" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.linguaMinistrada == null || escola.linguaMinistrada == ''}">Selecione...</option>
+                            <option value="PORTUGUESA" th:selected="${escola.linguaMinistrada == 'PORTUGUESA'}">Portuguesa</option>
+                            <option value="INDIGENA" th:selected="${escola.linguaMinistrada == 'INDIGENA'}">Indígena</option>
+                            <option value="BILINGUE" th:selected="${escola.linguaMinistrada == 'BILINGUE'}">Bilíngue</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Ato de Criação (Número)</label>
+                        <input type="text" name="regulamentacaoNumero" class="form-control form-control-lg fs-6" th:value="${escola.regulamentacaoNumero}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-secondary small">Ato de Criação (Data)</label>
+                        <input type="date" name="regulamentacaoData" class="form-control form-control-lg fs-6" th:value="${escola.regulamentacaoData}">
+                    </div>
+
+                    <div class="col-md-12 mt-4">
+                        <h5 class="mb-3 border-bottom pb-2 text-primary">Infraestrutura</h5>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold text-secondary small">Água</label>
+                        <select name="infraAgua" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.infraAgua == null || escola.infraAgua == ''}">Selecione...</option>
+                            <option value="REDE_PUBLICA" th:selected="${escola.infraAgua == 'REDE_PUBLICA'}">Rede Pública</option>
+                            <option value="POCO_ARTESIANO" th:selected="${escola.infraAgua == 'POCO_ARTESIANO'}">Poço Artesiano</option>
+                            <option value="CISTERNA" th:selected="${escola.infraAgua == 'CISTERNA'}">Cisterna</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold text-secondary small">Energia</label>
+                        <select name="infraEnergia" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.infraEnergia == null || escola.infraEnergia == ''}">Selecione...</option>
+                            <option value="REDE_PUBLICA" th:selected="${escola.infraEnergia == 'REDE_PUBLICA'}">Rede Pública</option>
+                            <option value="GERADOR" th:selected="${escola.infraEnergia == 'GERADOR'}">Gerador</option>
+                            <option value="INEXISTENTE" th:selected="${escola.infraEnergia == 'INEXISTENTE'}">Inexistente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold text-secondary small">Esgoto</label>
+                        <select name="infraEsgoto" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.infraEsgoto == null || escola.infraEsgoto == ''}">Selecione...</option>
+                            <option value="REDE_PUBLICA" th:selected="${escola.infraEsgoto == 'REDE_PUBLICA'}">Rede Pública</option>
+                            <option value="FOSSA_SEPTICA" th:selected="${escola.infraEsgoto == 'FOSSA_SEPTICA'}">Fossa Séptica</option>
+                            <option value="INEXISTENTE" th:selected="${escola.infraEsgoto == 'INEXISTENTE'}">Inexistente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold text-secondary small">Destinação de Lixo</label>
+                        <select name="infraLixo" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.infraLixo == null || escola.infraLixo == ''}">Selecione...</option>
+                            <option value="COLETA_PUBLICA" th:selected="${escola.infraLixo == 'COLETA_PUBLICA'}">Coleta Pública</option>
+                            <option value="QUEIMA" th:selected="${escola.infraLixo == 'QUEIMA'}">Queima</option>
+                            <option value="ENTERRA" th:selected="${escola.infraLixo == 'ENTERRA'}">Enterra</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Qtd Computadores</label>
+                        <input type="number" name="qtdComputadores" class="form-control form-control-lg fs-6" th:value="${escola.qtdComputadores}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input type="checkbox" name="temInternet" class="form-check-input" id="temInternetCheck" th:checked="${escola.temInternet}">
+                            <label class="form-check-label" for="temInternetCheck">Possui Internet</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-secondary small">Tipo Banda Larga</label>
+                        <select name="tipoBandaLarga" class="form-select form-select-lg fs-6">
+                            <option value="" th:selected="${escola.tipoBandaLarga == null || escola.tipoBandaLarga == ''}">Selecione...</option>
+                            <option value="FIBRA_OTICA" th:selected="${escola.tipoBandaLarga == 'FIBRA_OTICA'}">Fibra Ótica</option>
+                            <option value="RADIO" th:selected="${escola.tipoBandaLarga == 'RADIO'}">Rádio</option>
+                            <option value="SATELITE" th:selected="${escola.tipoBandaLarga == 'SATELITE'}">Satélite</option>
+                        </select>
+                    </div>
 
                 <hr class="my-4">
 

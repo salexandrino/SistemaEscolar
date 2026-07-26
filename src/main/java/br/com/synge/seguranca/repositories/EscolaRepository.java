@@ -24,7 +24,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public List<Escola> findAll() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
                 "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em FROM escola ORDER BY nome ASC";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -47,7 +47,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public List<Escola> findAllAtivas() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
                 "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola WHERE status = 'ATIVA' ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -70,7 +70,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public List<Escola> findAllInativas() {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
                 "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE status = 'INATIVA' ORDER BY nome ASC";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola WHERE status = 'INATIVA' ORDER BY nome ASC";
         List<Escola> escolas = new ArrayList<>();
 
         try (Connection conn = getConnection();
@@ -94,7 +94,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public Optional<Escola> findById(UUID id) {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
                 "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE id = ?";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -117,7 +117,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public Optional<Escola> findByCnpj(String cnpj) {
         String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
                 "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em FROM escola WHERE cnpj = ?";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola WHERE cnpj = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -142,8 +142,8 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     public Escola save(Escola escola) {
         String sql = "INSERT INTO escola (id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, " +
                 "numero, complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
-                "email_responsavel, status, criado_em, atualizado_em) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -175,7 +175,28 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
             stmt.setString(16, escola.getEmailResponsavel());
             stmt.setString(17, escola.getStatus());
             stmt.setObject(18, escola.getCriadoEm());
+            
             stmt.setObject(19, escola.getAtualizadoEm());
+            stmt.setString(20, escola.getCodigoInep());
+            stmt.setString(21, escola.getSituacaoFuncionamento());
+            stmt.setObject(22, escola.getDataInicioAnoLetivo());
+            stmt.setObject(23, escola.getDataTerminoAnoLetivo());
+            stmt.setString(24, escola.getLatitude());
+            stmt.setString(25, escola.getLongitude());
+            stmt.setString(26, escola.getZona());
+            stmt.setString(27, escola.getLocalizacaoDiferenciada());
+            stmt.setString(28, escola.getDependenciaAdministrativa());
+            stmt.setString(29, escola.getRegulamentacaoNumero());
+            stmt.setObject(30, escola.getRegulamentacaoData());
+            stmt.setString(31, escola.getInfraAgua());
+            stmt.setString(32, escola.getInfraEnergia());
+            stmt.setString(33, escola.getInfraEsgoto());
+            stmt.setString(34, escola.getInfraLixo());
+            stmt.setInt(35, escola.getQtdComputadores());
+            stmt.setBoolean(36, escola.isTemInternet());
+            stmt.setString(37, escola.getTipoBandaLarga());
+            stmt.setString(38, escola.getLinguaMinistrada());
+
 
             stmt.executeUpdate();
 
@@ -193,7 +214,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
         String sql = "UPDATE escola SET nome = ?, cnpj = ?, email_institucional = ?, telefone = ?, " +
                 "endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, cep = ?, " +
                 "nome_responsavel = ?, telefone_responsavel = ?, email_responsavel = ?, status = ?, " +
-                "atualizado_em = ? WHERE id = ?";
+                "atualizado_em = ?, codigo_inep = ?, situacao_funcionamento = ?, data_inicio_ano_letivo = ?, data_termino_ano_letivo = ?, latitude = ?, longitude = ?, zona = ?, localizacao_diferenciada = ?, dependencia_administrativa = ?, regulamentacao_numero = ?, regulamentacao_data = ?, infra_agua = ?, infra_energia = ?, infra_esgoto = ?, infra_lixo = ?, qtd_computadores = ?, tem_internet = ?, tipo_banda_larga = ?, lingua_ministrada = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -215,8 +236,29 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
             stmt.setString(13, escola.getTelefoneResponsavel());
             stmt.setString(14, escola.getEmailResponsavel());
             stmt.setString(15, escola.getStatus());
+            
             stmt.setObject(16, escola.getAtualizadoEm());
-            stmt.setObject(17, escola.getId());
+            stmt.setString(17, escola.getCodigoInep());
+            stmt.setString(18, escola.getSituacaoFuncionamento());
+            stmt.setObject(19, escola.getDataInicioAnoLetivo());
+            stmt.setObject(20, escola.getDataTerminoAnoLetivo());
+            stmt.setString(21, escola.getLatitude());
+            stmt.setString(22, escola.getLongitude());
+            stmt.setString(23, escola.getZona());
+            stmt.setString(24, escola.getLocalizacaoDiferenciada());
+            stmt.setString(25, escola.getDependenciaAdministrativa());
+            stmt.setString(26, escola.getRegulamentacaoNumero());
+            stmt.setObject(27, escola.getRegulamentacaoData());
+            stmt.setString(28, escola.getInfraAgua());
+            stmt.setString(29, escola.getInfraEnergia());
+            stmt.setString(30, escola.getInfraEsgoto());
+            stmt.setString(31, escola.getInfraLixo());
+            stmt.setInt(32, escola.getQtdComputadores());
+            stmt.setBoolean(33, escola.isTemInternet());
+            stmt.setString(34, escola.getTipoBandaLarga());
+            stmt.setString(35, escola.getLinguaMinistrada());
+            stmt.setObject(36, escola.getId());
+
 
             stmt.executeUpdate();
 
@@ -294,7 +336,28 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
         escola.setEmailResponsavel(rs.getString("email_responsavel"));
         escola.setStatus(rs.getString("status"));
         escola.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
-        escola.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
+        
+        escola.setAtualizadoEm(rs.getObject("atualizado_em", java.time.LocalDateTime.class));
+        escola.setCodigoInep(rs.getString("codigo_inep"));
+        escola.setSituacaoFuncionamento(rs.getString("situacao_funcionamento"));
+        escola.setDataInicioAnoLetivo(rs.getObject("data_inicio_ano_letivo", java.time.LocalDate.class));
+        escola.setDataTerminoAnoLetivo(rs.getObject("data_termino_ano_letivo", java.time.LocalDate.class));
+        escola.setLatitude(rs.getString("latitude"));
+        escola.setLongitude(rs.getString("longitude"));
+        escola.setZona(rs.getString("zona"));
+        escola.setLocalizacaoDiferenciada(rs.getString("localizacao_diferenciada"));
+        escola.setDependenciaAdministrativa(rs.getString("dependencia_administrativa"));
+        escola.setRegulamentacaoNumero(rs.getString("regulamentacao_numero"));
+        escola.setRegulamentacaoData(rs.getObject("regulamentacao_data", java.time.LocalDate.class));
+        escola.setInfraAgua(rs.getString("infra_agua"));
+        escola.setInfraEnergia(rs.getString("infra_energia"));
+        escola.setInfraEsgoto(rs.getString("infra_esgoto"));
+        escola.setInfraLixo(rs.getString("infra_lixo"));
+        escola.setQtdComputadores(rs.getInt("qtd_computadores"));
+        escola.setTemInternet(rs.getBoolean("tem_internet"));
+        escola.setTipoBandaLarga(rs.getString("tipo_banda_larga"));
+        escola.setLinguaMinistrada(rs.getString("lingua_ministrada"));
+
 
         return escola;
     }

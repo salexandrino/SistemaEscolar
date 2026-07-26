@@ -13,9 +13,12 @@ public class CancelarMensalidadesObserver implements AlunoSituacaoObserver {
     }
 
     @Override
-    public void aoMudarSituacao(Aluno aluno, SituacaoAluno anterior, SituacaoAluno nova) {
+    public void aoMudarSituacao(Aluno aluno, SituacaoAluno anterior, SituacaoAluno nova, String motivo) {
         if (nova == SituacaoAluno.CANCELADO || nova == SituacaoAluno.TRANSFERIDO) {
-            //mensalidadeService.cancelarMensalidades(aluno.getTenantId(), aluno.getId());
+            // TODO: MensalidadeService ainda não tem um método de cancelamento em massa
+            // por aluno. Quando existir (ex: cancelarPendentes(tenantId, idAluno)),
+            // descomentar a linha abaixo.
+            // mensalidadeService.cancelarPendentes(aluno.getTenantId(), aluno.getId());
         }
     }
 }

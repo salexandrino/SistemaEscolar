@@ -164,6 +164,10 @@ public class SyngeApplication {
         ValidadorCpf validadorCpf = new ValidadorCpf();
         ProfessorService professorService = new ProfessorService(professorRepository, tdpRepository, validadorCpf);
         AlunoService alunoService = new AlunoService(alunoRepository, historicoRepository, matriculaRepository, documentoRepository, validadorCpf, turmaService);
+        // Padrão Observer: quem grava o histórico de mudança de situação do aluno
+        // agora é o HistoricoSituacaoObserver (o CancelarMensalidadesObserver é
+        // registrado mais abaixo, assim que o MensalidadeService existir).
+        alunoService.adicionarObserver(new br.com.synge.academico.services.observers.HistoricoSituacaoObserver(historicoRepository));
         LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository, alunoRepository);
         // CORRIGIDO: Removido FrequenciaService e ajustado construtor do BoletimService
         BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, new CalculoMediaAritmetica());
@@ -192,6 +196,7 @@ public class SyngeApplication {
 
         // 2. Inicialização dos Services
         MensalidadeService mensalidadeService = new MensalidadeService(mensalidadeRepository, descontoRepository, pagamentoRepository, parcelaRepository);
+        alunoService.adicionarObserver(new br.com.synge.financeiro.observers.CancelarMensalidadesObserver(mensalidadeService));
         ParcelamentoService parcelamentoService = new ParcelamentoService(parcelaRepository, mensalidadeRepository);
         InadimplenciaService inadimplenciaService = new InadimplenciaService(mensalidadeRepository);
         RelatorioFinanceiroService relatorioFinanceiroService = new RelatorioFinanceiroService(mensalidadeRepository);

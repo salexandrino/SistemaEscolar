@@ -103,6 +103,51 @@ public class EscolaService {
                 !dto.getStatus().equals("ATIVA") && !dto.getStatus().equals("INATIVA")) {
             throw new ValidationException("Status deve ser ATIVA ou INATIVA.");
         }
+
+        if (dto.getCodigoInep() != null && !dto.getCodigoInep().isBlank() && dto.getCodigoInep().length() != 8) {
+            throw new ValidationException("Código INEP deve conter exatamente 8 caracteres.");
+        }
+        
+        if ((dto.getLatitude() != null && !dto.getLatitude().isBlank()) || (dto.getLongitude() != null && !dto.getLongitude().isBlank())) {
+            if (dto.getLatitude() == null || dto.getLatitude().isBlank() || dto.getLongitude() == null || dto.getLongitude().isBlank()) {
+                throw new ValidationException("Latitude e Longitude devem ser informados juntos.");
+            }
+            try {
+                double lat = Double.parseDouble(dto.getLatitude());
+                double lon = Double.parseDouble(dto.getLongitude());
+                if (lat < -90 || lat > 90) throw new ValidationException("Latitude deve estar entre -90 e 90.");
+                if (lon < -180 || lon > 180) throw new ValidationException("Longitude deve estar entre -180 e 180.");
+            } catch (NumberFormatException e) {
+                throw new ValidationException("Latitude e Longitude devem ser numéricos válidos.");
+            }
+        }
+        
+        if (dto.getDataInicioAnoLetivo() != null && dto.getDataTerminoAnoLetivo() != null) {
+            if (dto.getDataTerminoAnoLetivo().isBefore(dto.getDataInicioAnoLetivo())) {
+                throw new ValidationException("Data de término do ano letivo não pode ser anterior à data de início.");
+            }
+        }
+        
+        List<String> situacoes = List.of("EM_ATIVIDADE", "PARALISADA", "EXTINTA");
+        if (dto.getSituacaoFuncionamento() != null && !dto.getSituacaoFuncionamento().isBlank() && !situacoes.contains(dto.getSituacaoFuncionamento())) {
+            throw new ValidationException("Situação de funcionamento inválida.");
+        }
+        
+        List<String> dependencias = List.of("FEDERAL", "ESTADUAL", "MUNICIPAL", "PRIVADA");
+        if (dto.getDependenciaAdministrativa() != null && !dto.getDependenciaAdministrativa().isBlank() && !dependencias.contains(dto.getDependenciaAdministrativa())) {
+            throw new ValidationException("Dependência administrativa inválida.");
+        }
+        
+        List<String> zonas = List.of("URBANA", "RURAL");
+        if (dto.getZona() != null && !dto.getZona().isBlank() && !zonas.contains(dto.getZona())) {
+            throw new ValidationException("Zona inválida.");
+        }
+        
+        List<String> linguas = List.of("PORTUGUESA", "INDIGENA", "BILINGUE");
+        if (dto.getLinguaMinistrada() != null && !dto.getLinguaMinistrada().isBlank() && !linguas.contains(dto.getLinguaMinistrada())) {
+            throw new ValidationException("Língua ministrada inválida.");
+        }
+
     }
 
     /**
@@ -132,6 +177,9 @@ public class EscolaService {
         escola.setEmailInstitucional(dto.getEmailInstitucional());
         escola.setTelefone(dto.getTelefone());
         escola.setEndereco(dto.getEndereco());
+        escola.setNumero(dto.getNumero());
+        escola.setComplemento(dto.getComplemento());
+        escola.setBairro(dto.getBairro());
         escola.setCep(dto.getCep());
         escola.setCidade(dto.getCidade());
         escola.setEstado(dto.getEstado());
@@ -139,6 +187,26 @@ public class EscolaService {
         escola.setTelefoneResponsavel(dto.getTelefoneResponsavel());
         escola.setEmailResponsavel(dto.getEmailResponsavel());
         escola.setStatus("ATIVA");
+        escola.setCodigoInep(dto.getCodigoInep());
+        escola.setSituacaoFuncionamento(dto.getSituacaoFuncionamento());
+        escola.setDataInicioAnoLetivo(dto.getDataInicioAnoLetivo());
+        escola.setDataTerminoAnoLetivo(dto.getDataTerminoAnoLetivo());
+        escola.setLatitude(dto.getLatitude());
+        escola.setLongitude(dto.getLongitude());
+        escola.setZona(dto.getZona());
+        escola.setLocalizacaoDiferenciada(dto.getLocalizacaoDiferenciada());
+        escola.setDependenciaAdministrativa(dto.getDependenciaAdministrativa());
+        escola.setRegulamentacaoNumero(dto.getRegulamentacaoNumero());
+        escola.setRegulamentacaoData(dto.getRegulamentacaoData());
+        escola.setInfraAgua(dto.getInfraAgua());
+        escola.setInfraEnergia(dto.getInfraEnergia());
+        escola.setInfraEsgoto(dto.getInfraEsgoto());
+        escola.setInfraLixo(dto.getInfraLixo());
+        escola.setQtdComputadores(dto.getQtdComputadores());
+        escola.setTemInternet(dto.isTemInternet());
+        escola.setTipoBandaLarga(dto.getTipoBandaLarga());
+        escola.setLinguaMinistrada(dto.getLinguaMinistrada());
+
 
         Escola escolaSalva = escolaRepository.save(escola);
 
@@ -280,6 +348,26 @@ public class EscolaService {
         if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
             escola.setStatus(dto.getStatus());
         }
+        if (dto.getCodigoInep() != null) escola.setCodigoInep(dto.getCodigoInep());
+        if (dto.getSituacaoFuncionamento() != null) escola.setSituacaoFuncionamento(dto.getSituacaoFuncionamento());
+        if (dto.getDataInicioAnoLetivo() != null) escola.setDataInicioAnoLetivo(dto.getDataInicioAnoLetivo());
+        if (dto.getDataTerminoAnoLetivo() != null) escola.setDataTerminoAnoLetivo(dto.getDataTerminoAnoLetivo());
+        if (dto.getLatitude() != null) escola.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) escola.setLongitude(dto.getLongitude());
+        if (dto.getZona() != null) escola.setZona(dto.getZona());
+        if (dto.getLocalizacaoDiferenciada() != null) escola.setLocalizacaoDiferenciada(dto.getLocalizacaoDiferenciada());
+        if (dto.getDependenciaAdministrativa() != null) escola.setDependenciaAdministrativa(dto.getDependenciaAdministrativa());
+        if (dto.getRegulamentacaoNumero() != null) escola.setRegulamentacaoNumero(dto.getRegulamentacaoNumero());
+        if (dto.getRegulamentacaoData() != null) escola.setRegulamentacaoData(dto.getRegulamentacaoData());
+        if (dto.getInfraAgua() != null) escola.setInfraAgua(dto.getInfraAgua());
+        if (dto.getInfraEnergia() != null) escola.setInfraEnergia(dto.getInfraEnergia());
+        if (dto.getInfraEsgoto() != null) escola.setInfraEsgoto(dto.getInfraEsgoto());
+        if (dto.getInfraLixo() != null) escola.setInfraLixo(dto.getInfraLixo());
+        if (dto.getQtdComputadores() >= 0) escola.setQtdComputadores(dto.getQtdComputadores());
+        escola.setTemInternet(dto.isTemInternet());
+        if (dto.getTipoBandaLarga() != null) escola.setTipoBandaLarga(dto.getTipoBandaLarga());
+        if (dto.getLinguaMinistrada() != null) escola.setLinguaMinistrada(dto.getLinguaMinistrada());
+
 
         escolaRepository.update(escola);
 
@@ -454,6 +542,51 @@ public class EscolaService {
         ValidationUtil.validateUf(dto.getEstado());
         ValidationUtil.validateCep(dto.getCep());
         ValidationUtil.validateTamanho(dto.getNomeResponsavel(), 5, 150, "Nome do responsável");
+
+        if (dto.getCodigoInep() != null && !dto.getCodigoInep().isBlank() && dto.getCodigoInep().length() != 8) {
+            throw new ValidationException("Código INEP deve conter exatamente 8 caracteres.");
+        }
+        
+        if ((dto.getLatitude() != null && !dto.getLatitude().isBlank()) || (dto.getLongitude() != null && !dto.getLongitude().isBlank())) {
+            if (dto.getLatitude() == null || dto.getLatitude().isBlank() || dto.getLongitude() == null || dto.getLongitude().isBlank()) {
+                throw new ValidationException("Latitude e Longitude devem ser informados juntos.");
+            }
+            try {
+                double lat = Double.parseDouble(dto.getLatitude());
+                double lon = Double.parseDouble(dto.getLongitude());
+                if (lat < -90 || lat > 90) throw new ValidationException("Latitude deve estar entre -90 e 90.");
+                if (lon < -180 || lon > 180) throw new ValidationException("Longitude deve estar entre -180 e 180.");
+            } catch (NumberFormatException e) {
+                throw new ValidationException("Latitude e Longitude devem ser numéricos válidos.");
+            }
+        }
+        
+        if (dto.getDataInicioAnoLetivo() != null && dto.getDataTerminoAnoLetivo() != null) {
+            if (dto.getDataTerminoAnoLetivo().isBefore(dto.getDataInicioAnoLetivo())) {
+                throw new ValidationException("Data de término do ano letivo não pode ser anterior à data de início.");
+            }
+        }
+        
+        List<String> situacoes = List.of("EM_ATIVIDADE", "PARALISADA", "EXTINTA");
+        if (dto.getSituacaoFuncionamento() != null && !dto.getSituacaoFuncionamento().isBlank() && !situacoes.contains(dto.getSituacaoFuncionamento())) {
+            throw new ValidationException("Situação de funcionamento inválida.");
+        }
+        
+        List<String> dependencias = List.of("FEDERAL", "ESTADUAL", "MUNICIPAL", "PRIVADA");
+        if (dto.getDependenciaAdministrativa() != null && !dto.getDependenciaAdministrativa().isBlank() && !dependencias.contains(dto.getDependenciaAdministrativa())) {
+            throw new ValidationException("Dependência administrativa inválida.");
+        }
+        
+        List<String> zonas = List.of("URBANA", "RURAL");
+        if (dto.getZona() != null && !dto.getZona().isBlank() && !zonas.contains(dto.getZona())) {
+            throw new ValidationException("Zona inválida.");
+        }
+        
+        List<String> linguas = List.of("PORTUGUESA", "INDIGENA", "BILINGUE");
+        if (dto.getLinguaMinistrada() != null && !dto.getLinguaMinistrada().isBlank() && !linguas.contains(dto.getLinguaMinistrada())) {
+            throw new ValidationException("Língua ministrada inválida.");
+        }
+
 
         if (dto.getNumero() != null && dto.getNumero().length() > 10) {
             throw new ValidationException("Número do endereço deve ter no máximo 10 caracteres.");
