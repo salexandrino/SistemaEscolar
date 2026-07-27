@@ -21,6 +21,7 @@ public class TurmaRepository extends BaseDAO {
         t.setTenantId(rs.getObject("tenant_id", UUID.class));
         t.setIdAnoLetivo(rs.getObject("id_ano_letivo", UUID.class));
         t.setIdSerie(rs.getObject("id_serie", UUID.class));
+        t.setNome(rs.getString("nome"));
         t.setTurno(rs.getString("turno"));
         t.setSala(rs.getString("sala"));
         t.setCapacidade(rs.getInt("capacidade"));
@@ -30,13 +31,14 @@ public class TurmaRepository extends BaseDAO {
         return t;
     }
 
-    public Turma criar(UUID tenantId, UUID idAnoLetivo, UUID idSerie, String turno, String sala, int capacidade) {
-        String sql = "INSERT INTO turma (id, tenant_id, id_ano_letivo, id_serie, turno, sala, capacidade, situacao, criado_em, atualizado_em) VALUES (?,?,?,?,?,?,?,?,?,?)";
+    public Turma criar(UUID tenantId, UUID idAnoLetivo, UUID idSerie, String nome, String turno, String sala, int capacidade) {
+        String sql = "INSERT INTO turma (id, tenant_id, id_ano_letivo, id_serie, nome, turno, sala, capacidade, situacao, criado_em, atualizado_em) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         Turma t = new Turma();
         t.setId(UUID.randomUUID());
         t.setTenantId(tenantId);
         t.setIdAnoLetivo(idAnoLetivo);
         t.setIdSerie(idSerie);
+        t.setNome(nome);
         t.setTurno(turno);
         t.setSala(sala);
         t.setCapacidade(capacidade);
@@ -48,12 +50,13 @@ public class TurmaRepository extends BaseDAO {
             ps.setObject(2, t.getTenantId());
             ps.setObject(3, t.getIdAnoLetivo());
             ps.setObject(4, t.getIdSerie());
-            ps.setString(5, t.getTurno());
-            ps.setString(6, t.getSala());
-            ps.setInt(7, t.getCapacidade());
-            ps.setString(8, t.getSituacao());
-            ps.setObject(9, t.getCriadoEm());
-            ps.setObject(10, t.getAtualizadoEm());
+            ps.setString(5, t.getNome());
+            ps.setString(6, t.getTurno());
+            ps.setString(7, t.getSala());
+            ps.setInt(8, t.getCapacidade());
+            ps.setString(9, t.getSituacao());
+            ps.setObject(10, t.getCriadoEm());
+            ps.setObject(11, t.getAtualizadoEm());
             ps.executeUpdate();
             return t;
         } catch (SQLException e) {

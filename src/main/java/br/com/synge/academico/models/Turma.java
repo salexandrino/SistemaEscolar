@@ -8,6 +8,7 @@ public class Turma {
     private UUID tenantId;
     private UUID idAnoLetivo;
     private UUID idSerie;
+    private String nome; // ex.: "Turma 101", "3º Ano A"
     private String turno; // MANHA, TARDE, NOITE
     private String sala;  // identificador livre da sala
     private int capacidade;
@@ -23,6 +24,8 @@ public class Turma {
     public void setIdAnoLetivo(UUID idAnoLetivo) { this.idAnoLetivo = idAnoLetivo; }
     public UUID getIdSerie() { return idSerie; }
     public void setIdSerie(UUID idSerie) { this.idSerie = idSerie; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
     public String getTurno() { return turno; }
     public void setTurno(String turno) { this.turno = turno; }
     public String getSala() { return sala; }

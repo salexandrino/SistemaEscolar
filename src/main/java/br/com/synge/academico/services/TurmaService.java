@@ -37,6 +37,7 @@ public class TurmaService {
         if (dto == null) throw new ValidationException("Dados obrigatórios ausentes.");
         if (dto.getIdAnoLetivo() == null) throw new ValidationException("idAnoLetivo é obrigatório.");
         if (dto.getIdSerie() == null) throw new ValidationException("idSerie é obrigatório.");
+        if (dto.getNome() == null || dto.getNome().isBlank()) throw new ValidationException("nome da turma é obrigatório.");
         if (dto.getTurno() == null || dto.getTurno().isBlank()) throw new ValidationException("turno é obrigatório.");
         if (dto.getCapacidade() == null || dto.getCapacidade() < 0) throw new ValidationException("capacidade deve ser >= 0.");
 
@@ -53,7 +54,7 @@ public class TurmaService {
             throw new ValidationException("Série não pertence ao Ano Letivo informado.");
         }
 
-        Turma criada = turmaRepository.criar(tenantId, dto.getIdAnoLetivo(), dto.getIdSerie(), dto.getTurno(), dto.getSala(), dto.getCapacidade());
+        Turma criada = turmaRepository.criar(tenantId, dto.getIdAnoLetivo(), dto.getIdSerie(), dto.getNome(), dto.getTurno(), dto.getSala(), dto.getCapacidade());
         return toDto(criada);
     }
 
@@ -108,6 +109,7 @@ public class TurmaService {
         d.setId(t.getId());
         d.setIdAnoLetivo(t.getIdAnoLetivo());
         d.setIdSerie(t.getIdSerie());
+        d.setNome(t.getNome());
         d.setTurno(t.getTurno());
         d.setSala(t.getSala());
         d.setCapacidade(t.getCapacidade());

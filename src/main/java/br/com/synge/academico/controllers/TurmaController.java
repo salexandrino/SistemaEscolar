@@ -28,6 +28,7 @@ public class TurmaController {
         CriarTurmaDTO dto = ctx.bodyValidator(CriarTurmaDTO.class)
                 .check(d -> d.getIdAnoLetivo() != null, "idAnoLetivo é obrigatório")
                 .check(d -> d.getIdSerie() != null, "idSerie é obrigatório")
+                .check(d -> d.getNome() != null && !d.getNome().isBlank(), "nome da turma é obrigatório")
                 .check(d -> d.getTurno() != null && !d.getTurno().isBlank(), "turno é obrigatório")
                 .check(d -> d.getCapacidade() != null && d.getCapacidade() >= 0, "capacidade deve ser >= 0")
                 .get();
