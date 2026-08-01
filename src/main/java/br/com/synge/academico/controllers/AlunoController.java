@@ -67,13 +67,8 @@ public class AlunoController {
     }
 
     public void emitirHistoricoEscolar(Context ctx) {
-        // 1. Obtém o tenantId do usuário autenticado na sessão atual
         UUID tenantId = br.com.synge.seguranca.utils.AuthUserContext.getAuthUser().getTenantId();
-
-        // 2. Obtém o id do Aluno a partir do parâmetro da rota
         UUID idAluno = UUID.fromString(ctx.pathParam("id"));
-
-        // 3. Passa ambos os argumentos requeridos pelo Service
         ctx.json(service.emitirHistoricoEscolar(tenantId, idAluno));
     }
 }

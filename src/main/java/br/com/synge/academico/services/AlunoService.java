@@ -63,6 +63,10 @@ public class AlunoService {
         if (dto.getDataNascimento() != null && dto.getDataNascimento().isAfter(LocalDate.now())) {
             throw new ValidationException("A data de nascimento não pode ser no futuro.");
         }
+        if (dto.isUsaTransporteEscolar() && (dto.getResponsavelTransporte() == null
+                || "NENHUM".equalsIgnoreCase(dto.getResponsavelTransporte()))) {
+            throw new ValidationException("Se o aluno usa transporte escolar, informe o responsável (ESTADUAL ou MUNICIPAL).");
+        }
 
         UUID tenantId = tenant();
 
@@ -85,6 +89,13 @@ public class AlunoService {
         a.setCriadoEm(LocalDateTime.now());
         a.setAtualizadoEm(LocalDateTime.now());
 
+        aplicarCamposCenso(a, dto.getCodigoInep(), dto.getNomePai(), dto.getNomeMae(), dto.getSexo(),
+                dto.getCorRaca(), dto.getNacionalidade(), dto.getUfNascimento(), dto.getMunicipioNascimento(),
+                dto.getCertidaoNascimento(), dto.getNis(), dto.getCep(), dto.getEndereco(), dto.getNumero(),
+                dto.getComplemento(), dto.getBairro(), dto.getCidade(), dto.getEstado(), dto.getZona(),
+                dto.getLocalizacaoDiferenciada(), dto.isUsaTransporteEscolar(), dto.getResponsavelTransporte(),
+                dto.getTipoCondicao(), dto.getRecursosAcessibilidade());
+
         Aluno criado = alunoRepository.criar(a);
 
         HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
@@ -106,6 +117,10 @@ public class AlunoService {
 
     public AlunoResponseDTO atualizar(UUID id, AtualizarAlunoDTO dto) {
         if (dto == null || dto.getNome() == null || dto.getNome().isBlank()) throw new ValidationException("Nome é obrigatório.");
+        if (dto.isUsaTransporteEscolar() && (dto.getResponsavelTransporte() == null
+                || "NENHUM".equalsIgnoreCase(dto.getResponsavelTransporte()))) {
+            throw new ValidationException("Se o aluno usa transporte escolar, informe o responsável (ESTADUAL ou MUNICIPAL).");
+        }
         UUID tenantId = tenant();
 
         Aluno a = alunoRepository.buscarPorId(tenantId, id)
@@ -116,9 +131,54 @@ public class AlunoService {
         a.setEmail(dto.getEmail());
         a.setTelefone(dto.getTelefone());
 
+        aplicarCamposCenso(a, dto.getCodigoInep(), dto.getNomePai(), dto.getNomeMae(), dto.getSexo(),
+                dto.getCorRaca(), dto.getNacionalidade(), dto.getUfNascimento(), dto.getMunicipioNascimento(),
+                dto.getCertidaoNascimento(), dto.getNis(), dto.getCep(), dto.getEndereco(), dto.getNumero(),
+                dto.getComplemento(), dto.getBairro(), dto.getCidade(), dto.getEstado(), dto.getZona(),
+                dto.getLocalizacaoDiferenciada(), dto.isUsaTransporteEscolar(), dto.getResponsavelTransporte(),
+                dto.getTipoCondicao(), dto.getRecursosAcessibilidade());
+
         alunoRepository.atualizar(a);
 
         return toDto(alunoRepository.buscarPorId(tenantId, id).get());
+    }
+
+    /**
+     * Aplica os campos do Censo Escolar (Educacenso) no model Aluno.
+     * Centralizado aqui pra criar() e atualizar() não duplicarem a mesma
+     * lista gigante de setters.
+     */
+    private void aplicarCamposCenso(Aluno a, String codigoInep, String nomePai, String nomeMae, String sexo,
+                                    String corRaca, String nacionalidade, String ufNascimento,
+                                    String municipioNascimento, String certidaoNascimento, String nis,
+                                    String cep, String endereco, String numero, String complemento,
+                                    String bairro, String cidade, String estado, String zona,
+                                    String localizacaoDiferenciada, boolean usaTransporteEscolar,
+                                    String responsavelTransporte, String tipoCondicao, String recursosAcessibilidade) {
+        a.setCodigoInep(codigoInep);
+        a.setNomePai(nomePai);
+        a.setNomeMae(nomeMae);
+        a.setSexo(sexo);
+        a.setCorRaca(corRaca);
+        a.setNacionalidade(nacionalidade != null && !nacionalidade.isBlank() ? nacionalidade : "Brasileira");
+        a.setUfNascimento(ufNascimento);
+        a.setMunicipioNascimento(municipioNascimento);
+        a.setCertidaoNascimento(certidaoNascimento);
+        a.setNis(nis);
+        a.setCep(cep);
+        a.setEndereco(endereco);
+        a.setNumero(numero);
+        a.setComplemento(complemento);
+        a.setBairro(bairro);
+        a.setCidade(cidade);
+        a.setEstado(estado);
+        a.setZona(zona);
+        a.setLocalizacaoDiferenciada(localizacaoDiferenciada != null && !localizacaoDiferenciada.isBlank()
+                ? localizacaoDiferenciada : "NAO_DIFERENCIADA");
+        a.setUsaTransporteEscolar(usaTransporteEscolar);
+        a.setResponsavelTransporte(usaTransporteEscolar ? responsavelTransporte : "NENHUM");
+        a.setTipoCondicao(tipoCondicao);
+        a.setRecursosAcessibilidade(recursosAcessibilidade);
     }
 
     public void alterarSituacao(UUID id, AlterarSituacaoAlunoDTO dto) {
@@ -142,9 +202,6 @@ public class AlunoService {
 
         alunoRepository.atualizarSituacao(tenantId, id, nova.name());
 
-        // Dispara os observers registrados (histórico, cancelamento de mensalidades, etc.)
-        // em vez de fazer tudo aqui dentro — quem grava o histórico agora é o
-        // HistoricoSituacaoObserver, registrado no SyngeApplication.
         String motivo = dto.getMotivo() != null ? dto.getMotivo() : "Alteração manual";
         for (AlunoSituacaoObserver observer : observers) {
             observer.aoMudarSituacao(a, atual, nova, motivo);
@@ -159,7 +216,6 @@ public class AlunoService {
             throw new ValidationException("Aluno já matriculado nesta turma.");
         }
 
-        // Validação de Vaga Disponível e Ano Letivo Ativo
         turmaService.validarDisponibilidadeParaMatricula(tenantId, dto.getIdTurma());
 
         Matricula m = new Matricula();
@@ -254,7 +310,6 @@ public class AlunoService {
         Aluno aluno = alunoRepository.buscarPorId(tenantId, idAluno)
                 .orElseThrow(() -> new NotFoundException("Aluno não encontrado."));
 
-        // PREENCHIDO COM O NOVO MÉTODO:
         List<br.com.synge.academico.dtos.HistoricoEscolarDTO.ItemMatriculaHistorico> itens =
                 matriculaRepository.buscarHistoricoMatriculas(tenantId, idAluno);
 
@@ -288,6 +343,34 @@ public class AlunoService {
         dto.setTelefone(a.getTelefone());
         dto.setSituacao(a.getSituacao());
         dto.setCriadoEm(a.getCriadoEm());
+
+        dto.setCodigoInep(a.getCodigoInep());
+        dto.setNomePai(a.getNomePai());
+        dto.setNomeMae(a.getNomeMae());
+        dto.setSexo(a.getSexo());
+        dto.setCorRaca(a.getCorRaca());
+        dto.setNacionalidade(a.getNacionalidade());
+        dto.setUfNascimento(a.getUfNascimento());
+        dto.setMunicipioNascimento(a.getMunicipioNascimento());
+        dto.setCertidaoNascimento(a.getCertidaoNascimento());
+        dto.setNis(a.getNis());
+
+        dto.setCep(a.getCep());
+        dto.setEndereco(a.getEndereco());
+        dto.setNumero(a.getNumero());
+        dto.setComplemento(a.getComplemento());
+        dto.setBairro(a.getBairro());
+        dto.setCidade(a.getCidade());
+        dto.setEstado(a.getEstado());
+        dto.setZona(a.getZona());
+        dto.setLocalizacaoDiferenciada(a.getLocalizacaoDiferenciada());
+
+        dto.setUsaTransporteEscolar(a.isUsaTransporteEscolar());
+        dto.setResponsavelTransporte(a.getResponsavelTransporte());
+
+        dto.setTipoCondicao(a.getTipoCondicao());
+        dto.setRecursosAcessibilidade(a.getRecursosAcessibilidade());
+
         return dto;
     }
 

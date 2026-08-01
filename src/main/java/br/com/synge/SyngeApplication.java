@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import br.com.synge.academico.services.observers.HistoricoSituacaoObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
@@ -167,7 +168,7 @@ public class SyngeApplication {
         // Padrão Observer: quem grava o histórico de mudança de situação do aluno
         // agora é o HistoricoSituacaoObserver (o CancelarMensalidadesObserver é
         // registrado mais abaixo, assim que o MensalidadeService existir).
-        alunoService.adicionarObserver(new br.com.synge.academico.services.observers.HistoricoSituacaoObserver(historicoRepository));
+        alunoService.adicionarObserver(new HistoricoSituacaoObserver(historicoRepository));
         LancamentoNotasService notasService = new LancamentoNotasService(notaRepository, avaliacaoRepository, matriculaRepository, alunoRepository);
         // CORRIGIDO: Removido FrequenciaService e ajustado construtor do BoletimService
         BoletimService boletimService = new BoletimService(avaliacaoRepository, notaRepository, new CalculoMediaAritmetica());

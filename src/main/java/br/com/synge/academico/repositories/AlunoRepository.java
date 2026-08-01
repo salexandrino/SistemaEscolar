@@ -26,6 +26,8 @@ public class AlunoRepository extends BaseDAO {
         a.setEmail(rs.getString("email"));
         a.setTelefone(rs.getString("telefone"));
         a.setSituacao(rs.getString("situacao"));
+        a.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
+        a.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
 
         a.setCodigoInep(rs.getString("codigo_inep"));
         a.setNomePai(rs.getString("nome_pai"));
@@ -35,7 +37,7 @@ public class AlunoRepository extends BaseDAO {
         a.setNacionalidade(rs.getString("nacionalidade"));
         a.setUfNascimento(rs.getString("uf_nascimento"));
         a.setMunicipioNascimento(rs.getString("municipio_nascimento"));
-        a.setNumeroCertidaoNascimento(rs.getString("numero_certidao_nascimento"));
+        a.setCertidaoNascimento(rs.getString("certidao_nascimento"));
         a.setNis(rs.getString("nis"));
 
         a.setCep(rs.getString("cep"));
@@ -48,70 +50,56 @@ public class AlunoRepository extends BaseDAO {
         a.setZona(rs.getString("zona"));
         a.setLocalizacaoDiferenciada(rs.getString("localizacao_diferenciada"));
 
-        boolean usaTransporte = rs.getBoolean("usa_transporte_escolar");
-        a.setUsaTransporteEscolar(rs.wasNull() ? null : usaTransporte);
+        a.setUsaTransporteEscolar(rs.getBoolean("usa_transporte_escolar"));
         a.setResponsavelTransporte(rs.getString("responsavel_transporte"));
 
-        a.setTipoCondicaoEspecial(rs.getString("tipo_condicao_especial"));
+        a.setTipoCondicao(rs.getString("tipo_condicao"));
         a.setRecursosAcessibilidade(rs.getString("recursos_acessibilidade"));
 
-        a.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
-        a.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
         return a;
     }
 
     public Aluno criar(Aluno a) {
-        String sql = "INSERT INTO aluno (" +
-                "id, tenant_id, nome, cpf, data_nascimento, email, telefone, situacao, " +
-                "codigo_inep, nome_pai, nome_mae, sexo, cor_raca, nacionalidade, uf_nascimento, " +
-                "municipio_nascimento, numero_certidao_nascimento, nis, " +
-                "cep, endereco, numero, complemento, bairro, cidade, estado, zona, localizacao_diferenciada, " +
-                "usa_transporte_escolar, responsavel_transporte, " +
-                "tipo_condicao_especial, recursos_acessibilidade, " +
-                "criado_em, atualizado_em" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO aluno (id, tenant_id, nome, cpf, data_nascimento, email, telefone, situacao, " +
+                "criado_em, atualizado_em, codigo_inep, nome_pai, nome_mae, sexo, cor_raca, nacionalidade, " +
+                "uf_nascimento, municipio_nascimento, certidao_nascimento, nis, cep, endereco, numero, complemento, " +
+                "bairro, cidade, estado, zona, localizacao_diferenciada, usa_transporte_escolar, " +
+                "responsavel_transporte, tipo_condicao, recursos_acessibilidade) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            int i = 1;
-            ps.setObject(i++, a.getId());
-            ps.setObject(i++, a.getTenantId());
-            ps.setString(i++, a.getNome());
-            ps.setString(i++, a.getCpf());
-            ps.setObject(i++, a.getDataNascimento());
-            ps.setString(i++, a.getEmail());
-            ps.setString(i++, a.getTelefone());
-            ps.setString(i++, a.getSituacao());
-
-            ps.setString(i++, a.getCodigoInep());
-            ps.setString(i++, a.getNomePai());
-            ps.setString(i++, a.getNomeMae());
-            ps.setString(i++, a.getSexo());
-            ps.setString(i++, a.getCorRaca());
-            ps.setString(i++, a.getNacionalidade());
-            ps.setString(i++, a.getUfNascimento());
-            ps.setString(i++, a.getMunicipioNascimento());
-            ps.setString(i++, a.getNumeroCertidaoNascimento());
-            ps.setString(i++, a.getNis());
-
-            ps.setString(i++, a.getCep());
-            ps.setString(i++, a.getEndereco());
-            ps.setString(i++, a.getNumero());
-            ps.setString(i++, a.getComplemento());
-            ps.setString(i++, a.getBairro());
-            ps.setString(i++, a.getCidade());
-            ps.setString(i++, a.getEstado());
-            ps.setString(i++, a.getZona());
-            ps.setString(i++, a.getLocalizacaoDiferenciada());
-
-            if (a.getUsaTransporteEscolar() != null) ps.setBoolean(i++, a.getUsaTransporteEscolar());
-            else ps.setNull(i++, Types.BOOLEAN);
-            ps.setString(i++, a.getResponsavelTransporte());
-
-            ps.setString(i++, a.getTipoCondicaoEspecial());
-            ps.setString(i++, a.getRecursosAcessibilidade());
-
-            ps.setObject(i++, a.getCriadoEm());
-            ps.setObject(i++, a.getAtualizadoEm());
-
+            ps.setObject(1, a.getId());
+            ps.setObject(2, a.getTenantId());
+            ps.setString(3, a.getNome());
+            ps.setString(4, a.getCpf());
+            ps.setObject(5, a.getDataNascimento());
+            ps.setString(6, a.getEmail());
+            ps.setString(7, a.getTelefone());
+            ps.setString(8, a.getSituacao());
+            ps.setObject(9, a.getCriadoEm());
+            ps.setObject(10, a.getAtualizadoEm());
+            ps.setString(11, a.getCodigoInep());
+            ps.setString(12, a.getNomePai());
+            ps.setString(13, a.getNomeMae());
+            ps.setString(14, a.getSexo());
+            ps.setString(15, a.getCorRaca());
+            ps.setString(16, a.getNacionalidade());
+            ps.setString(17, a.getUfNascimento());
+            ps.setString(18, a.getMunicipioNascimento());
+            ps.setString(19, a.getCertidaoNascimento());
+            ps.setString(20, a.getNis());
+            ps.setString(21, a.getCep());
+            ps.setString(22, a.getEndereco());
+            ps.setString(23, a.getNumero());
+            ps.setString(24, a.getComplemento());
+            ps.setString(25, a.getBairro());
+            ps.setString(26, a.getCidade());
+            ps.setString(27, a.getEstado());
+            ps.setString(28, a.getZona());
+            ps.setString(29, a.getLocalizacaoDiferenciada());
+            ps.setBoolean(30, a.isUsaTransporteEscolar());
+            ps.setString(31, a.getResponsavelTransporte());
+            ps.setString(32, a.getTipoCondicao());
+            ps.setString(33, a.getRecursosAcessibilidade());
             ps.executeUpdate();
             return a;
         } catch (SQLException e) {
@@ -166,54 +154,43 @@ public class AlunoRepository extends BaseDAO {
     }
 
     public void atualizar(Aluno a) {
-        String sql = "UPDATE aluno SET " +
-                "nome = ?, data_nascimento = ?, email = ?, telefone = ?, " +
+        String sql = "UPDATE aluno SET nome = ?, data_nascimento = ?, email = ?, telefone = ?, " +
                 "codigo_inep = ?, nome_pai = ?, nome_mae = ?, sexo = ?, cor_raca = ?, nacionalidade = ?, " +
-                "uf_nascimento = ?, municipio_nascimento = ?, numero_certidao_nascimento = ?, nis = ?, " +
-                "cep = ?, endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, " +
-                "zona = ?, localizacao_diferenciada = ?, " +
-                "usa_transporte_escolar = ?, responsavel_transporte = ?, " +
-                "tipo_condicao_especial = ?, recursos_acessibilidade = ?, " +
-                "atualizado_em = CURRENT_TIMESTAMP " +
+                "uf_nascimento = ?, municipio_nascimento = ?, certidao_nascimento = ?, nis = ?, cep = ?, " +
+                "endereco = ?, numero = ?, complemento = ?, bairro = ?, cidade = ?, estado = ?, zona = ?, " +
+                "localizacao_diferenciada = ?, usa_transporte_escolar = ?, responsavel_transporte = ?, " +
+                "tipo_condicao = ?, recursos_acessibilidade = ?, atualizado_em = CURRENT_TIMESTAMP " +
                 "WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            int i = 1;
-            ps.setString(i++, a.getNome());
-            ps.setObject(i++, a.getDataNascimento());
-            ps.setString(i++, a.getEmail());
-            ps.setString(i++, a.getTelefone());
-
-            ps.setString(i++, a.getCodigoInep());
-            ps.setString(i++, a.getNomePai());
-            ps.setString(i++, a.getNomeMae());
-            ps.setString(i++, a.getSexo());
-            ps.setString(i++, a.getCorRaca());
-            ps.setString(i++, a.getNacionalidade());
-            ps.setString(i++, a.getUfNascimento());
-            ps.setString(i++, a.getMunicipioNascimento());
-            ps.setString(i++, a.getNumeroCertidaoNascimento());
-            ps.setString(i++, a.getNis());
-
-            ps.setString(i++, a.getCep());
-            ps.setString(i++, a.getEndereco());
-            ps.setString(i++, a.getNumero());
-            ps.setString(i++, a.getComplemento());
-            ps.setString(i++, a.getBairro());
-            ps.setString(i++, a.getCidade());
-            ps.setString(i++, a.getEstado());
-            ps.setString(i++, a.getZona());
-            ps.setString(i++, a.getLocalizacaoDiferenciada());
-
-            if (a.getUsaTransporteEscolar() != null) ps.setBoolean(i++, a.getUsaTransporteEscolar());
-            else ps.setNull(i++, Types.BOOLEAN);
-            ps.setString(i++, a.getResponsavelTransporte());
-
-            ps.setString(i++, a.getTipoCondicaoEspecial());
-            ps.setString(i++, a.getRecursosAcessibilidade());
-
-            ps.setObject(i++, a.getId());
-            ps.setObject(i++, a.getTenantId());
-
+            ps.setString(1, a.getNome());
+            ps.setObject(2, a.getDataNascimento());
+            ps.setString(3, a.getEmail());
+            ps.setString(4, a.getTelefone());
+            ps.setString(5, a.getCodigoInep());
+            ps.setString(6, a.getNomePai());
+            ps.setString(7, a.getNomeMae());
+            ps.setString(8, a.getSexo());
+            ps.setString(9, a.getCorRaca());
+            ps.setString(10, a.getNacionalidade());
+            ps.setString(11, a.getUfNascimento());
+            ps.setString(12, a.getMunicipioNascimento());
+            ps.setString(13, a.getCertidaoNascimento());
+            ps.setString(14, a.getNis());
+            ps.setString(15, a.getCep());
+            ps.setString(16, a.getEndereco());
+            ps.setString(17, a.getNumero());
+            ps.setString(18, a.getComplemento());
+            ps.setString(19, a.getBairro());
+            ps.setString(20, a.getCidade());
+            ps.setString(21, a.getEstado());
+            ps.setString(22, a.getZona());
+            ps.setString(23, a.getLocalizacaoDiferenciada());
+            ps.setBoolean(24, a.isUsaTransporteEscolar());
+            ps.setString(25, a.getResponsavelTransporte());
+            ps.setString(26, a.getTipoCondicao());
+            ps.setString(27, a.getRecursosAcessibilidade());
+            ps.setObject(28, a.getId());
+            ps.setObject(29, a.getTenantId());
             int affected = ps.executeUpdate();
             if (affected == 0) throw new RuntimeException("Nenhum registro atualizado.");
         } catch (SQLException e) {
