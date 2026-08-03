@@ -473,7 +473,6 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             throw new RuntimeException("Erro ao excluir usuarios do tenant no banco de dados.", e);
         }
     }
-
     public void updatePassword(UUID id, UUID tenantId, String newPasswordHash) {
         String sql = "UPDATE usuario SET senha_hash = ?, reset_password_token = NULL, reset_password_expires_at = NULL, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection();
@@ -482,7 +481,13 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             stmt.setObject(2, LocalDateTime.now(), Types.TIMESTAMP);
             stmt.setObject(3, id);
             stmt.setObject(4, tenantId);
-            stmt.executeUpdate();
+
+            int linhasAfetadas = stmt.executeUpdate();
+            if (linhasAfetadas == 0) {
+                logger.warn("Troca de senha: nenhuma linha atualizada para usuário ID {} / tenant ID {}. Verifique se o tenant_id do usuário no banco bate com o do token JWT.", id, tenantId);
+                throw new RuntimeException("Não foi possível atualizar a senha: usuário não encontrado para este tenant.");
+            }
+
             logger.info("Senha do usuário ID {} atualizada para tenant ID {}", id, tenantId);
         } catch (SQLException e) {
             logger.error("Erro ao atualizar senha do usuário ID {} para tenant ID {}: {}", id, tenantId, e.getMessage(), e);
