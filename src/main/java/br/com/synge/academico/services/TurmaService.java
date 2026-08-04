@@ -11,11 +11,17 @@ import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.models.AuthUser;
 import br.com.synge.seguranca.utils.AuthUserContext;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TurmaService {
+
+    private static final List<String> MEDIADORES_VALIDOS = List.of("PRESENCIAL", "EAD", "SEMIPRESENCIAL");
+    private static final List<String> ATENDIMENTOS_VALIDOS = List.of("ESCOLARIZACAO", "AEE", "ATIVIDADE_COMPLEMENTAR");
+    private static final List<String> MODALIDADES_VALIDAS = List.of("REGULAR", "EDUCACAO_ESPECIAL", "EJA", "PROFISSIONAL");
+    private static final List<String> ORGANIZACOES_VALIDAS = List.of("SERIE_ANO", "CICLO", "PERIODOS_SEMESTRAIS", "MODULOS", "MULTISSERIADO");
 
     private final TurmaRepository turmaRepository;
     private final AnoLetivoRepository anoLetivoRepository;
@@ -41,21 +47,62 @@ public class TurmaService {
         if (dto.getTurno() == null || dto.getTurno().isBlank()) throw new ValidationException("turno é obrigatório.");
         if (dto.getCapacidade() == null || dto.getCapacidade() < 0) throw new ValidationException("capacidade deve ser >= 0.");
 
+        String tipoMediador = valorOuPadrao(dto.getTipoMediador(), "PRESENCIAL");
+        String tipoAtendimento = valorOuPadrao(dto.getTipoAtendimento(), "ESCOLARIZACAO");
+        String modalidadeEnsino = valorOuPadrao(dto.getModalidadeEnsino(), "REGULAR");
+        String formaOrganizacao = valorOuPadrao(dto.getFormaOrganizacao(), "SERIE_ANO");
+
+        if (!MEDIADORES_VALIDOS.contains(tipoMediador)) throw new ValidationException("tipoMediador inválido. Use: " + MEDIADORES_VALIDOS);
+        if (!ATENDIMENTOS_VALIDOS.contains(tipoAtendimento)) throw new ValidationException("tipoAtendimento inválido. Use: " + ATENDIMENTOS_VALIDOS);
+        if (!MODALIDADES_VALIDAS.contains(modalidadeEnsino)) throw new ValidationException("modalidadeEnsino inválida. Use: " + MODALIDADES_VALIDAS);
+        if (!ORGANIZACOES_VALIDAS.contains(formaOrganizacao)) throw new ValidationException("formaOrganizacao inválida. Use: " + ORGANIZACOES_VALIDAS);
+        if (dto.getHoraInicio() != null && dto.getHoraTermino() != null && !dto.getHoraInicio().isBefore(dto.getHoraTermino())) {
+            throw new ValidationException("horaInicio deve ser anterior a horaTermino.");
+        }
+
         UUID tenantId = tenant();
 
-        // valida Ano Letivo e Série
         var anoLetivo = anoLetivoRepository.buscarPorId(tenantId, dto.getIdAnoLetivo())
                 .orElseThrow(() -> new ValidationException("Ano letivo inválido para este tenant."));
+
+        if (!anoLetivo.isAtivo()) {
+            throw new ValidationException("Não é possível criar turma em um Ano Letivo que não está ATIVO. Status atual: " + anoLetivo.getSituacao());
+        }
+
         var serie = serieRepository.buscarPorId(tenantId, dto.getIdSerie())
                 .orElseThrow(() -> new ValidationException("Série inválida para este tenant."));
 
-        // Série deve pertencer ao mesmo Ano Letivo informado
         if (!serie.getIdAnoLetivo().equals(anoLetivo.getId())) {
             throw new ValidationException("Série não pertence ao Ano Letivo informado.");
         }
 
-        Turma criada = turmaRepository.criar(tenantId, dto.getIdAnoLetivo(), dto.getIdSerie(), dto.getNome(), dto.getTurno(), dto.getSala(), dto.getCapacidade());
+        Turma t = new Turma();
+        t.setId(UUID.randomUUID());
+        t.setTenantId(tenantId);
+        t.setIdAnoLetivo(dto.getIdAnoLetivo());
+        t.setIdSerie(dto.getIdSerie());
+        t.setNome(dto.getNome());
+        t.setTurno(dto.getTurno());
+        t.setSala(dto.getSala());
+        t.setCapacidade(dto.getCapacidade());
+        t.setSituacao("ATIVA");
+        t.setCriadoEm(LocalDateTime.now());
+        t.setAtualizadoEm(LocalDateTime.now());
+        t.setTipoMediador(tipoMediador);
+        t.setHoraInicio(dto.getHoraInicio());
+        t.setHoraTermino(dto.getHoraTermino());
+        t.setDiasSemana(dto.getDiasSemana());
+        t.setCargaHorariaSemanal(dto.getCargaHorariaSemanal());
+        t.setTipoAtendimento(tipoAtendimento);
+        t.setModalidadeEnsino(modalidadeEnsino);
+        t.setFormaOrganizacao(formaOrganizacao);
+
+        Turma criada = turmaRepository.criar(t);
         return toDto(criada);
+    }
+
+    private String valorOuPadrao(String valor, String padrao) {
+        return (valor == null || valor.isBlank()) ? padrao : valor.toUpperCase();
     }
 
     public void encerrar(UUID idTurma) {
@@ -75,13 +122,6 @@ public class TurmaService {
         return turmaRepository.contarMatriculas(tenantId, idTurma);
     }
 
-    /**
-     * Valida se uma turma está apta a receber uma nova matrícula:
-     * - a turma precisa existir e estar com situação ATIVA (não ENCERRADA);
-     * - o ano letivo ao qual ela pertence precisa estar ATIVO (não ARQUIVADO);
-     * - precisa haver vaga disponível (matriculados < capacidade).
-     * Lança ValidationException com a razão específica caso alguma regra falhe.
-     */
     public Turma validarDisponibilidadeParaMatricula(UUID tenantId, UUID idTurma) {
         Turma turma = turmaRepository.buscarPorId(tenantId, idTurma)
                 .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
@@ -116,6 +156,14 @@ public class TurmaService {
         d.setSituacao(t.getSituacao());
         d.setCriadoEm(t.getCriadoEm());
         d.setAtualizadoEm(t.getAtualizadoEm());
+        d.setTipoMediador(t.getTipoMediador());
+        d.setHoraInicio(t.getHoraInicio());
+        d.setHoraTermino(t.getHoraTermino());
+        d.setDiasSemana(t.getDiasSemana());
+        d.setCargaHorariaSemanal(t.getCargaHorariaSemanal());
+        d.setTipoAtendimento(t.getTipoAtendimento());
+        d.setModalidadeEnsino(t.getModalidadeEnsino());
+        d.setFormaOrganizacao(t.getFormaOrganizacao());
         return d;
     }
 }

@@ -8,7 +8,7 @@
 <div th:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-dark mb-0">Turmas</h2>
-        <button class="btn btn-primary" onclick="alert('Funcionalidade de criação a ser implementada')">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-nova-turma">
             <i class="bi bi-plus-lg me-1"></i> Nova Turma
         </button>
     </div>
@@ -35,10 +35,238 @@
         </div>
     </div>
 
-    <!-- Modal para Docentes e Capacidade viriam aqui num app completo -->
+    <!-- Modal de Criação de Turma -->
+    <div class="modal fade" id="modal-nova-turma" tabindex="-1" aria-labelledby="modalNovaTurmaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNovaTurmaLabel">Nova Turma</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="alerta-modal-turma"></div>
+                    <form id="form-nova-turma">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ano Letivo <span class="text-danger">*</span></label>
+                                <select id="nt-ano" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Série <span class="text-danger">*</span></label>
+                                <select id="nt-serie" class="form-select" required></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input id="nt-nome" class="form-control" required maxlength="100" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Turno</label>
+                                <select id="nt-turno" class="form-select">
+                                    <option value="MANHA">MANHÃ</option>
+                                    <option value="TARDE">TARDE</option>
+                                    <option value="NOITE">NOITE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Sala</label>
+                                <input id="nt-sala" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Capacidade <span class="text-danger">*</span></label>
+                                <input id="nt-capacidade" type="number" class="form-control" required min="0" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo Mediador</label>
+                                <select id="nt-tipo-mediador" class="form-select">
+                                    <option value="PRESENCIAL">PRESENCIAL</option>
+                                    <option value="EAD">EAD</option>
+                                    <option value="SEMIPRESENCIAL">SEMIPRESENCIAL</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hora Início</label>
+                                <input id="nt-hora-inicio" type="time" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hora Término</label>
+                                <input id="nt-hora-termino" type="time" class="form-control" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Dias da Semana</label>
+                                <input id="nt-dias-semana" class="form-control" placeholder="SEG,TER,QUA,QUI,SEX" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Carga Horária Semanal</label>
+                                <input id="nt-carga" type="number" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo Atendimento</label>
+                                <select id="nt-tipo-atendimento" class="form-select">
+                                    <option value="ESCOLARIZACAO">ESCOLARIZAÇÃO</option>
+                                    <option value="AEE">AEE</option>
+                                    <option value="ATIVIDADE_COMPLEMENTAR">ATIVIDADE COMPLEMENTAR</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Modalidade Ensino</label>
+                                <select id="nt-modalidade" class="form-select">
+                                    <option value="REGULAR">REGULAR</option>
+                                    <option value="EDUCACAO_ESPECIAL">EDUCAÇÃO ESPECIAL</option>
+                                    <option value="EJA">EJA</option>
+                                    <option value="PROFISSIONAL">PROFISSIONAL</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Forma Organização</label>
+                                <select id="nt-forma-organizacao" class="form-select">
+                                    <option value="SERIE_ANO">SÉRIE/ANO</option>
+                                    <option value="CICLO">CICLO</option>
+                                    <option value="PERIODOS_SEMESTRAIS">PERÍODOS SEMESTRAIS</option>
+                                    <option value="MODULOS">MÓDULOS</option>
+                                    <option value="MULTISSERIADO">MULTISSERIADO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" id="btn-salvar-turma" class="btn btn-primary">Criar Turma</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', carregarTurmas);
+        // Carrega anos e popula séries ao abrir modal
+        var anosCache = [];
+        document.getElementById('modal-nova-turma')?.addEventListener('show.bs.modal', function () {
+            carregarAnosParaModal();
+        });
+
+                function carregarSeriesParaAno(anoId) {
+                    return fetch(`/api/academico/series?idAnoLetivo=${anoId}`)
+                        .then(r => r.ok ? r.json() : Promise.reject(new Error('Erro ao carregar séries')))
+                        .then(series => {
+                            const serieSel = document.getElementById('nt-serie');
+                            serieSel.innerHTML = '';
+                            series.forEach(s => {
+                                const o = document.createElement('option'); o.value = s.id; o.textContent = s.nome;
+                                serieSel.appendChild(o);
+                            });
+                            return series;
+                        }).catch(() => {
+                            const serieSel = document.getElementById('nt-serie');
+                            serieSel.innerHTML = '<option>Erro</option>';
+                            return [];
+                        });
+                }
+
+                function carregarAnosParaModal() {
+                    return fetch('/api/academico/anos-letivos')
+                        .then(r => r.ok ? r.json() : Promise.reject(new Error('Erro ao carregar anos')))
+                        .then(anos => {
+                            anosCache = anos;
+                            const sel = document.getElementById('nt-ano');
+                            sel.innerHTML = '';
+                            anos.filter(a => a.ativo).forEach(a => {
+                                const opt = document.createElement('option');
+                                opt.value = a.id; opt.textContent = a.ano + ' (ATIVO)';
+                                sel.appendChild(opt);
+                            });
+                            if(sel.options.length === 0) {
+                                sel.innerHTML = '<option value="">Nenhum ano ativo</option>';
+                                document.getElementById('btn-salvar-turma').disabled = true;
+                                return anos;
+                            } else {
+                                document.getElementById('btn-salvar-turma').disabled = false;
+                            }
+
+                            sel.onchange = function() {
+                                const id = sel.value;
+                                carregarSeriesParaAno(id);
+                            };
+
+                            if (sel.options.length > 0) sel.dispatchEvent(new Event('change'));
+                            return anos;
+                        });
+                }
+
+        document.getElementById('btn-salvar-turma')?.addEventListener('click', function() {
+            const payload = {
+                idAnoLetivo: document.getElementById('nt-ano').value || null,
+                idSerie: document.getElementById('nt-serie').value || null,
+                nome: document.getElementById('nt-nome').value,
+                turno: document.getElementById('nt-turno').value,
+                sala: document.getElementById('nt-sala').value,
+                capacidade: parseInt(document.getElementById('nt-capacidade').value, 10) || 0,
+                tipoMediador: document.getElementById('nt-tipo-mediador').value,
+                horaInicio: document.getElementById('nt-hora-inicio').value || null,
+                horaTermino: document.getElementById('nt-hora-termino').value || null,
+                diasSemana: document.getElementById('nt-dias-semana').value || null,
+                cargaHorariaSemanal: parseInt(document.getElementById('nt-carga').value, 10) || null,
+                tipoAtendimento: document.getElementById('nt-tipo-atendimento').value,
+                modalidadeEnsino: document.getElementById('nt-modalidade').value,
+                formaOrganizacao: document.getElementById('nt-forma-organizacao').value
+            };
+
+            const btn = document.getElementById('btn-salvar-turma');
+            btn.disabled = true; btn.innerText = 'Salvando...';
+
+            fetch('/api/academico/turmas', {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            })
+            .then(r => r.json().then(b => ({status: r.status, body: b})))
+            .then(result => {
+                btn.disabled = false; btn.innerText = 'Criar Turma';
+                if (result.status === 201) {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('modal-nova-turma'));
+                    modal.hide();
+                    carregarTurmas();
+                } else {
+                    const container = document.getElementById('alerta-modal-turma');
+                    container.innerHTML = `<div class="alert alert-danger">${result.body.message || 'Erro ao criar turma.'}</div>`;
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                btn.disabled = false; btn.innerText = 'Criar Turma';
+                document.getElementById('alerta-modal-turma').innerHTML = `<div class="alert alert-danger">Erro interno.</div>`;
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarTurmas();
+            const params = new URLSearchParams(window.location.search);
+            const idSerieParam = params.get('idSerie');
+            if (idSerieParam) {
+                // Busca a série para descobrir o anoLetivo dela e pré-selecionar
+                fetch(`/api/academico/series/${idSerieParam}`)
+                    .then(r => r.ok ? r.json() : Promise.reject())
+                    .then(serie => {
+                        const idAno = serie.idAnoLetivo || serie.idAno || serie.anoLetivoId || null;
+                        carregarAnosParaModal().then(() => {
+                            if (idAno) {
+                                const selAno = document.getElementById('nt-ano');
+                                selAno.value = idAno;
+                                return carregarSeriesParaAno(idAno).then(() => {
+                                    const selSerie = document.getElementById('nt-serie');
+                                    selSerie.value = idSerieParam;
+                                    const modalEl = document.getElementById('modal-nova-turma');
+                                    const modal = new bootstrap.Modal(modalEl);
+                                    modal.show();
+                                });
+                            } else {
+                                const modalEl = document.getElementById('modal-nova-turma');
+                                const modal = new bootstrap.Modal(modalEl);
+                                modal.show();
+                            }
+                        }).catch(() => {});
+                    }).catch(() => {});
+            }
+        });
 
         function carregarTurmas() {
             fetch('/api/academico/turmas')

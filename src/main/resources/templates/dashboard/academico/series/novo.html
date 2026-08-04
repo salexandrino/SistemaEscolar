@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Nova Série - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Nova Série</h2>
+        <a href="/dashboard/academico/series" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div id="alerta-container"></div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form id="form-criar-serie">
+                        <div class="mb-3">
+                            <label for="input-ano-letivo" class="form-label">Ano Letivo <span class="text-danger">*</span></label>
+                            <select class="form-select" id="input-ano-letivo" required>
+                                <option value="">Selecionar...</option>
+                            </select>
+                            <div class="form-text">Selecione um ano letivo ATIVO para criar a série.</div>
+                            <div id="aviso-ano-letivo" class="alert alert-warning d-none mt-2" role="alert">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <strong>Atenção:</strong> Não há nenhum Ano Letivo ATIVO cadastrado. 
+                                <a href="/dashboard/academico/anos-letivos">Crie um Ano Letivo</a> antes de continuar.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="input-nome" class="form-label">Nome da Série <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="input-nome" placeholder="Ex: 1º Ano, 6º Ano" required maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="input-etapa-ensino" class="form-label">Etapa de Ensino</label>
+                            <select class="form-select" id="input-etapa-ensino">
+                                <option value="">Não especificado</option>
+                                <option value="INFANTIL_CRECHE">Educação Infantil - Creche</option>
+                                <option value="INFANTIL_PRE_ESCOLA">Educação Infantil - Pré-Escola</option>
+                                <option value="FUNDAMENTAL_ANOS_INICIAIS">Fundamental - Anos Iniciais (1º ao 5º)</option>
+                                <option value="FUNDAMENTAL_ANOS_FINAIS">Fundamental - Anos Finais (6º ao 9º)</option>
+                                <option value="MEDIO">Ensino Médio</option>
+                                <option value="EJA">Educação de Jovens e Adultos (EJA)</option>
+                                <option value="TECNICO">Ensino Técnico</option>
+                            </select>
+                            <div class="form-text">Campo opcional. Conforme Educacenso.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btn-submit">
+                                <i class="bi bi-check-circle"></i> Criar Série
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Dicas</h6>
+                    <ul class="small list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-success"></i> O nome da série deve ser único dentro do mesmo ano letivo.</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i> A etapa de ensino ajuda a classificar a série conforme as normas do Educacenso.</li>
+                        <li><i class="bi bi-check-circle-fill text-success"></i> Você precisará criar séries antes de cadastrar turmas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let anosLetivos = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarAnosLetivos();
+            document.getElementById('form-criar-serie').addEventListener('submit', criarSerie);
+        });
+
+        function carregarAnosLetivos() {
+            fetch('/api/academico/anos-letivos', {method: 'GET'})
+                .then(r => r.json())
+                .then(anos => {
+                    anosLetivos = anos;
+                    const select = document.getElementById('input-ano-letivo');
+                    const aviso = document.getElementById('aviso-ano-letivo');
+
+                    const ativosExistem = anos.some(a => a.ativo);
+                    if (!ativosExistem) {
+                        aviso.classList.remove('d-none');
+                        document.getElementById('form-criar-serie').style.opacity = '0.5';
+                        document.getElementById('btn-submit').disabled = true;
+                        return;
+                    }
+
+                    select.innerHTML = '<option value="">Selecionar...</option>';
+                    anos.filter(a => a.ativo).forEach(a => {
+                        const option = document.createElement('option');
+                        option.value = a.id;
+                        option.textContent = a.ano + ' (ATIVO)';
+                        select.appendChild(option);
+                    });
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta('Erro ao carregar anos letivos.', 'danger');
+                });
+        }
+
+        function criarSerie(e) {
+            e.preventDefault();
+
+            const idAnoLetivo = document.getElementById('input-ano-letivo').value;
+            const nome = document.getElementById('input-nome').value;
+            const etapaEnsino = document.getElementById('input-etapa-ensino').value;
+
+            if (!idAnoLetivo) {
+                mostrarAlerta('Selecione um Ano Letivo.', 'warning');
+                return;
+            }
+
+            if (!nome.trim()) {
+                mostrarAlerta('Informe o nome da série.', 'warning');
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'Criando...';
+
+            fetch('/api/academico/series', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    idAnoLetivo: idAnoLetivo,
+                    nome: nome.trim(),
+                    etapaEnsino: etapaEnsino || null
+                })
+            })
+            .then(r => r.json().then(body => ({status: r.status, body})))
+            .then(result => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Criar Série';
+
+                if (result.status === 201) {
+                    mostrarAlerta('Série criada com sucesso! Redirecionando...', 'success');
+                    setTimeout(() => {
+                                            window.location.href = '/portal/series';
+                    }, 2000);
+                } else {
+                    mostrarAlerta(result.body.message || 'Erro ao criar série.', 'danger');
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Criar Série';
+                mostrarAlerta('Ocorreu um erro interno. Tente novamente mais tarde.', 'danger');
+            });
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const container = document.getElementById('alerta-container');
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+            alerta.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alerta);
+
+            setTimeout(() => alerta.remove(), 5000);
+        }
+    </script>
+</div>
+</body>
+</html>

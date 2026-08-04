@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Editar Série - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Editar Série</h2>
+        <a href="/dashboard/academico/series" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div id="alerta-container"></div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form id="form-editar-serie">
+                        <div class="mb-3">
+                            <label for="input-ano-letivo" class="form-label">Ano Letivo</label>
+                            <input type="text" class="form-control" id="input-ano-letivo" disabled>
+                            <div class="form-text">Não é possível alterar o Ano Letivo de uma série já criada.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="input-nome" class="form-label">Nome da Série <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="input-nome" required maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="input-etapa-ensino" class="form-label">Etapa de Ensino</label>
+                            <select class="form-select" id="input-etapa-ensino">
+                                <option value="">Não especificado</option>
+                                <option value="INFANTIL_CRECHE">Educação Infantil - Creche</option>
+                                <option value="INFANTIL_PRE_ESCOLA">Educação Infantil - Pré-Escola</option>
+                                <option value="FUNDAMENTAL_ANOS_INICIAIS">Fundamental - Anos Iniciais (1º ao 5º)</option>
+                                <option value="FUNDAMENTAL_ANOS_FINAIS">Fundamental - Anos Finais (6º ao 9º)</option>
+                                <option value="MEDIO">Ensino Médio</option>
+                                <option value="EJA">Educação de Jovens e Adultos (EJA)</option>
+                                <option value="TECNICO">Ensino Técnico</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="btn-submit">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Informações</h6>
+                    <div class="small text-muted">
+                        <p><strong>ID:</strong> <span id="info-id">-</span></p>
+                        <p><strong>Criado em:</strong> <span id="info-criado">-</span></p>
+                        <p><strong>Atualizado em:</strong> <span id="info-atualizado">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let serieAtual = null;
+        let anoLetivoAtual = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!id) {
+                mostrarAlerta('ID da série não fornecido.', 'danger');
+                setTimeout(() => window.location.href = '/portal/series', 2000);
+                return;
+            }
+
+            carregarSerie(id);
+            document.getElementById('form-editar-serie').addEventListener('submit', editarSerie);
+        });
+
+        function carregarSerie(id) {
+            fetch(`/api/academico/series/${id}`, {method: 'GET'})
+                .then(r => r.json())
+                .then(serie => {
+                    serieAtual = serie;
+                    document.getElementById('input-nome').value = serie.nome;
+                    document.getElementById('input-etapa-ensino').value = serie.etapaEnsino || '';
+                    document.getElementById('input-ano-letivo').value = serie.idAnoLetivo;
+
+                    document.getElementById('info-id').textContent = serie.id;
+                    document.getElementById('info-criado').textContent = formatarData(serie.criadoEm);
+                    document.getElementById('info-atualizado').textContent = formatarData(serie.atualizadoEm);
+
+                    carregarAnoLetivo(serie.idAnoLetivo);
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta('Erro ao carregar série.', 'danger');
+                });
+        }
+
+        function carregarAnoLetivo(id) {
+            fetch(`/api/academico/anos-letivos`, {method: 'GET'})
+                .then(r => r.json())
+                .then(anos => {
+                    const ano = anos.find(a => a.id === id);
+                    if (ano) {
+                        anoLetivoAtual = ano;
+                        document.getElementById('input-ano-letivo').value = ano.ano;
+                    }
+                })
+                .catch(e => console.error(e));
+        }
+
+        function editarSerie(e) {
+            e.preventDefault();
+
+            const nome = document.getElementById('input-nome').value;
+            const etapaEnsino = document.getElementById('input-etapa-ensino').value;
+
+            if (!nome.trim()) {
+                mostrarAlerta('Informe o nome da série.', 'warning');
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btn-submit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = 'Salvando...';
+
+            fetch(`/api/academico/series/${serieAtual.id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nome: nome.trim(),
+                    etapaEnsino: etapaEnsino || null
+                })
+            })
+            .then(r => r.json().then(body => ({status: r.status, body})))
+            .then(result => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Salvar Alterações';
+
+                if (result.status === 200 || result.status === 204) {
+                    mostrarAlerta('Série atualizada com sucesso!', 'success');
+                    setTimeout(() => {
+                                        window.location.href = '/portal/series';
+                    }, 2000);
+                } else {
+                    mostrarAlerta(result.body.message || 'Erro ao atualizar série.', 'danger');
+                }
+            })
+            .catch(e => {
+                console.error(e);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'Salvar Alterações';
+                mostrarAlerta('Ocorreu um erro interno. Tente novamente mais tarde.', 'danger');
+            });
+        }
+
+        function formatarData(data) {
+            if (!data) return '-';
+            return new Date(data).toLocaleDateString('pt-BR') + ' ' + new Date(data).toLocaleTimeString('pt-BR');
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const container = document.getElementById('alerta-container');
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+            alerta.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alerta);
+
+            setTimeout(() => alerta.remove(), 5000);
+        }
+    </script>
+</div>
+</body>
+</html>

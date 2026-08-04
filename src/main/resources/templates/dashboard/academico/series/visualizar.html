@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Visualizar Série - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0" id="titulo-serie">Série</h2>
+        <div>
+            <a href="/dashboard/academico/series" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <a href="javascript:void(0)" onclick="irParaEdicao()" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <button onclick="deletarSerie()" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Deletar
+            </button>
+        </div>
+    </div>
+
+    <div id="alerta-container"></div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">Informações da Série</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Nome</label>
+                            <p id="info-nome" class="text-dark">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Etapa de Ensino</label>
+                            <p id="info-etapa" class="text-dark">-</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Ano Letivo</label>
+                            <p id="info-ano-letivo" class="text-dark">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">ID</label>
+                            <p id="info-id" class="text-muted font-monospace small">-</p>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Criado em</label>
+                            <p id="info-criado" class="text-muted small">-</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Atualizado em</label>
+                            <p id="info-atualizado" class="text-muted small">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mt-3">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">Turmas Relacionadas</h5>
+                </div>
+                <div class="card-body">
+                    <div id="lista-turmas">
+                        <p class="text-muted text-center py-4">Carregando turmas...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">Ações Rápidas</h6>
+                    <div class="d-grid gap-2">
+                        <a href="javascript:void(0)" onclick="irParaNovaAssociacao()" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Criar Turma
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 bg-info text-white mt-3">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-2">Dica</h6>
+                    <small>
+                        Antes de deletar uma série, certifique-se de que não há turmas relacionadas. 
+                        Se houver turmas, remova-as primeiro.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let serieAtual = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!id) {
+                mostrarAlerta('ID da série não fornecido.', 'danger');
+                setTimeout(() => window.location.href = '/dashboard/academico/series', 2000);
+                return;
+            }
+
+            carregarSerie(id);
+        });
+
+        function carregarSerie(id) {
+            fetch(`/api/academico/series/${id}`, {method: 'GET'})
+                .then(r => r.json())
+                .then(serie => {
+                    serieAtual = serie;
+                    document.getElementById('titulo-serie').textContent = `Série: ${serie.nome}`;
+                    document.getElementById('info-nome').textContent = serie.nome;
+                    document.getElementById('info-etapa').textContent = serie.etapaEnsino || '(não especificado)';
+                    document.getElementById('info-id').textContent = serie.id;
+                    document.getElementById('info-criado').textContent = formatarDataHora(serie.criadoEm);
+                    document.getElementById('info-atualizado').textContent = formatarDataHora(serie.atualizadoEm);
+
+                    carregarAnoLetivo(serie.idAnoLetivo);
+                    carregarTurmas(id);
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta('Erro ao carregar série.', 'danger');
+                });
+        }
+
+        function carregarAnoLetivo(id) {
+            fetch('/api/academico/anos-letivos', {method: 'GET'})
+                .then(r => r.json())
+                .then(anos => {
+                    const ano = anos.find(a => a.id === id);
+                    if (ano) {
+                        document.getElementById('info-ano-letivo').textContent = ano.ano + (ano.ativo ? ' (ATIVO)' : ' (ARQUIVADO)');
+                    }
+                })
+                .catch(e => console.error(e));
+        }
+
+        function carregarTurmas(idSerie) {
+            // Implementar carregamento de turmas relacionadas
+            // Por enquanto, exibir mensagem de placeholder
+            const container = document.getElementById('lista-turmas');
+            container.innerHTML = '<p class="text-muted text-center py-4">Nenhuma turma cadastrada para esta série.</p>';
+        }
+
+        function irParaEdicao() {
+            if (serieAtual) {
+                        window.location.href = `/portal/series/editar?id=${serieAtual.id}`;
+            }
+        }
+
+        function irParaNovaAssociacao() {
+            if (serieAtual) {
+                window.location.href = `/portal/turmas?idSerie=${serieAtual.id}`;
+            }
+        }
+
+        function deletarSerie() {
+            if (!serieAtual) return;
+
+            if (!confirm('Tem certeza que deseja deletar esta série? Esta ação não pode ser desfeita.')) return;
+
+            const btn = event.target.closest('button');
+            btn.disabled = true;
+            btn.innerText = 'Deletando...';
+
+            fetch(`/api/academico/series/${serieAtual.id}`, {method: 'DELETE'})
+                .then(r => {
+                    if (r.status === 204) {
+                        mostrarAlerta('Série deletada com sucesso! Redirecionando...', 'success');
+                        setTimeout(() => {
+                                                window.location.href = '/portal/series';
+                        }, 2000);
+                    } else {
+                        return r.json().then(body => {
+                            throw new Error(body.message || 'Erro ao deletar série.');
+                        });
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta(e.message || 'Erro ao deletar série.', 'danger');
+                    btn.disabled = false;
+                    btn.innerText = 'Deletar';
+                });
+        }
+
+        function formatarDataHora(data) {
+            if (!data) return '-';
+            return new Date(data).toLocaleDateString('pt-BR') + ' ' + new Date(data).toLocaleTimeString('pt-BR');
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const container = document.getElementById('alerta-container');
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+            alerta.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alerta);
+
+            setTimeout(() => alerta.remove(), 5000);
+        }
+    </script>
+</div>
+</body>
+</html>

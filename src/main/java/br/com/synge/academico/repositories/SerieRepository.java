@@ -21,11 +21,12 @@ public class SerieRepository extends BaseDAO {
         s.setNome(rs.getString("nome"));
         s.setCriadoEm(rs.getObject("criado_em", LocalDateTime.class));
         s.setAtualizadoEm(rs.getObject("atualizado_em", LocalDateTime.class));
+        s.setEtapaEnsino(rs.getString("etapa_ensino"));
         return s;
     }
 
-    public Serie criar(UUID tenantId, UUID idAnoLetivo, String nome) {
-        String sql = "INSERT INTO serie (id, tenant_id, id_ano_letivo, nome, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?)";
+    public Serie criar(UUID tenantId, UUID idAnoLetivo, String nome, String etapaEnsino) {
+        String sql = "INSERT INTO serie (id, tenant_id, id_ano_letivo, nome, criado_em, atualizado_em, etapa_ensino) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Serie s = new Serie();
         s.setId(UUID.randomUUID());
         s.setTenantId(tenantId);
@@ -33,6 +34,7 @@ public class SerieRepository extends BaseDAO {
         s.setNome(nome);
         s.setCriadoEm(LocalDateTime.now());
         s.setAtualizadoEm(LocalDateTime.now());
+        s.setEtapaEnsino(etapaEnsino);
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setObject(1, s.getId());
             ps.setObject(2, s.getTenantId());
@@ -40,6 +42,7 @@ public class SerieRepository extends BaseDAO {
             ps.setString(4, s.getNome());
             ps.setObject(5, s.getCriadoEm());
             ps.setObject(6, s.getAtualizadoEm());
+            ps.setString(7, s.getEtapaEnsino());
             ps.executeUpdate();
             return s;
         } catch (SQLException e) {
@@ -48,12 +51,13 @@ public class SerieRepository extends BaseDAO {
         }
     }
 
-    public void atualizar(UUID tenantId, UUID id, String nome) {
-        String sql = "UPDATE serie SET nome = ?, atualizado_em = CURRENT_TIMESTAMP WHERE id = ? AND tenant_id = ?";
+    public void atualizar(UUID tenantId, UUID id, String nome, String etapaEnsino) {
+        String sql = "UPDATE serie SET nome = ?, etapa_ensino = ?, atualizado_em = CURRENT_TIMESTAMP WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, nome);
-            ps.setObject(2, id);
-            ps.setObject(3, tenantId);
+            ps.setString(2, etapaEnsino);
+            ps.setObject(3, id);
+            ps.setObject(4, tenantId);
             int n = ps.executeUpdate();
             if (n == 0) throw new RuntimeException("Série não encontrada para atualização.");
         } catch (SQLException e) {

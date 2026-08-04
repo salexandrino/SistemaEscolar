@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Séries - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Séries</h2>
+        <a href="javascript:void(0)" class="btn btn-primary" id="btn-nova-serie">
+            <i class="bi bi-plus-circle"></i> Nova Série
+        </a>
+    </div>
+
+    <div id="alerta-container"></div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="select-ano-letivo" class="form-label">Filtrar por Ano Letivo</label>
+                <select class="form-select" id="select-ano-letivo">
+                    <option value="">Carregando...</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="table-light">
+                            <th>Nome</th>
+                            <th>Etapa de Ensino</th>
+                            <th>Ano Letivo</th>
+                            <th>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-series">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Carregando séries...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let anosLetivos = [];
+        let anoLetivoAtivo = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarAnosLetivos();
+            document.getElementById('select-ano-letivo').addEventListener('change', carregarSeries);
+            document.getElementById('btn-nova-serie').addEventListener('click', irParaNovaSerie);
+        });
+
+        function carregarAnosLetivos() {
+            fetch('/api/academico/anos-letivos', {method: 'GET'})
+                .then(r => r.json())
+                .then(anos => {
+                    anosLetivos = anos;
+                    const select = document.getElementById('select-ano-letivo');
+                    select.innerHTML = '';
+
+                    anoLetivoAtivo = anos.find(a => a.ativo);
+
+                    anos.forEach(a => {
+                        const option = document.createElement('option');
+                        option.value = a.id;
+                        option.textContent = a.ano + (a.ativo ? ' (ATIVO)' : ' (ARQUIVADO)');
+                        select.appendChild(option);
+                    });
+
+                    if (anoLetivoAtivo) {
+                        select.value = anoLetivoAtivo.id;
+                        carregarSeries();
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta('Erro ao carregar anos letivos.', 'danger');
+                });
+        }
+
+        function carregarSeries() {
+            const idAno = document.getElementById('select-ano-letivo').value;
+            if (!idAno) {
+                document.getElementById('tabela-series').innerHTML = 
+                    '<tr><td colspan="5" class="text-center text-muted py-4">Nenhum ano letivo selecionado.</td></tr>';
+                return;
+            }
+
+            fetch(`/api/academico/series?idAnoLetivo=${idAno}`, {method: 'GET'})
+                .then(r => r.json())
+                .then(series => {
+                    const tbody = document.getElementById('tabela-series');
+                    if (series.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Nenhuma série cadastrada.</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = series.map(s => `
+                        <tr>
+                            <td><strong>${s.nome}</strong></td>
+                            <td><small class="text-muted">${s.etapaEnsino || '-'}</small></td>
+                            <td>${anosLetivos.find(a => a.id === s.idAnoLetivo)?.ano || '-'}</td>
+                            <td><small>${formatarData(s.criadoEm)}</small></td>
+                            <td>
+                                <a href="javascript:void(0)" onclick="irParaVisualizacao('${s.id}')" class="btn btn-sm btn-info">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <a href="javascript:void(0)" onclick="irParaEdicao('${s.id}')" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <button onclick="deletarSerie('${s.id}')" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Deletar
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta('Erro ao carregar séries.', 'danger');
+                });
+        }
+
+        function irParaNovaSerie() {
+                    window.location.href = '/portal/series/novo';
+        }
+
+        function irParaVisualizacao(id) {
+                    window.location.href = `/portal/series/visualizar?id=${id}`;
+        }
+
+        function irParaEdicao(id) {
+                    window.location.href = `/portal/series/editar?id=${id}`;
+        }
+
+        function deletarSerie(id) {
+            if (!confirm('Tem certeza que deseja deletar esta série?')) return;
+
+            fetch(`/api/academico/series/${id}`, {method: 'DELETE'})
+                .then(r => {
+                    if (r.status === 204) {
+                        mostrarAlerta('Série deletada com sucesso.', 'success');
+                        setTimeout(() => carregarSeries(), 1500);
+                    } else {
+                        return r.json().then(body => {
+                            throw new Error(body.message || 'Erro ao deletar série.');
+                        });
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    mostrarAlerta(e.message || 'Erro ao deletar série.', 'danger');
+                });
+        }
+
+        function formatarData(data) {
+            if (!data) return '-';
+            return new Date(data).toLocaleDateString('pt-BR');
+        }
+
+        function mostrarAlerta(mensagem, tipo) {
+            const container = document.getElementById('alerta-container');
+            const alerta = document.createElement('div');
+            alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
+            alerta.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(alerta);
+
+            setTimeout(() => alerta.remove(), 5000);
+        }
+    </script>
+</div>
+</body>
+</html>

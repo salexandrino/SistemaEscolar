@@ -11,6 +11,11 @@ public class Serie {
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
+    // ===== Censo Escolar (Educacenso) =====
+    // Lista essencial — pode crescer se precisar diferenciar mais (ex.:
+    // Fundamental Anos Iniciais vs Finais já cobre a divisão oficial 1º-5º/6º-9º).
+    private String etapaEnsino; // INFANTIL_CRECHE, INFANTIL_PRE_ESCOLA, FUNDAMENTAL_ANOS_INICIAIS, FUNDAMENTAL_ANOS_FINAIS, MEDIO, EJA, TECNICO
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public UUID getTenantId() { return tenantId; }
@@ -23,4 +28,6 @@ public class Serie {
     public void setCriadoEm(LocalDateTime criadoEm) { this.criadoEm = criadoEm; }
     public LocalDateTime getAtualizadoEm() { return atualizadoEm; }
     public void setAtualizadoEm(LocalDateTime atualizadoEm) { this.atualizadoEm = atualizadoEm; }
+    public String getEtapaEnsino() { return etapaEnsino; }
+    public void setEtapaEnsino(String etapaEnsino) { this.etapaEnsino = etapaEnsino; }
 }

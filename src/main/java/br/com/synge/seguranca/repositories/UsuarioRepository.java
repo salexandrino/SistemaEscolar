@@ -484,7 +484,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
             int linhasAfetadas = stmt.executeUpdate();
             if (linhasAfetadas == 0) {
-                logger.warn("Troca de senha: nenhuma linha atualizada para usuário ID {} / tenant ID {}. Verifique se o tenant_id do usuário no banco bate com o do token JWT.", id, tenantId);
+                logger.warn("Troca de senha: nenhuma linha atualizada para usuário ID {} / tenant ID {}.", id, tenantId);
                 throw new RuntimeException("Não foi possível atualizar a senha: usuário não encontrado para este tenant.");
             }
 

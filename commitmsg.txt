@@ -1,0 +1,3 @@
+﻿Fix: corrigir navegação de séries para /portal, adicionar rota /portal/professores, melhorar modal de criação de turmas (?idSerie preselect) e limpar templates órfãos.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>

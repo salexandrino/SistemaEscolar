@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
+    <title>Professores - SYNGE</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Professores</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-novo-professor">
+            <i class="bi bi-plus-lg me-1"></i> Novo Professor
+        </button>
+    </div>
+
+    <div id="alerta-container"></div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Nome</th>
+                        <th>CPF</th>
+                        <th>E-mail</th>
+                        <th>Telefone</th>
+                        <th>Carga Horária</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabela-professores">
+                    <tr><td colspan="6" class="text-center py-4">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Novo Professor -->
+    <div class="modal fade" id="modal-novo-professor" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Novo Professor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="alerta-modal-professor"></div>
+                    <form id="form-novo-professor">
+                        <div class="mb-3">
+                            <label class="form-label">Nome <span class="text-danger">*</span></label>
+                            <input id="p-nome" class="form-control" required maxlength="150" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CPF</label>
+                            <input id="p-cpf" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">E-mail</label>
+                            <input id="p-email" type="email" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefone</label>
+                            <input id="p-telefone" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Carga Horária Contratual</label>
+                            <input id="p-carga" type="number" class="form-control" min="0" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" id="btn-salvar-professor" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){ carregarProfessores(); });
+
+        function carregarProfessores() {
+            fetch('/api/academico/professores')
+                .then(r => r.json())
+                .then(dados => {
+                    const tbody = document.getElementById('tabela-professores');
+                    if(!dados || dados.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">Nenhum professor encontrado.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = dados.map(p => `
+                        <tr>
+                            <td class="ps-4">${p.nome}</td>
+                            <td>${p.cpf || '-'}</td>
+                            <td>${p.email || '-'}</td>
+                            <td>${p.telefone || '-'}</td>
+                            <td>${p.cargaHorariaContratual || '-'}</td>
+                            <td class="text-end pe-4">
+                                <a href="/portal/professores/editar?id=${p.id}" class="btn btn-sm btn-warning me-1">Editar</a>
+                                <button class="btn btn-sm btn-danger" onclick="inativarProfessor('${p.id}')">Inativar</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        document.getElementById('btn-salvar-professor')?.addEventListener('click', function(){
+            const payload = {
+                nome: document.getElementById('p-nome').value,
+                cpf: document.getElementById('p-cpf').value || null,
+                email: document.getElementById('p-email').value || null,
+                telefone: document.getElementById('p-telefone').value || null,
+                cargaHorariaContratual: parseInt(document.getElementById('p-carga').value, 10) || null
+            };
+            const btn = document.getElementById('btn-salvar-professor'); btn.disabled = true; btn.innerText = 'Salvando...';
+            fetch('/api/academico/professores', {method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)})
+                .then(r => r.json().then(b => ({status: r.status, body: b})))
+                .then(res => {
+                    btn.disabled = false; btn.innerText = 'Salvar';
+                    if(res.status === 201) { var modal = bootstrap.Modal.getInstance(document.getElementById('modal-novo-professor')); modal.hide(); carregarProfessores(); }
+                    else document.getElementById('alerta-modal-professor').innerHTML = `<div class='alert alert-danger'>${res.body.message || 'Erro'}</div>`;
+                }).catch(e => { console.error(e); btn.disabled = false; btn.innerText = 'Salvar'; document.getElementById('alerta-modal-professor').innerHTML = '<div class="alert alert-danger">Erro interno</div>'; });
+        });
+
+        function inativarProfessor(id) {
+            if(!confirm('Deseja inativar este professor?')) return;
+            fetch(`/api/academico/professores/${id}`, {method: 'DELETE'})
+                .then(r => { if(r.ok) carregarProfessores(); else r.json().then(b => alert(b.message || 'Erro')); });
+        }
+    </script>
+
+</div>
+</body>
+</html>

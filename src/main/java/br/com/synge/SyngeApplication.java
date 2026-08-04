@@ -157,7 +157,7 @@ public class SyngeApplication {
         // Acadêmico
         DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
         AnoLetivoService anoLetivoService = new AnoLetivoService(anoLetivoRepository, cloneRepository);
-        SerieService serieService = new SerieService(serieRepository, anoLetivoRepository);
+        SerieService serieService = new SerieService(serieRepository, anoLetivoRepository, turmaRepository);
         MatrizCurricularService matrizCurricularService = new MatrizCurricularService(serieDisciplinaRepository, serieRepository, disciplinaRepository);
         TurmaService turmaService = new TurmaService(turmaRepository, anoLetivoRepository, serieRepository);
         AlocacaoDocenteService alocacaoDocenteService = new AlocacaoDocenteService(tdpRepository, serieDisciplinaRepository, turmaRepository, professorRepository);
@@ -324,6 +324,12 @@ public class SyngeApplication {
 
         app.before("/portal/anos-letivos", uiAcessoPeriodosSeries);
         app.before("/portal/series", uiAcessoPeriodosSeries);
+        app.before("/portal/professores", uiAcessoPeriodosSeries);
+        app.get("/portal/professores", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/escola/professores");
+            ctx.html(templateEngine.process("dashboard/escola/professores", context));
+        });
         app.before("/portal/turmas", uiAcessoTurmasAlunos);
         app.before("/portal/alunos", uiAcessoTurmasAlunos);
         app.before("/portal/notas", uiAcessoBoletim);
@@ -343,8 +349,26 @@ public class SyngeApplication {
 
         app.get("/portal/series", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-            context.setVariable("content", "dashboard/escola/series");
-            ctx.html(templateEngine.process("dashboard/escola/series", context));
+            context.setVariable("content", "dashboard/academico/series/index");
+            ctx.html(templateEngine.process("dashboard/academico/series/index", context));
+        });
+
+        app.get("/portal/series/novo", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/academico/series/novo");
+            ctx.html(templateEngine.process("dashboard/academico/series/novo", context));
+        });
+
+        app.get("/portal/series/editar", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/academico/series/editar");
+            ctx.html(templateEngine.process("dashboard/academico/series/editar", context));
+        });
+
+        app.get("/portal/series/visualizar", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            context.setVariable("content", "dashboard/academico/series/visualizar");
+            ctx.html(templateEngine.process("dashboard/academico/series/visualizar", context));
         });
 
         app.get("/portal/turmas", ctx -> {
@@ -366,8 +390,16 @@ public class SyngeApplication {
         });
 
         app.get("/portal/perfil", ctx -> {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                ctx.redirect("/login");
+                return;
+            }
             Context context = new Context(ctx.req().getLocale());
             context.setVariable("content", "portal/perfil");
+            Usuario usuarioReal = usuarioRepository.findById(currentUser.getUserId())
+                    .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+            context.setVariable("usuarioLogado", usuarioReal);
             ctx.html(templateEngine.process("portal/perfil", context));
         });
 
