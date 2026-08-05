@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR"
       xmlns:th="http://www.thymeleaf.org"
-      th:fragment="layout(title, content, scripts)">
+      th:fragment="html(content)">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title th:replace="${title}">
-        SYNGE - Portal Escolar
-    </title>
+    <title>SYNGE - Portal Escolar</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,45 +19,37 @@
             position:fixed;
             background:#0a4b29;
         }
-
         .main-content{
             margin-left:260px;
             padding:30px;
             background:#f8f9fa;
             min-height:100vh;
         }
-
         .logo-container-sidebar{
             height:50px;
             display:flex;
             align-items:center;
         }
-
         .logo-oficial-topo{
             max-height:100%;
             max-width:150px;
             object-fit:contain;
         }
-
         .sidebar .nav-link{
             color:rgba(255,255,255,.75)!important;
         }
-
         .sidebar .nav-link:hover{
             color:#fff!important;
             background:rgba(255,255,255,.08);
         }
-
         .sidebar .nav-link.active{
             color:#fff!important;
             background:#198754!important;
         }
-
         .btn-primary{
             background:#198754!important;
             border-color:#198754!important;
         }
-
         .btn-primary:hover{
             background:#146c43!important;
             border-color:#146c43!important;
@@ -73,106 +62,67 @@
 <div class="sidebar d-flex flex-column p-3">
 
     <div class="logo-container-sidebar mb-4 px-2">
-        <img src="/images/logo.png"
-             class="logo-oficial-topo"
-             alt="Logo">
+        <img src="/images/logo.png" class="logo-oficial-topo" alt="Logo">
     </div>
 
     <hr class="border-light opacity-25">
 
     <ul class="nav nav-pills flex-column mb-auto gap-1">
-
         <li class="nav-item">
             <a href="/hub" class="nav-link">
-                <i class="bi bi-grid-1x2-fill me-2"></i>
-                Painel Inicial
+                <i class="bi bi-grid-1x2-fill me-2"></i>Painel Inicial
             </a>
         </li>
-
         <li>
             <a href="/portal/turmas" class="nav-link">
-                <i class="bi bi-collection-fill me-2"></i>
-                Minhas Turmas
+                <i class="bi bi-collection-fill me-2"></i>Minhas Turmas
             </a>
         </li>
-
         <li>
             <a href="/portal/alunos" class="nav-link">
-                <i class="bi bi-people-fill me-2"></i>
-                Alunos
+                <i class="bi bi-people-fill me-2"></i>Alunos
             </a>
         </li>
-
         <li>
             <a href="/portal/professores" class="nav-link">
-                <i class="bi bi-person-badge-fill me-2"></i>
-                Professores
+                <i class="bi bi-person-badge-fill me-2"></i>Professores
             </a>
         </li>
-
         <li>
             <a href="/portal/notas" class="nav-link">
-                <i class="bi bi-journal-bookmark-fill me-2"></i>
-                Notas
+                <i class="bi bi-journal-bookmark-fill me-2"></i>Notas
             </a>
         </li>
-
     </ul>
 
     <hr class="border-light opacity-25">
 
     <div class="dropdown">
-
         <a href="#"
            class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            data-bs-toggle="dropdown">
-
             <img src="https://ui-avatars.com/api/?name=User&background=198754&color=fff"
-                 width="32"
-                 height="32"
-                 class="rounded-circle me-2">
-
+                 width="32" height="32" class="rounded-circle me-2">
             <strong>Meu Perfil</strong>
-
         </a>
-
         <ul class="dropdown-menu">
-
-            <li>
-                <a class="dropdown-item" href="/portal/perfil">
-                    Minha Conta
-                </a>
-            </li>
-
-            <li>
-                <hr class="dropdown-divider">
-            </li>
-
+            <li><a class="dropdown-item" href="/portal/perfil">Minha Conta</a></li>
+            <li><hr class="dropdown-divider"></li>
             <li>
                 <form action="/auth/logout" method="post">
-                    <button class="dropdown-item text-danger">
-                        Sair
-                    </button>
+                    <button class="dropdown-item text-danger">Sair</button>
                 </form>
             </li>
-
         </ul>
-
     </div>
 
 </div>
 
 <div class="main-content">
-
-    <div th:replace="${content}">
-        Conteúdo
-    </div>
-
+    <div th:replace="${content}">Conteúdo</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<th:block th:replace="${scripts}"></th:block>
 
 </body>
 </html>

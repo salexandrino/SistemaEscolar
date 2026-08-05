@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/master-escola :: layout(~{::title}, ~{::content}, ~{::scripts})}"><head>
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
+<head>
     <title>Gestão de Anos Letivos</title>
 </head>
 <body>
 <div th:fragment="content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3">Anos Letivos</h1>
-        <!-- CORREÇÃO: Usando a variável booleana 'canEdit' vinda do controller -->
         <button id="btnNovoAno" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoAno"
                 th:if="${canEdit}">
             <i class="bi bi-plus-circle me-2"></i>Novo Ano Letivo
@@ -33,8 +33,7 @@
                         <th>Ações</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
@@ -56,79 +55,74 @@
                         <th>Ações</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Novo Ano Letivo -->
-<div class="modal fade" id="modalNovoAno" tabindex="-1" aria-labelledby="modalNovoAnoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalNovoAnoLabel">Novo Ano Letivo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formNovoAno">
-                    <div class="mb-3">
-                        <label for="ano" class="form-label">Ano</label>
-                        <input type="number" class="form-control" id="ano" name="ano" required
-                               th:placeholder="${T(java.time.Year).now().getValue()}">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnSalvarNovoAno">Salvar</button>
+    <!-- Modal Novo Ano Letivo -->
+    <div class="modal fade" id="modalNovoAno" tabindex="-1" aria-labelledby="modalNovoAnoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNovoAnoLabel">Novo Ano Letivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNovoAno">
+                        <div class="mb-3">
+                            <label for="ano" class="form-label">Ano</label>
+                            <input type="number" class="form-control" id="ano" name="ano" required
+                                   placeholder="2026">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSalvarNovoAno">Salvar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Editar Ano Letivo -->
-<div class="modal fade" id="modalEditarAno" tabindex="-1" aria-labelledby="modalEditarAnoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalEditarAnoLabel">Editar Ano Letivo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formEditarAno">
-                    <input type="hidden" id="editAnoId">
-                    <p><strong>Ano:</strong> <span id="editAnoTexto"></span></p>
-                    <div class="mb-3">
-                        <label for="editDataInicio" class="form-label">Data de Início</label>
-                        <input type="date" class="form-control" id="editDataInicio" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editDataFim" class="form-label">Data de Término</label>
-                        <input type="date" class="form-control" id="editDataFim" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnSalvarEdicaoAno">Salvar Alterações</button>
+    <!-- Modal Editar Ano Letivo -->
+    <div class="modal fade" id="modalEditarAno" tabindex="-1" aria-labelledby="modalEditarAnoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarAnoLabel">Editar Ano Letivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarAno">
+                        <input type="hidden" id="editAnoId">
+                        <p><strong>Ano:</strong> <span id="editAnoTexto"></span></p>
+                        <div class="mb-3">
+                            <label for="editDataInicio" class="form-label">Data de Início</label>
+                            <input type="date" class="form-control" id="editDataInicio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDataFim" class="form-label">Data de Término</label>
+                            <input type="date" class="form-control" id="editDataFim" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSalvarEdicaoAno">Salvar Alterações</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<div th:fragment="scripts">
-    <script>
+    <!-- Script movido para dentro do content -->
+    <script th:inline="javascript">
         let anosLetivosCache = [];
-        // CORREÇÃO: Usando a variável 'canEdit' injetada pelo Thymeleaf
-        const canEdit = "[[${canEdit}]]" === 'true';
+        const canEdit = [[${canEdit}]] === true;
 
         document.addEventListener('DOMContentLoaded', function () {
             carregarDados();
-
             document.getElementById('btnSalvarNovoAno').addEventListener('click', criarNovoAno);
             document.getElementById('btnSalvarEdicaoAno').addEventListener('click', salvarEdicaoAno);
         });
@@ -138,9 +132,7 @@
             alertaDiv.className = `alert alert-${tipo}`;
             alertaDiv.textContent = mensagem;
             alertaDiv.style.display = 'block';
-            setTimeout(() => {
-                alertaDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { alertaDiv.style.display = 'none'; }, 5000);
         }
 
         async function carregarDados() {
@@ -154,7 +146,6 @@
                 renderizarTabelaHistorico(historico);
             } catch (error) {
                 mostrarAlerta('Erro ao carregar dados dos anos letivos.', 'danger');
-                console.error('Erro:', error);
             }
         }
 
@@ -162,16 +153,14 @@
             const corpoTabela = document.getElementById('tabelaAnosAtivos').querySelector('tbody');
             corpoTabela.innerHTML = '';
             dados.forEach(ano => {
-                const linha = `
+                corpoTabela.innerHTML += `
                     <tr>
                         <td>${ano.ano}</td>
                         <td>${formatarData(ano.dataInicio)} - ${formatarData(ano.dataFim)}</td>
                         <td><span class="badge bg-${ano.situacao === 'ATIVO' ? 'success' : 'secondary'}">${ano.situacao}</span></td>
                         <td><span class="badge bg-${ano.ativo ? 'success' : 'danger'}">${ano.ativo ? 'Ativo' : 'Inativo'}</span></td>
                         <td>${renderizarBotoesAcao(ano, true)}</td>
-                    </tr>
-                `;
-                corpoTabela.innerHTML += linha;
+                    </tr>`;
             });
         }
 
@@ -179,74 +168,53 @@
             const corpoTabela = document.getElementById('tabelaHistorico').querySelector('tbody');
             corpoTabela.innerHTML = '';
             dados.forEach(ano => {
-                const linha = `
+                corpoTabela.innerHTML += `
                     <tr>
                         <td>${ano.ano}</td>
                         <td>${formatarData(ano.dataInicio)} - ${formatarData(ano.dataFim)}</td>
                         <td><span class="badge bg-secondary">${ano.situacao}</span></td>
                         <td>${renderizarBotoesAcao(ano, false)}</td>
-                    </tr>
-                `;
-                corpoTabela.innerHTML += linha;
+                    </tr>`;
             });
         }
 
         function renderizarBotoesAcao(ano, isAtivo) {
-            // O resto do script já usa a variável 'canEdit' corretamente
             if (!canEdit) return '';
-
             let botoes = '';
             if (isAtivo) {
-                if (!ano.ativo) {
-                    botoes += `<button class="btn btn-sm btn-success me-1" onclick="definirAtivo('${ano.id}')" title="Definir como Ativo"><i class="bi bi-check-circle"></i></button>`;
-                }
+                if (!ano.ativo) botoes += `<button class="btn btn-sm btn-success me-1" onclick="definirAtivo('${ano.id}')" title="Definir como Ativo"><i class="bi bi-check-circle"></i></button>`;
                 botoes += `<button class="btn btn-sm btn-warning me-1" onclick="arquivarAno('${ano.id}')" title="Arquivar"><i class="bi bi-archive"></i></button>`;
             } else {
                 botoes += `<button class="btn btn-sm btn-success me-1" onclick="definirAtivo('${ano.id}')" title="Reativar"><i class="bi bi-arrow-up-circle"></i></button>`;
             }
-
             botoes += `<button class="btn btn-sm btn-info me-1" onclick="abrirModalEdicao('${ano.id}')" title="Editar"><i class="bi bi-pencil"></i></button>`;
             botoes += `<button class="btn btn-sm btn-outline-danger" onclick="apagarAno('${ano.id}')" title="Apagar"><i class="bi bi-trash"></i></button>`;
-
             return botoes;
         }
 
         async function criarNovoAno() {
             const ano = document.getElementById('ano').value;
-            if (!ano) {
-                mostrarAlerta('O campo ano é obrigatório.', 'warning');
-                return;
-            }
-
+            if (!ano) { mostrarAlerta('O campo ano é obrigatório.', 'warning'); return; }
             try {
                 const response = await fetch('/api/academico/anos-letivos', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ano: parseInt(ano) })
                 });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Erro ao criar ano letivo');
-                }
-
+                if (!response.ok) { const e = await response.json(); throw new Error(e.message || 'Erro ao criar'); }
                 bootstrap.Modal.getInstance(document.getElementById('modalNovoAno')).hide();
                 mostrarAlerta('Ano letivo criado com sucesso!');
                 carregarDados();
-            } catch (error) {
-                mostrarAlerta(error.message, 'danger');
-            }
+            } catch (error) { mostrarAlerta(error.message, 'danger'); }
         }
 
         function abrirModalEdicao(id) {
             const ano = anosLetivosCache.find(a => a.id === id);
             if (!ano) return;
-
             document.getElementById('editAnoId').value = id;
             document.getElementById('editAnoTexto').textContent = ano.ano;
             document.getElementById('editDataInicio').value = ano.dataInicio;
             document.getElementById('editDataFim').value = ano.dataFim;
-
             new bootstrap.Modal(document.getElementById('modalEditarAno')).show();
         }
 
@@ -254,82 +222,49 @@
             const id = document.getElementById('editAnoId').value;
             const dataInicio = document.getElementById('editDataInicio').value;
             const dataFim = document.getElementById('editDataFim').value;
-
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ dataInicio, dataFim })
                 });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Erro ao editar ano letivo');
-                }
-
+                if (!response.ok) { const e = await response.json(); throw new Error(e.message || 'Erro ao editar'); }
                 bootstrap.Modal.getInstance(document.getElementById('modalEditarAno')).hide();
                 mostrarAlerta('Ano letivo atualizado com sucesso!');
                 carregarDados();
-            } catch (error) {
-                mostrarAlerta(error.message, 'danger');
-            }
+            } catch (error) { mostrarAlerta(error.message, 'danger'); }
         }
 
         async function apagarAno(id) {
-            if (!confirm('Tem certeza que deseja apagar este ano letivo? Esta ação não pode ser desfeita.')) {
-                return;
-            }
-
+            if (!confirm('Tem certeza que deseja apagar este ano letivo?')) return;
             try {
-                const response = await fetch(`/api/academico/anos-letivos/${id}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.status === 204) {
-                    mostrarAlerta('Ano letivo apagado com sucesso.');
-                    carregarDados();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.message || `Erro ${response.status}`);
-                }
-            } catch (error) {
-                mostrarAlerta(error.message, 'danger');
-            }
+                const response = await fetch(`/api/academico/anos-letivos/${id}`, { method: 'DELETE' });
+                if (response.status === 204) { mostrarAlerta('Ano letivo apagado.'); carregarDados(); }
+                else { const e = await response.json(); throw new Error(e.message || `Erro ${response.status}`); }
+            } catch (error) { mostrarAlerta(error.message, 'danger'); }
         }
 
         async function arquivarAno(id) {
             if (!confirm('Tem certeza que deseja arquivar este ano letivo?')) return;
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}/arquivar`, { method: 'PATCH' });
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message);
-                }
+                if (!response.ok) { const e = await response.json(); throw new Error(e.message); }
                 mostrarAlerta('Ano letivo arquivado com sucesso.');
                 carregarDados();
-            } catch (error) {
-                mostrarAlerta(error.message, 'danger');
-            }
+            } catch (error) { mostrarAlerta(error.message, 'danger'); }
         }
 
         async function definirAtivo(id) {
-            if (!confirm('Tem certeza que deseja definir este ano como ativo? O ano ativo anterior será desativado.')) return;
+            if (!confirm('Definir este ano como ativo? O ano ativo anterior será desativado.')) return;
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}/definir-ativo`, { method: 'PATCH' });
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message);
-                }
+                if (!response.ok) { const e = await response.json(); throw new Error(e.message); }
                 mostrarAlerta('Ano letivo definido como ativo.');
                 carregarDados();
-            } catch (error) {
-                mostrarAlerta(error.message, 'danger');
-            }
+            } catch (error) { mostrarAlerta(error.message, 'danger'); }
         }
 
         function formatarData(data) {
-            // Adiciona T00:00:00 para evitar problemas de fuso horário (timezone)
-            // que podem fazer a data voltar um dia.
             return new Date(data + 'T00:00:00').toLocaleDateString('pt-BR');
         }
     </script>
