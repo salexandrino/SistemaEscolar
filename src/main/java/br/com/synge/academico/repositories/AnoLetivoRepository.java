@@ -27,9 +27,22 @@ public class AnoLetivoRepository extends BaseDAO {
         return a;
     }
 
-    public AnoLetivo criar(UUID tenantId, int ano, LocalDate inicio, LocalDate fim) {
-        // Importante: Novo ano letivo nasce INATIVO por padrão. A ativação é feita apenas via definirAtivoUnico().
-        String sql = "INSERT INTO ano_letivo (id, tenant_id, ano, data_inicio, data_fim, situacao, ativo, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, 'ATIVO', FALSE, ?, ?)";
+    public boolean existsAtivo(UUID tenantId) {
+        String sql = "SELECT COUNT(1) FROM ano_letivo WHERE tenant_id = ? AND ativo = TRUE";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, tenantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar existência de ano letivo ativo para tenant {}: {}", tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao verificar ano letivo ativo.", e);
+        }
+        return false;
+    }
+
+    public AnoLetivo criar(UUID tenantId, int ano, LocalDate inicio, LocalDate fim, boolean ativo) {
+        String sql = "INSERT INTO ano_letivo (id, tenant_id, ano, data_inicio, data_fim, situacao, ativo, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, 'ATIVO', ?, ?, ?)";
         AnoLetivo a = new AnoLetivo();
         a.setId(UUID.randomUUID());
         a.setTenantId(tenantId);
@@ -37,7 +50,7 @@ public class AnoLetivoRepository extends BaseDAO {
         a.setDataInicio(inicio);
         a.setDataFim(fim);
         a.setSituacao("ATIVO");
-        a.setAtivo(false);
+        a.setAtivo(ativo);
         a.setCriadoEm(LocalDateTime.now());
         a.setAtualizadoEm(LocalDateTime.now());
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -46,8 +59,9 @@ public class AnoLetivoRepository extends BaseDAO {
             ps.setInt(3, a.getAno());
             ps.setObject(4, a.getDataInicio());
             ps.setObject(5, a.getDataFim());
-            ps.setObject(6, a.getCriadoEm());
-            ps.setObject(7, a.getAtualizadoEm());
+            ps.setBoolean(6, a.isAtivo());
+            ps.setObject(7, a.getCriadoEm());
+            ps.setObject(8, a.getAtualizadoEm());
             ps.executeUpdate();
             return a;
         } catch (SQLException e) {
@@ -88,7 +102,7 @@ public class AnoLetivoRepository extends BaseDAO {
 
     public void definirAtivoUnico(UUID tenantId, UUID idParaAtivar) {
         String desativar = "UPDATE ano_letivo SET ativo = FALSE, atualizado_em = CURRENT_TIMESTAMP WHERE tenant_id = ?";
-        String ativar = "UPDATE ano_letivo SET ativo = TRUE, atualizado_em = CURRENT_TIMESTAMP WHERE tenant_id = ? AND id = ?";
+        String ativar = "UPDATE ano_letivo SET ativo = TRUE, situacao = 'ATIVO', atualizado_em = CURRENT_TIMESTAMP WHERE tenant_id = ? AND id = ?";
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
             try (PreparedStatement p1 = conn.prepareStatement(desativar); PreparedStatement p2 = conn.prepareStatement(ativar)) {
@@ -129,7 +143,7 @@ public class AnoLetivoRepository extends BaseDAO {
     }
 
     public List<AnoLetivo> listar(UUID tenantId) {
-        String sql = "SELECT * FROM ano_letivo WHERE tenant_id = ? ORDER BY ano DESC";
+        String sql = "SELECT * FROM ano_letivo WHERE tenant_id = ? AND situacao = 'ATIVO' ORDER BY ano DESC";
         List<AnoLetivo> lista = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setObject(1, tenantId);
@@ -144,7 +158,7 @@ public class AnoLetivoRepository extends BaseDAO {
     }
 
     public List<AnoLetivo> listarAnteriores(UUID tenantId, int anoAtual) {
-        String sql = "SELECT * FROM ano_letivo WHERE tenant_id = ? AND ano < ? ORDER BY ano DESC";
+        String sql = "SELECT * FROM ano_letivo WHERE tenant_id = ? AND situacao = 'ARQUIVADO' ORDER BY ano DESC";
         List<AnoLetivo> lista = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setObject(1, tenantId);

@@ -32,7 +32,7 @@ public class AnoLetivoService {
         return u.getTenantId();
     }
 
-    public AnoLetivoResponseDTO criar(CriarAnoLetivoDTO dto) {
+    public br.com.synge.academico.dtos.AnoLetivoResponseDTO criar(CriarAnoLetivoDTO dto) {
         if (dto == null || dto.getAno() == null) throw new ValidationException("Ano é obrigatório.");
         UUID tenantId = tenant();
         int ano = dto.getAno();
@@ -43,7 +43,10 @@ public class AnoLetivoService {
         LocalDate fim = LocalDate.of(ano, 12, 15);
         if (fim.isBefore(inicio)) throw new ValidationException("Período do ano letivo inválido.");
 
-        AnoLetivo criado = repository.criar(tenantId, ano, inicio, fim);
+        boolean hasActive = repository.existsAtivo(tenantId);
+        boolean ativo = !hasActive;
+
+        AnoLetivo criado = repository.criar(tenantId, ano, inicio, fim, ativo);
         return toDto(criado);
     }
 
