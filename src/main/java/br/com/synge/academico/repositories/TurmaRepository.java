@@ -1,6 +1,7 @@
 package br.com.synge.academico.repositories;
 
 import br.com.synge.academico.models.Turma;
+import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.repositories.base.BaseDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,9 @@ public class TurmaRepository extends BaseDAO {
             ps.executeUpdate();
             return t;
         } catch (SQLException e) {
+            if ("23505".equals(e.getSQLState())) {
+                throw new ConflictException("Já existe uma turma com esse nome neste ano letivo.");
+            }
             logger.error("Erro ao criar turma para tenant {}: {}", t.getTenantId(), e.getMessage(), e);
             throw new RuntimeException("Erro ao criar turma.", e);
         }

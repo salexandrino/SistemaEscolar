@@ -2,6 +2,7 @@ package br.com.synge.academico.services;
 
 import br.com.synge.academico.dtos.AnoLetivoResponseDTO;
 import br.com.synge.academico.dtos.CriarAnoLetivoDTO;
+import br.com.synge.academico.dtos.EditarAnoLetivoDTO;
 import br.com.synge.academico.models.AnoLetivo;
 import br.com.synge.academico.repositories.AnoLetivoCloneRepository;
 import br.com.synge.academico.repositories.AnoLetivoRepository;
@@ -85,6 +86,38 @@ public class AnoLetivoService {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao clonar configurações: " + e.getMessage(), e);
         }
+    }
+
+    public void editar(UUID id, EditarAnoLetivoDTO dto) {
+        UUID tenantId = tenant();
+        AnoLetivo anoLetivo = repository.buscarPorId(tenantId, id)
+                .orElseThrow(() -> new NotFoundException("Ano letivo não encontrado."));
+
+        if ("ARQUIVADO".equalsIgnoreCase(anoLetivo.getSituacao())) {
+            throw new ValidationException("Não é possível editar um ano letivo arquivado.");
+        }
+
+        if (dto.getDataInicio() == null || dto.getDataFim() == null) {
+            throw new ValidationException("Datas de início and fim são obrigatórias.");
+        }
+
+        if (dto.getDataFim().isBefore(dto.getDataInicio())) {
+            throw new ValidationException("A data de fim não pode ser anterior à data de início.");
+        }
+
+        repository.atualizar(tenantId, id, dto.getDataInicio(), dto.getDataFim());
+    }
+
+    public void apagar(UUID id) {
+        UUID tenantId = tenant();
+        repository.buscarPorId(tenantId, id).orElseThrow(() -> new NotFoundException("Ano letivo não encontrado."));
+
+        int seriesVinculadas = repository.contarSeriesVinculadas(tenantId, id);
+        if (seriesVinculadas > 0) {
+            throw new ConflictException("Não é possível apagar: existem " + seriesVinculadas + " série(s) vinculada(s) a este ano letivo. Arquive-o em vez de apagar, ou remova as séries primeiro.");
+        }
+
+        repository.apagar(tenantId, id);
     }
 
     private AnoLetivoResponseDTO toDto(AnoLetivo a) {

@@ -3,6 +3,9 @@ package br.com.synge.academico.controllers;
 import br.com.synge.academico.dtos.CriarTurmaDTO;
 import br.com.synge.academico.dtos.TurmaResponseDTO;
 import br.com.synge.academico.services.TurmaService;
+import br.com.synge.seguranca.exceptions.ConflictException;
+import br.com.synge.seguranca.exceptions.NotFoundException;
+import br.com.synge.seguranca.exceptions.ValidationException;
 import io.javalin.http.Context;
 
 import java.util.List;
@@ -25,15 +28,19 @@ public class TurmaController {
     }
 
     public void criar(Context ctx) {
-        CriarTurmaDTO dto = ctx.bodyValidator(CriarTurmaDTO.class)
-                .check(d -> d.getIdAnoLetivo() != null, "idAnoLetivo é obrigatório")
-                .check(d -> d.getIdSerie() != null, "idSerie é obrigatório")
-                .check(d -> d.getNome() != null && !d.getNome().isBlank(), "nome da turma é obrigatório")
-                .check(d -> d.getTurno() != null && !d.getTurno().isBlank(), "turno é obrigatório")
-                .check(d -> d.getCapacidade() != null && d.getCapacidade() >= 0, "capacidade deve ser >= 0")
-                .get();
-        TurmaResponseDTO resp = service.criar(dto);
-        ctx.status(201).json(resp);
+        try {
+            CriarTurmaDTO dto = ctx.bodyValidator(CriarTurmaDTO.class)
+                    .check(d -> d.getIdAnoLetivo() != null, "idAnoLetivo é obrigatório")
+                    .check(d -> d.getIdSerie() != null, "idSerie é obrigatório")
+                    .check(d -> d.getNome() != null && !d.getNome().isBlank(), "nome da turma é obrigatório")
+                    .check(d -> d.getTurno() != null && !d.getTurno().isBlank(), "turno é obrigatório")
+                    .check(d -> d.getCapacidade() != null && d.getCapacidade() >= 0, "capacidade deve ser >= 0")
+                    .get();
+            TurmaResponseDTO resp = service.criar(dto);
+            ctx.status(201).json(resp);
+        } catch (ValidationException | ConflictException | NotFoundException e) {
+            ctx.status(e.getStatus()).json(Map.of("message", e.getMessage()));
+        }
     }
 
     public void encerrar(Context ctx) {

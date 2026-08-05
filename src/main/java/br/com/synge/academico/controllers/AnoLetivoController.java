@@ -2,10 +2,10 @@ package br.com.synge.academico.controllers;
 
 import br.com.synge.academico.dtos.AnoLetivoResponseDTO;
 import br.com.synge.academico.dtos.CriarAnoLetivoDTO;
+import br.com.synge.academico.dtos.EditarAnoLetivoDTO;
 import br.com.synge.academico.services.AnoLetivoService;
 import io.javalin.http.Context;
-import io.javalin.http.HttpStatus; // IMPORT INCLUÍDO
-import java.time.LocalDate; // IMPORT INCLUÍDO
+import io.javalin.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,19 @@ public class AnoLetivoController {
         UUID idOrigem = UUID.fromString(ctx.pathParam("id"));
         UUID idDestino = UUID.fromString(ctx.pathParam("destinoId"));
         service.clonarConfiguracoes(idOrigem, idDestino);
+        ctx.status(HttpStatus.NO_CONTENT);
+    }
+
+    public void editar(Context ctx) {
+        UUID id = UUID.fromString(ctx.pathParam("id"));
+        EditarAnoLetivoDTO dto = ctx.bodyAsClass(EditarAnoLetivoDTO.class);
+        service.editar(id, dto);
+        ctx.status(HttpStatus.NO_CONTENT);
+    }
+
+    public void apagar(Context ctx) {
+        UUID id = UUID.fromString(ctx.pathParam("id"));
+        service.apagar(id);
         ctx.status(HttpStatus.NO_CONTENT);
     }
 }

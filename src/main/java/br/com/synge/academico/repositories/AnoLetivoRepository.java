@@ -171,4 +171,52 @@ public class AnoLetivoRepository extends BaseDAO {
         }
         return lista;
     }
+
+    public void atualizar(UUID tenantId, UUID id, LocalDate inicio, LocalDate fim) {
+        String sql = "UPDATE ano_letivo SET data_inicio = ?, data_fim = ?, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, inicio);
+            ps.setObject(2, fim);
+            ps.setObject(3, LocalDateTime.now());
+            ps.setObject(4, id);
+            ps.setObject(5, tenantId);
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Ano letivo não encontrado para atualização.");
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar ano letivo {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar ano letivo.", e);
+        }
+    }
+
+    public int contarSeriesVinculadas(UUID tenantId, UUID idAnoLetivo) {
+        String sql = "SELECT COUNT(1) FROM serie WHERE id_ano_letivo = ? AND tenant_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, idAnoLetivo);
+            ps.setObject(2, tenantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao contar séries vinculadas ao ano letivo {}: {}", idAnoLetivo, e.getMessage(), e);
+            throw new RuntimeException("Erro ao contar séries vinculadas.", e);
+        }
+        return 0;
+    }
+
+    public void apagar(UUID tenantId, UUID id) {
+        String sql = "DELETE FROM ano_letivo WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, id);
+            ps.setObject(2, tenantId);
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Ano letivo não encontrado para exclusão.");
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao apagar ano letivo {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao apagar ano letivo.", e);
+        }
+    }
 }

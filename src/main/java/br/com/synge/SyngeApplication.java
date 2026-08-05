@@ -336,14 +336,26 @@ public class SyngeApplication {
 
         // Rotas UI do Portal da Escola (Dashboard Gestor)
         app.get("/portal/anos-letivos", ctx -> {
-            Context context = new Context(ctx.req().getLocale());
+            // 1. Obter o usuário logado
             AuthUser currentUser = AuthUserContext.getAuthUser();
             if (currentUser == null) {
                 ctx.redirect("/login");
                 return;
             }
+
+            // 2. Determinar a permissão de edição no backend
+            Perfil perfil = currentUser.getPerfil();
+            boolean canEdit = (perfil == Perfil.GESTOR || perfil == Perfil.SUPER_ADMIN);
+
+            // 3. Preparar o contexto para o Thymeleaf
+            Context context = new Context(ctx.req().getLocale());
             context.setVariable("currentUser", currentUser);
+            context.setVariable("canEdit", canEdit); // <-- Variável booleana injetada aqui!
+
+            // Opcional: o "content" é parte de um layout, mantemos como está
             context.setVariable("content", "dashboard/academico/anos-letivos/index");
+
+            // 4. Renderizar o template
             ctx.html(templateEngine.process("dashboard/academico/anos-letivos/index", context));
         });
 
@@ -545,6 +557,8 @@ public class SyngeApplication {
         // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ
         app.get("/api/academico/anos-letivos", anoLetivoController::listar);
         app.post("/api/academico/anos-letivos", anoLetivoController::criar);
+        app.put("/api/academico/anos-letivos/{id}", anoLetivoController::editar);
+        app.delete("/api/academico/anos-letivos/{id}", anoLetivoController::apagar);
         app.patch("/api/academico/anos-letivos/{id}/arquivar", anoLetivoController::arquivar);
         app.patch("/api/academico/anos-letivos/{id}/definir-ativo", anoLetivoController::definirAtivo);
         app.get("/api/academico/anos-letivos/historico", anoLetivoController::historico);
