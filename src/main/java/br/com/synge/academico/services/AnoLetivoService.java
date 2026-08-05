@@ -70,9 +70,9 @@ public class AnoLetivoService {
         return repository.listar(tenantId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    public List<AnoLetivoResponseDTO> historicoAnosAnteriores(int anoAtual) {
+    public List<AnoLetivoResponseDTO> historicoAnosAnteriores() {
         UUID tenantId = tenant();
-        return repository.listarAnteriores(tenantId, anoAtual).stream().map(this::toDto).collect(Collectors.toList());
+        return repository.listarAnteriores(tenantId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public void clonarConfiguracoes(UUID idOrigem, UUID idDestino) {

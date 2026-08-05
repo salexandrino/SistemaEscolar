@@ -157,12 +157,11 @@ public class AnoLetivoRepository extends BaseDAO {
         return lista;
     }
 
-    public List<AnoLetivo> listarAnteriores(UUID tenantId, int anoAtual) {
+    public List<AnoLetivo> listarAnteriores(UUID tenantId) {
         String sql = "SELECT * FROM ano_letivo WHERE tenant_id = ? AND situacao = 'ARQUIVADO' ORDER BY ano DESC";
         List<AnoLetivo> lista = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setObject(1, tenantId);
-            ps.setInt(2, anoAtual);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) lista.add(map(rs));
             }

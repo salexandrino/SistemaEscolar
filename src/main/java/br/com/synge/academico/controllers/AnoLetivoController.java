@@ -45,8 +45,7 @@ public class AnoLetivoController {
     }
 
     public void historico(Context ctx) {
-        int anoAtual = ctx.queryParamAsClass("anoAtual", Integer.class).getOrDefault(LocalDate.now().getYear());
-        ctx.json(service.historicoAnosAnteriores(anoAtual));
+        ctx.json(service.historicoAnosAnteriores());
     }
 
     public void clonar(Context ctx) {

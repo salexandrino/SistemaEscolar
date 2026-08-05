@@ -112,6 +112,10 @@
                 .catch(e => {
                     console.error(e);
                     mostrarAlerta('Erro ao carregar anos letivos.', 'danger');
+                    const select = document.getElementById('input-ano-letivo');
+                    if (select) {
+                        select.innerHTML = '<option value="">Erro ao carregar anos letivos.</option>';
+                    }
                 });
         }
 

@@ -15,8 +15,7 @@
             <div>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-1">
-                        <li class="breadcrumb-item"><a th:href="${'/dashboard'}" class="text-success text-decoration-none">Dashboard</a></li>
-                        <li class="breadcrumb-item text-muted">Acadêmico</li>
+                        <li class="breadcrumb-item"><a th:href="${'/hub'}" class="text-success text-decoration-none">hub</a></li>                        <li class="breadcrumb-item text-muted">Acadêmico</li>
                         <li class="breadcrumb-item active" aria-current="page">Anos Letivos</li>
                     </ol>
                 </nav>
@@ -216,6 +215,12 @@
             } catch (error) {
                 console.error('Erro ao carregar anos letivos:', error);
                 mostrarAlerta('Não foi possível carregar os anos letivos. Veja o console para detalhes.', 'danger');
+
+                // Substitui o "Carregando..." por uma mensagem de erro visível
+                const tbodyAtivos = document.getElementById('tabelaAtivos');
+                const tbodyHistorico = document.getElementById('tabelaHistorico');
+                if (tbodyAtivos) tbodyAtivos.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">Erro ao carregar. Tente recarregar a página.</td></tr>`;
+                if (tbodyHistorico) tbodyHistorico.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-danger">Erro ao carregar. Tente recarregar a página.</td></tr>`;
             }
         }
 
