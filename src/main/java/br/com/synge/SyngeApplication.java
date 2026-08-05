@@ -337,6 +337,12 @@ public class SyngeApplication {
         // Rotas UI do Portal da Escola (Dashboard Gestor)
         app.get("/portal/anos-letivos", ctx -> {
             Context context = new Context(ctx.req().getLocale());
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                ctx.redirect("/login");
+                return;
+            }
+            context.setVariable("currentUser", currentUser);
             context.setVariable("content", "dashboard/academico/anos-letivos/index");
             ctx.html(templateEngine.process("dashboard/academico/anos-letivos/index", context));
         });
