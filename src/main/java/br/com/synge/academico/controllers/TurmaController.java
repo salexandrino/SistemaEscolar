@@ -1,12 +1,14 @@
 package br.com.synge.academico.controllers;
 
 import br.com.synge.academico.dtos.CriarTurmaDTO;
+import br.com.synge.academico.dtos.EditarTurmaDTO;
 import br.com.synge.academico.dtos.TurmaResponseDTO;
 import br.com.synge.academico.services.TurmaService;
 import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.exceptions.ValidationException;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -53,5 +55,24 @@ public class TurmaController {
         UUID id = UUID.fromString(ctx.pathParam("id"));
         int matriculados = service.consultarCapacidadeMatriculados(id);
         ctx.json(Map.of("idTurma", id, "matriculados", matriculados));
+    }
+
+    public void buscarPorId(Context ctx) {
+        UUID id = UUID.fromString(ctx.pathParam("id"));
+        TurmaResponseDTO turma = service.buscarPorId(id);
+        ctx.json(turma);
+    }
+
+    public void editar(Context ctx) {
+        UUID id = UUID.fromString(ctx.pathParam("id"));
+        EditarTurmaDTO dto = ctx.bodyAsClass(EditarTurmaDTO.class);
+        service.editar(id, dto);
+        ctx.status(HttpStatus.NO_CONTENT);
+    }
+
+    public void apagar(Context ctx) {
+        UUID id = UUID.fromString(ctx.pathParam("id"));
+        service.apagar(id);
+        ctx.status(HttpStatus.NO_CONTENT);
     }
 }

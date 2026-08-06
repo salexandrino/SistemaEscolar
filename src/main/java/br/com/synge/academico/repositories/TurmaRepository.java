@@ -154,4 +154,48 @@ public class TurmaRepository extends BaseDAO {
         }
         return 0;
     }
+
+    public void atualizar(Turma t) {
+        String sql = "UPDATE turma SET nome = ?, turno = ?, sala = ?, capacidade = ?, tipo_mediador = ?, " +
+                "hora_inicio = ?, hora_termino = ?, dias_semana = ?, carga_horaria_semanal = ?, " +
+                "tipo_atendimento = ?, modalidade_ensino = ?, forma_organizacao = ?, atualizado_em = ? " +
+                "WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, t.getNome());
+            ps.setString(2, t.getTurno());
+            ps.setString(3, t.getSala());
+            ps.setInt(4, t.getCapacidade());
+            ps.setString(5, t.getTipoMediador());
+            ps.setObject(6, t.getHoraInicio());
+            ps.setObject(7, t.getHoraTermino());
+            ps.setString(8, t.getDiasSemana());
+            ps.setObject(9, t.getCargaHorariaSemanal());
+            ps.setString(10, t.getTipoAtendimento());
+            ps.setString(11, t.getModalidadeEnsino());
+            ps.setString(12, t.getFormaOrganizacao());
+            ps.setObject(13, t.getAtualizadoEm());
+            ps.setObject(14, t.getId());
+            ps.setObject(15, t.getTenantId());
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Turma não encontrada para atualização.");
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar turma {}: {}", t.getId(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar turma.", e);
+        }
+    }
+
+    public void apagar(UUID tenantId, UUID id) {
+        String sql = "DELETE FROM turma WHERE id = ? AND tenant_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, id);
+            ps.setObject(2, tenantId);
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Turma não encontrada para exclusão.");
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao apagar turma {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao apagar turma.", e);
+        }
+    }
 }

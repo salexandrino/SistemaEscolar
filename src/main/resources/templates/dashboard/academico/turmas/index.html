@@ -1,13 +1,242 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-escola :: html(~{::content})}">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
 <head>
-    <title>Template removido</title>
+    <title>Gestão de Turmas</title>
 </head>
 <body>
 <div th:fragment="content">
-    <div class="alert alert-secondary">
-        Este template foi removido — use a interface principal de Turmas em <a href="/portal/turmas">/portal/turmas</a>.
+    <!-- CORREÇÃO: Adicionado Breadcrumb para consistência -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Turmas</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Gestão de Turmas</h1>
+        <!-- CORREÇÃO: Adicionado controle de acesso (th:if) -->
+        <a th:if="${canEdit}" href="/portal/turmas/novo" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nova Turma
+        </a>
     </div>
+
+    <div id="alerta" class="alert" role="alert" style="display: none;"></div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Filtros de Pesquisa</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label for="filtroAno" class="form-label">Ano Letivo</label>
+                    <select id="filtroAno" class="form-select">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="filtroSerie" class="form-label">Série</label>
+                    <select id="filtroSerie" class="form-select" disabled>
+                        <option value="">Selecione um Ano Letivo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Lista de Turmas</h5>
+        </div>
+        <div class="card-body">
+            <div id="loadingState" class="text-center p-4 d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+            </div>
+            <div id="emptyState" class="text-center p-4 d-none">
+                <p class="text-muted">Nenhuma turma encontrada para os filtros selecionados.</p>
+            </div>
+            <div id="tableContainer" class="table-responsive d-none">
+                <table id="tabelaTurmas" class="table table-striped table-hover" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>Nome da Turma</th>
+                        <th>Turno</th>
+                        <th>Sala</th>
+                        <th>Capacidade</th>
+                        <th>Situação</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="scripts">
+    <script th:inline="javascript">
+        const canEdit = /*[[${canEdit}]]*/ false; // CORREÇÃO: Usar sintaxe de template natural para melhor legibilidade e fallback
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const filtroAno = document.getElementById('filtroAno');
+            const filtroSerie = document.getElementById('filtroSerie');
+            const tabelaCorpo = document.getElementById('tabelaTurmas').querySelector('tbody');
+            const loadingState = document.getElementById('loadingState');
+            const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.getElementById('tableContainer');
+
+            function mostrarAlerta(mensagem, tipo = 'success') {
+                const alertaDiv = document.getElementById('alerta');
+                alertaDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
+                alertaDiv.innerHTML = `${mensagem}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                alertaDiv.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+
+            function toggleLoading(show) {
+                loadingState.classList.toggle('d-none', !show);
+                tableContainer.classList.toggle('d-none', show);
+                emptyState.classList.add('d-none');
+            }
+
+            function toggleEmpty(show) {
+                emptyState.classList.toggle('d-none', !show);
+                tableContainer.classList.toggle('d-none', show);
+                loadingState.classList.add('d-none');
+            }
+
+            async function carregarAnos() {
+                try {
+                    const response = await fetch('/api/academico/anos-letivos');
+                    if (!response.ok) throw new Error('Falha ao carregar anos letivos.');
+                    const anos = await response.json();
+                    filtroAno.innerHTML = '<option value="">Selecione um ano letivo</option>';
+                    anos.filter(a => a.ativo).forEach(ano => {
+                        filtroAno.innerHTML += `<option value="${ano.id}">${ano.ano}</option>`;
+                    });
+                } catch (error) {
+                    filtroAno.innerHTML = '<option value="">Erro ao carregar</option>';
+                    mostrarAlerta(error.message, 'danger');
+                }
+            }
+
+            async function carregarSeries(idAnoLetivo) {
+                filtroSerie.disabled = true;
+                filtroSerie.innerHTML = '<option value="">Carregando...</option>';
+                if (!idAnoLetivo) {
+                    filtroSerie.innerHTML = '<option value="">Selecione um Ano Letivo</option>';
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/academico/series?idAnoLetivo=${idAnoLetivo}`);
+                    if (!response.ok) throw new Error('Falha ao carregar séries.');
+                    const series = await response.json();
+                    filtroSerie.innerHTML = '<option value="">Selecione uma série</option>';
+                    series.forEach(serie => {
+                        filtroSerie.innerHTML += `<option value="${serie.id}">${serie.nome}</option>`;
+                    });
+                    filtroSerie.disabled = false;
+                } catch (error) {
+                    filtroSerie.innerHTML = '<option value="">Erro ao carregar</option>';
+                    mostrarAlerta(error.message, 'danger');
+                }
+            }
+
+            async function carregarTurmas(idAnoLetivo, idSerie) {
+                toggleLoading(true);
+                tabelaCorpo.innerHTML = '';
+                try {
+                    const response = await fetch(`/api/academico/turmas?idAnoLetivo=${idAnoLetivo}&idSerie=${idSerie}`);
+                    if (!response.ok) throw new Error('Falha ao carregar turmas.');
+                    const turmas = await response.json();
+
+                    if (turmas.length === 0) {
+                        toggleEmpty(true);
+                    } else {
+                        renderizarTabela(turmas);
+                        toggleLoading(false);
+                    }
+                } catch (error) {
+                    mostrarAlerta(error.message, 'danger');
+                    toggleEmpty(true);
+                }
+            }
+
+            function renderizarTabela(turmas) {
+                const turnosMap = { 'MATUTINO': 'Matutino', 'VESPERTINO': 'Vespertino', 'NOTURNO': 'Noturno', 'INTEGRAL': 'Integral' };
+                turmas.forEach(turma => {
+                    const situacaoBadge = turma.situacao === 'ATIVA' ? 'bg-success' : 'bg-secondary';
+
+                    // CORREÇÃO: Montagem dos botões de ação
+                    let botoesAcao = `
+                        <a href="/portal/turmas/visualizar?id=${turma.id}" class="btn btn-sm btn-outline-secondary" title="Visualizar"><i class="bi bi-eye"></i></a>
+                    `;
+                    if (canEdit) {
+                        botoesAcao += `
+                            <a href="/portal/turmas/editar?id=${turma.id}" class="btn btn-sm btn-outline-primary ms-1" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="apagarTurma('${turma.id}')" title="Apagar"><i class="bi bi-trash"></i></button>
+                        `;
+                    }
+
+                    const linha = `
+                        <tr>
+                            <td>${turma.nome}</td>
+                            <td>${turnosMap[turma.turno] || turma.turno}</td>
+                            <td>${turma.sala || 'N/A'}</td>
+                            <td>${turma.capacidade}</td>
+                            <td><span class="badge ${situacaoBadge}">${turma.situacao}</span></td>
+                            <td class="text-end">${botoesAcao}</td>
+                        </tr>
+                    `;
+                    tabelaCorpo.innerHTML += linha;
+                });
+            }
+
+            filtroAno.addEventListener('change', () => {
+                const idAnoLetivo = filtroAno.value;
+                carregarSeries(idAnoLetivo);
+                tabelaCorpo.innerHTML = '';
+                toggleEmpty(idAnoLetivo ? false : true);
+                if (!idAnoLetivo) tableContainer.classList.add('d-none');
+            });
+
+            filtroSerie.addEventListener('change', () => {
+                const idAnoLetivo = filtroAno.value;
+                const idSerie = filtroSerie.value;
+                if (idAnoLetivo && idSerie) {
+                    carregarTurmas(idAnoLetivo, idSerie);
+                } else {
+                    tabelaCorpo.innerHTML = '';
+                    toggleEmpty(true);
+                }
+            });
+
+            window.apagarTurma = async function(id) {
+                if (!confirm('Tem certeza que deseja apagar esta turma? Esta ação não pode ser desfeita.')) {
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/academico/turmas/${id}`, { method: 'DELETE' });
+                    if (response.status === 204) {
+                        mostrarAlerta('Turma apagada com sucesso.', 'success');
+                        carregarTurmas(filtroAno.value, filtroSerie.value);
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Erro ao apagar turma.');
+                    }
+                } catch (error) {
+                    mostrarAlerta(error.message, 'danger');
+                }
+            }
+
+            carregarAnos();
+        });
+    </script>
 </div>
 </body>
 </html>

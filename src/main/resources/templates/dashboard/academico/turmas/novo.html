@@ -1,13 +1,522 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-escola :: html(~{::content})}">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
 <head>
-    <title>Template removido</title>
+    <title>Nova Turma</title>
 </head>
 <body>
+
 <div th:fragment="content">
-    <div class="alert alert-secondary">
-        Este template foi removido — use a interface principal de Turmas em <a href="/portal/turmas">/portal/turmas</a>.
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="/portal/turmas">Turmas</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Nova Turma
+            </li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Nova Turma</h1>
     </div>
+
+    <div id="alerta" class="alert" role="alert" style="display:none;"></div>
+
+    <div class="card">
+
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                Dados da Turma
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form id="formNovaTurma">
+
+                <div class="row">
+
+                    <!-- Ano Letivo -->
+
+                    <div class="col-md-6 mb-3">
+                        <label for="idAnoLetivo" class="form-label">
+                            Ano Letivo
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select
+                                id="idAnoLetivo"
+                                class="form-select"
+                                required>
+
+                            <option value="">
+                                Carregando...
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <!-- Série -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label for="idSerie" class="form-label">
+                            Série
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select
+                                id="idSerie"
+                                class="form-select"
+                                required
+                                disabled>
+
+                            <option value="">
+                                Selecione um Ano Letivo primeiro
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Nome -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label for="nome" class="form-label">
+                            Nome da Turma
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <input
+                                type="text"
+                                id="nome"
+                                class="form-control"
+                                placeholder="Ex: Turma A"
+                                required>
+
+                    </div>
+
+                    <!-- Turno -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label for="turno" class="form-label">
+                            Turno
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select
+                                id="turno"
+                                class="form-select"
+                                required>
+
+                            <option value="MATUTINO">
+                                Matutino
+                            </option>
+
+                            <option value="VESPERTINO">
+                                Vespertino
+                            </option>
+
+                            <option value="NOTURNO">
+                                Noturno
+                            </option>
+
+                            <option value="INTEGRAL">
+                                Integral
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Capacidade -->
+
+                    <div class="col-md-3 mb-3">
+
+                        <label
+                                for="capacidade"
+                                class="form-label">
+
+                            Capacidade (Vagas)
+
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                                type="number"
+                                id="capacidade"
+                                class="form-control"
+                                value="30"
+                                min="0"
+                                required>
+
+                    </div>
+
+                    <!-- Sala -->
+
+                    <div class="col-md-12 mb-3">
+
+                        <label
+                                for="sala"
+                                class="form-label">
+
+                            Sala
+
+                        </label>
+
+                        <input
+                                type="text"
+                                id="sala"
+                                class="form-control"
+                                placeholder="Ex: Sala 101">
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h5 class="mt-4">
+                    Dados do Censo Escolar (Opcional)
+                </h5>
+
+                <p class="text-muted">
+                    Informações adicionais para o relatório do Educacenso.
+                </p>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+
+                        <label
+                                for="modalidadeEnsino"
+                                class="form-label">
+
+                            Modalidade de Ensino
+
+                        </label>
+
+                        <select
+                                id="modalidadeEnsino"
+                                class="form-select">
+
+                            <option value="REGULAR" selected>
+                                Ensino Regular
+                            </option>
+
+                            <option value="EDUCACAO_ESPECIAL">
+                                Educação Especial - Modalidade Substitutiva
+                            </option>
+
+                            <option value="EJA">
+                                Educação de Jovens e Adultos (EJA)
+                            </option>
+
+                            <option value="PROFISSIONAL">
+                                Educação Profissional
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label
+                                for="tipoAtendimento"
+                                class="form-label">
+
+                            Tipo de Atendimento
+
+                        </label>
+
+                        <select
+                                id="tipoAtendimento"
+                                class="form-select">
+
+                            <option value="ESCOLARIZACAO" selected>
+                                Escolarização
+                            </option>
+
+                            <option value="AEE">
+                                Atendimento Educacional Especializado (AEE)
+                            </option>
+
+                            <option value="ATIVIDADE_COMPLEMENTAR">
+                                Atividade Complementar
+                            </option>
+
+                        </select>
+
+                    </div>
+                    <div class="col-md-4 mb-3">
+
+                        <label
+                                for="tipoMediador"
+                                class="form-label">
+
+                            Tipo de Mediação Didático-Pedagógica
+
+                        </label>
+
+                        <select
+                                id="tipoMediador"
+                                class="form-select">
+
+                            <option value="PRESENCIAL" selected>
+                                Presencial
+                            </option>
+
+                            <option value="EAD">
+                                A Distância (EAD)
+                            </option>
+
+                            <option value="SEMIPRESENCIAL">
+                                Semipresencial
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="card-footer text-end">
+
+            <a href="/portal/turmas"
+               class="btn btn-secondary">
+
+                Cancelar
+
+            </a>
+
+            <button
+                    type="button"
+                    id="btnSalvar"
+                    class="btn btn-primary">
+
+                Salvar Turma
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const selectAnoLetivo = document.getElementById('idAnoLetivo');
+            const selectSerie = document.getElementById('idSerie');
+            const btnSalvar = document.getElementById('btnSalvar');
+
+            function mostrarAlerta(mensagem, tipo = 'success') {
+
+                const alertaDiv = document.getElementById('alerta');
+
+                alertaDiv.className =
+                    `alert alert-${tipo} alert-dismissible fade show`;
+
+                alertaDiv.innerHTML =
+                    `${mensagem}
+                     <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                     </button>`;
+
+                alertaDiv.style.display = 'block';
+
+                window.scrollTo(0,0);
+
+            }
+
+            async function carregarAnosLetivos() {
+
+                try {
+
+                    const response =
+                        await fetch('/api/academico/anos-letivos');
+
+                    if (!response.ok)
+                        throw new Error('Erro ao carregar anos.');
+
+                    const anos = await response.json();
+
+                    selectAnoLetivo.innerHTML =
+                        '<option value="">Selecione o Ano Letivo</option>';
+
+                    anos.forEach(ano => {
+
+                        const option =
+                            new Option(ano.ano, ano.id);
+
+                        selectAnoLetivo.add(option);
+
+                    });
+
+                } catch(e){
+
+                    mostrarAlerta(e.message,'danger');
+
+                }
+
+            }
+
+            async function carregarSeries(idAno){
+
+                selectSerie.disabled = true;
+
+                selectSerie.innerHTML =
+                    '<option value="">Carregando...</option>';
+
+                if(!idAno){
+
+                    selectSerie.innerHTML =
+                        '<option value="">Selecione um Ano Letivo primeiro</option>';
+
+                    return;
+
+                }
+
+                try{
+
+                    const response =
+                        await fetch(`/api/academico/series?idAnoLetivo=${idAno}`);
+
+                    if(!response.ok)
+                        throw new Error('Erro ao carregar séries.');
+
+                    const series = await response.json();
+
+                    selectSerie.innerHTML =
+                        '<option value="">Selecione a Série</option>';
+
+                    series.forEach(serie=>{
+
+                        selectSerie.add(
+                            new Option(serie.nome,serie.id)
+                        );
+
+                    });
+
+                    selectSerie.disabled = false;
+
+                }catch(e){
+
+                    mostrarAlerta(e.message,'danger');
+
+                }
+
+            }
+
+            selectAnoLetivo.addEventListener(
+                'change',
+                ()=>carregarSeries(selectAnoLetivo.value)
+            );
+
+            btnSalvar.addEventListener('click', async ()=>{
+
+                const dados = {
+
+                    idAnoLetivo:
+                    selectAnoLetivo.value,
+
+                    idSerie:
+                    selectSerie.value,
+
+                    nome:
+                    document.getElementById('nome').value,
+
+                    turno:
+                    document.getElementById('turno').value,
+
+                    capacidade:
+                        Number(document.getElementById('capacidade').value),
+
+                    sala:
+                    document.getElementById('sala').value,
+
+                    modalidadeEnsino:
+                    document.getElementById('modalidadeEnsino').value,
+
+                    tipoAtendimento:
+                    document.getElementById('tipoAtendimento').value,
+
+                    tipoMediador:
+                    document.getElementById('tipoMediador').value
+
+                };
+
+                try{
+
+                    btnSalvar.disabled = true;
+
+                    const response =
+                        await fetch('/api/academico/turmas',{
+
+                            method:'POST',
+
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+
+                            body:JSON.stringify(dados)
+
+                        });
+
+                    if(!response.ok){
+
+                        const erro = await response.json();
+
+                        throw new Error(
+                            erro.message || 'Erro ao salvar.'
+                        );
+
+                    }
+
+                    mostrarAlerta(
+                        'Turma criada com sucesso!'
+                    );
+
+                    setTimeout(()=>{
+
+                        window.location.href='/portal/turmas';
+
+                    },1200);
+
+                }catch(e){
+
+                    mostrarAlerta(e.message,'danger');
+
+                }finally{
+
+                    btnSalvar.disabled=false;
+
+                }
+
+            });
+
+            carregarAnosLetivos();
+
+        });
+
+    </script>
+
 </div>
+
 </body>
 </html>

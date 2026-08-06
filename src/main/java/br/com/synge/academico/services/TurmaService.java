@@ -1,11 +1,13 @@
 package br.com.synge.academico.services;
 
 import br.com.synge.academico.dtos.CriarTurmaDTO;
+import br.com.synge.academico.dtos.EditarTurmaDTO;
 import br.com.synge.academico.dtos.TurmaResponseDTO;
 import br.com.synge.academico.models.Turma;
 import br.com.synge.academico.repositories.AnoLetivoRepository;
 import br.com.synge.academico.repositories.SerieRepository;
 import br.com.synge.academico.repositories.TurmaRepository;
+import br.com.synge.seguranca.exceptions.ConflictException;
 import br.com.synge.seguranca.exceptions.NotFoundException;
 import br.com.synge.seguranca.exceptions.ValidationException;
 import br.com.synge.seguranca.models.AuthUser;
@@ -142,6 +144,72 @@ public class TurmaService {
         }
 
         return turma;
+    }
+
+    public TurmaResponseDTO buscarPorId(UUID id) {
+        UUID tenantId = tenant();
+        return turmaRepository.buscarPorId(tenantId, id)
+                .map(this::toDto)
+                .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
+    }
+
+    public void editar(UUID id, EditarTurmaDTO dto) {
+        UUID tenantId = tenant();
+        Turma turma = turmaRepository.buscarPorId(tenantId, id)
+                .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
+
+        if (dto.getNome() != null && !dto.getNome().isBlank()) {
+            turma.setNome(dto.getNome());
+        }
+        if (dto.getTurno() != null && !dto.getTurno().isBlank()) {
+            turma.setTurno(dto.getTurno());
+        }
+        if (dto.getSala() != null) {
+            turma.setSala(dto.getSala());
+        }
+        if (dto.getCapacidade() != null && dto.getCapacidade() >= 0) {
+            turma.setCapacidade(dto.getCapacidade());
+        }
+        if (dto.getTipoMediador() != null && MEDIADORES_VALIDOS.contains(dto.getTipoMediador().toUpperCase())) {
+            turma.setTipoMediador(dto.getTipoMediador().toUpperCase());
+        }
+        if (dto.getHoraInicio() != null) {
+            turma.setHoraInicio(dto.getHoraInicio());
+        }
+        if (dto.getHoraTermino() != null) {
+            turma.setHoraTermino(dto.getHoraTermino());
+        }
+        if (dto.getDiasSemana() != null) {
+            turma.setDiasSemana(dto.getDiasSemana());
+        }
+        if (dto.getCargaHorariaSemanal() != null) {
+            turma.setCargaHorariaSemanal(dto.getCargaHorariaSemanal());
+        }
+        if (dto.getTipoAtendimento() != null && ATENDIMENTOS_VALIDOS.contains(dto.getTipoAtendimento().toUpperCase())) {
+            turma.setTipoAtendimento(dto.getTipoAtendimento().toUpperCase());
+        }
+        if (dto.getModalidadeEnsino() != null && MODALIDADES_VALIDAS.contains(dto.getModalidadeEnsino().toUpperCase())) {
+            turma.setModalidadeEnsino(dto.getModalidadeEnsino().toUpperCase());
+        }
+        if (dto.getFormaOrganizacao() != null && ORGANIZACOES_VALIDAS.contains(dto.getFormaOrganizacao().toUpperCase())) {
+            turma.setFormaOrganizacao(dto.getFormaOrganizacao().toUpperCase());
+        }
+
+        turma.setAtualizadoEm(LocalDateTime.now());
+        turmaRepository.atualizar(turma);
+    }
+
+    public void apagar(UUID id) {
+        UUID tenantId = tenant();
+        Turma turma = turmaRepository.buscarPorId(tenantId, id)
+                .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
+
+        int matriculasAtivas = turmaRepository.contarMatriculas(tenantId, id);
+        if (matriculasAtivas > 0) {
+            throw new ConflictException("Não é possível apagar: existem " + matriculasAtivas + " matrícula(s) ativa(s) nesta turma.");
+        }
+
+        turmaRepository.apagar(tenantId, id);
     }
 
     private TurmaResponseDTO toDto(Turma t) {

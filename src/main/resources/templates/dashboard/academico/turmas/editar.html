@@ -1,13 +1,232 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-escola :: html(~{::content})}">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
 <head>
-    <title>Template removido</title>
+    <title>Editar Turma</title>
 </head>
 <body>
+
 <div th:fragment="content">
-    <div class="alert alert-secondary">
-        Este template foi removido — use a interface principal de Turmas em <a href="/portal/turmas">/portal/turmas</a>.
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/portal/turmas}">Turmas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Editar Turma</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Editar Turma</h1>
+    </div>
+
+    <div id="alerta" class="alert" role="alert" style="display: none;"></div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Dados da Turma</h5>
+        </div>
+        <div class="card-body">
+            <div id="loadingState" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando dados da turma...</p>
+            </div>
+
+            <form id="formEditarTurma" class="d-none">
+                <input type="hidden" id="turmaId">
+                <div class="row">
+                    <!-- Campos de Relacionamento (read-only) -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ano Letivo</label>
+                        <input type="text" id="anoLetivoNome" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Série</label>
+                        <input type="text" id="serieNome" class="form-control" readonly>
+                    </div>
+
+                    <!-- Campos Editáveis -->
+                    <div class="col-md-6 mb-3">
+                        <label for="nome" class="form-label">Nome da Turma <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="turno" class="form-label">Turno <span class="text-danger">*</span></label>
+                        <select id="turno" class="form-select" required>
+                            <option value="MATUTINO">Matutino</option>
+                            <option value="VESPERTINO">Vespertino</option>
+                            <option value="NOTURNO">Noturno</option>
+                            <option value="INTEGRAL">Integral</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="capacidade" class="form-label">Capacidade (Vagas) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="capacidade" min="0" required>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="sala" class="form-label">Sala</label>
+                        <input type="text" class="form-control" id="sala">
+                    </div>
+                </div>
+
+                <hr>
+                <h5 class="mt-4">Dados do Censo Escolar (Opcional)</h5>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="modalidadeEnsino" class="form-label">Modalidade de Ensino</label>
+                        <select id="modalidadeEnsino" class="form-select">
+                            <option value="REGULAR">Ensino Regular</option>
+                            <option value="EDUCACAO_ESPECIAL">Educação Especial - Modalidade Substitutiva</option>
+                            <option value="EJA">Educação de Jovens e Adultos (EJA)</option>
+                            <option value="PROFISSIONAL">Educação Profissional</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="tipoAtendimento" class="form-label">Tipo de Atendimento</label>
+                        <select id="tipoAtendimento" class="form-select">
+                            <option value="ESCOLARIZACAO">Escolarização</option>
+                            <option value="AEE">Atendimento Educacional Especializado (AEE)</option>
+                            <option value="ATIVIDADE_COMPLEMENTAR">Atividade Complementar</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="tipoMediador" class="form-label">Tipo de Mediação</label>
+                        <select id="tipoMediador" class="form-select">
+                            <option value="PRESENCIAL">Presencial</option>
+                            <option value="EAD">A Distância (EAD)</option>
+                            <option value="SEMIPRESENCIAL">Semipresencial</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-end">
+            <a th:href="@{/portal/turmas}" class="btn btn-secondary">Cancelar</a>
+            <button type="button" id="btnSalvar" class="btn btn-primary" disabled>Salvar Alterações</button>
+        </div>
     </div>
 </div>
+
+<div th:fragment="scripts">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formEditarTurma');
+            const loadingState = document.getElementById('loadingState');
+            const btnSalvar = document.getElementById('btnSalvar');
+            const turmaIdInput = document.getElementById('turmaId');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const turmaId = urlParams.get('id');
+
+            function mostrarAlerta(mensagem, tipo = 'success') {
+                const alertaDiv = document.getElementById('alerta');
+                alertaDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
+                alertaDiv.innerHTML = `${mensagem}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+                alertaDiv.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+
+            async function carregarDadosDaTurma() {
+                if (!turmaId) {
+                    mostrarAlerta('ID da turma não fornecido.', 'danger');
+                    loadingState.innerHTML = '<p class="text-danger">Erro: ID da turma não encontrado na URL.</p>';
+                    return;
+                }
+
+                try {
+                    // Busca a turma, o ano e a série em paralelo para otimizar
+                    const [turmaRes, anosRes] = await Promise.all([
+                        fetch(`/api/academico/turmas/${turmaId}`),
+                        fetch('/api/academico/anos-letivos')
+                    ]);
+
+                    if (!turmaRes.ok) throw new Error('Turma não encontrada ou falha ao carregar.');
+                    if (!anosRes.ok) throw new Error('Falha ao carregar anos letivos.');
+
+                    const turma = await turmaRes.json();
+                    const anos = await anosRes.json();
+
+                    const anoLetivo = anos.find(a => a.id === turma.idAnoLetivo);
+
+                    const seriesRes = await fetch(`/api/academico/series?idAnoLetivo=${turma.idAnoLetivo}`);
+                    if (!seriesRes.ok) throw new Error('Falha ao carregar a série da turma.');
+                    const series = await seriesRes.json();
+                    const serie = series.find(s => s.id === turma.idSerie);
+
+                    // Preenche o formulário
+                    turmaIdInput.value = turma.id;
+                    document.getElementById('anoLetivoNome').value = anoLetivo ? anoLetivo.ano : 'Não encontrado';
+                    document.getElementById('serieNome').value = serie ? serie.nome : 'Não encontrada';
+                    document.getElementById('nome').value = turma.nome;
+                    document.getElementById('turno').value = turma.turno;
+                    document.getElementById('capacidade').value = turma.capacidade;
+                    document.getElementById('sala').value = turma.sala || '';
+                    document.getElementById('modalidadeEnsino').value = turma.modalidadeEnsino;
+                    document.getElementById('tipoAtendimento').value = turma.tipoAtendimento;
+                    document.getElementById('tipoMediador').value = turma.tipoMediador;
+
+                    // Exibe o formulário e esconde o loading
+                    loadingState.classList.add('d-none');
+                    form.classList.remove('d-none');
+                    btnSalvar.disabled = false;
+
+                } catch (error) {
+                    mostrarAlerta(error.message, 'danger');
+                    loadingState.innerHTML = `<p class="text-danger">Erro ao carregar dados: ${error.message}</p>`;
+                }
+            }
+
+            async function salvarAlteracoes() {
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    mostrarAlerta('Por favor, preencha todos os campos obrigatórios.', 'warning');
+                    return;
+                }
+
+                const dadosAtualizados = {
+                    nome: document.getElementById('nome').value,
+                    turno: document.getElementById('turno').value,
+                    capacidade: parseInt(document.getElementById('capacidade').value),
+                    sala: document.getElementById('sala').value,
+                    modalidadeEnsino: document.getElementById('modalidadeEnsino').value,
+                    tipoAtendimento: document.getElementById('tipoAtendimento').value,
+                    tipoMediador: document.getElementById('tipoMediador').value
+                };
+
+                btnSalvar.disabled = true;
+                btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+
+                try {
+                    const response = await fetch(`/api/academico/turmas/${turmaId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dadosAtualizados)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Ocorreu um erro ao salvar as alterações.');
+                    }
+
+                    mostrarAlerta('Turma atualizada com sucesso!', 'success');
+                    setTimeout(() => window.location.href = '/portal/turmas', 1500);
+
+                } catch (error) {
+                    mostrarAlerta(error.message, 'danger');
+                } finally {
+                    btnSalvar.disabled = false;
+                    btnSalvar.innerHTML = 'Salvar Alterações';
+                }
+            }
+
+            btnSalvar.addEventListener('click', salvarAlteracoes);
+
+            carregarDadosDaTurma();
+        });
+    </script>
+</div>
+
 </body>
 </html>

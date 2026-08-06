@@ -1,13 +1,154 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/master-escola :: html(~{::content})}">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-escola :: html(~{::content})}">
 <head>
-    <title>Template removido</title>
+    <title>Visualizar Turma</title>
 </head>
 <body>
+
 <div th:fragment="content">
-    <div class="alert alert-secondary">
-        Este template foi removido — use a interface principal de Turmas em <a href="/portal/turmas">/portal/turmas</a>.
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/portal/turmas}">Turmas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Visualizar Turma</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Visualizar Turma</h1>
+        <a id="btnEditar" href="#" class="btn btn-primary">
+            <i class="bi bi-pencil-square me-2"></i>Editar Turma
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Dados da Turma</h5>
+        </div>
+        <div class="card-body">
+            <div id="loadingState" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-2">Carregando dados da turma...</p>
+            </div>
+
+            <div id="viewContent" class="d-none">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Ano Letivo</p>
+                        <h6 id="anoLetivoNome"></h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Série</p>
+                        <h6 id="serieNome"></h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Nome da Turma</p>
+                        <h6 id="nome"></h6>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <p class="text-muted mb-1">Turno</p>
+                        <h6 id="turno"></h6>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <p class="text-muted mb-1">Capacidade (Vagas)</p>
+                        <h6 id="capacidade"></h6>
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <p class="text-muted mb-1">Sala</p>
+                        <h6 id="sala"></h6>
+                    </div>
+                </div>
+                <hr>
+                <h5 class="mt-4">Dados do Censo Escolar</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <p class="text-muted mb-1">Modalidade de Ensino</p>
+                        <h6 id="modalidadeEnsino"></h6>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <p class="text-muted mb-1">Tipo de Atendimento</p>
+                        <h6 id="tipoAtendimento"></h6>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <p class="text-muted mb-1">Tipo de Mediação</p>
+                        <h6 id="tipoMediador"></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a th:href="@{/portal/turmas}" class="btn btn-secondary">Voltar para a Lista</a>
+        </div>
     </div>
 </div>
+
+<div th:fragment="scripts">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loadingState = document.getElementById('loadingState');
+            const viewContent = document.getElementById('viewContent');
+            const btnEditar = document.getElementById('btnEditar');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const turmaId = urlParams.get('id');
+
+            const turnosMap = { 'MATUTINO': 'Matutino', 'VESPERTINO': 'Vespertino', 'NOTURNO': 'Noturno', 'INTEGRAL': 'Integral' };
+            const modalidadesMap = { 'REGULAR': 'Ensino Regular', 'EDUCACAO_ESPECIAL': 'Educação Especial', 'EJA': 'EJA', 'PROFISSIONAL': 'Educação Profissional' };
+            const atendimentosMap = { 'ESCOLARIZACAO': 'Escolarização', 'AEE': 'AEE', 'ATIVIDADE_COMPLEMENTAR': 'Atividade Complementar' };
+            const mediadoresMap = { 'PRESENCIAL': 'Presencial', 'EAD': 'A Distância (EAD)', 'SEMIPRESENCIAL': 'Semipresencial' };
+
+            async function carregarDados() {
+                if (!turmaId) {
+                    loadingState.innerHTML = '<p class="text-danger">Erro: ID da turma não encontrado na URL.</p>';
+                    return;
+                }
+
+                btnEditar.href = `/portal/turmas/editar?id=${turmaId}`;
+
+                try {
+                    const [turmaRes, anosRes] = await Promise.all([
+                        fetch(`/api/academico/turmas/${turmaId}`),
+                        fetch('/api/academico/anos-letivos')
+                    ]);
+
+                    if (!turmaRes.ok) throw new Error('Turma não encontrada.');
+                    if (!anosRes.ok) throw new Error('Falha ao carregar dados de apoio.');
+
+                    const turma = await turmaRes.json();
+                    const anos = await anosRes.json();
+                    const anoLetivo = anos.find(a => a.id === turma.idAnoLetivo);
+
+                    const seriesRes = await fetch(`/api/academico/series?idAnoLetivo=${turma.idAnoLetivo}`);
+                    if (!seriesRes.ok) throw new Error('Falha ao carregar série.');
+                    const series = await seriesRes.json();
+                    const serie = series.find(s => s.id === turma.idSerie);
+
+                    // Preenche os campos de visualização
+                    document.getElementById('anoLetivoNome').textContent = anoLetivo ? anoLetivo.ano : 'N/A';
+                    document.getElementById('serieNome').textContent = serie ? serie.nome : 'N/A';
+                    document.getElementById('nome').textContent = turma.nome;
+                    document.getElementById('turno').textContent = turnosMap[turma.turno] || turma.turno;
+                    document.getElementById('capacidade').textContent = turma.capacidade;
+                    document.getElementById('sala').textContent = turma.sala || 'Não informada';
+                    document.getElementById('modalidadeEnsino').textContent = modalidadesMap[turma.modalidadeEnsino] || turma.modalidadeEnsino;
+                    document.getElementById('tipoAtendimento').textContent = atendimentosMap[turma.tipoAtendimento] || turma.tipoAtendimento;
+                    document.getElementById('tipoMediador').textContent = mediadoresMap[turma.tipoMediador] || turma.tipoMediador;
+
+                    loadingState.classList.add('d-none');
+                    viewContent.classList.remove('d-none');
+
+                } catch (error) {
+                    loadingState.innerHTML = `<p class="text-danger">Erro ao carregar dados: ${error.message}</p>`;
+                }
+            }
+
+            carregarDados();
+        });
+    </script>
+</div>
+
 </body>
 </html>

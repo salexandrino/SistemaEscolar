@@ -383,16 +383,46 @@ public class SyngeApplication {
             ctx.html(templateEngine.process("dashboard/academico/series/editar", context));
         });
 
-        app.get("/portal/series/visualizar", ctx -> {
-            Context context = new Context(ctx.req().getLocale());
-            context.setVariable("content", "dashboard/academico/series/visualizar");
-            ctx.html(templateEngine.process("dashboard/academico/series/visualizar", context));
-        });
-
         app.get("/portal/turmas", ctx -> {
             Context context = new Context(ctx.req().getLocale());
-            context.setVariable("content", "dashboard/escola/turmas");
-            ctx.html(templateEngine.process("dashboard/escola/turmas", context));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+
+            // CORREÇÃO: Adicionando lógica de permissão
+            boolean canEdit = false;
+            if (currentUser != null) {
+                Perfil perfil = currentUser.getPerfil();
+                canEdit = (perfil == Perfil.GESTOR || perfil == Perfil.SUPER_ADMIN || perfil == Perfil.SECRETARIA);
+            }
+            context.setVariable("canEdit", canEdit);
+
+            context.setVariable("currentUser", currentUser);
+            context.setVariable("content", "dashboard/academico/turmas/index");
+            ctx.html(templateEngine.process("dashboard/academico/turmas/index", context));
+        });
+
+
+        app.get("/portal/turmas/novo", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            context.setVariable("content", "dashboard/academico/turmas/novo");
+            ctx.html(templateEngine.process("dashboard/academico/turmas/novo", context));
+        });
+
+        app.get("/portal/turmas/editar", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            context.setVariable("content", "dashboard/academico/turmas/editar");
+            ctx.html(templateEngine.process("dashboard/academico/turmas/editar", context));
+        });
+
+        app.get("/portal/turmas/visualizar", ctx -> {
+            Context context = new Context(ctx.req().getLocale());
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            context.setVariable("currentUser", currentUser);
+            context.setVariable("content", "dashboard/academico/turmas/visualizar");
+            ctx.html(templateEngine.process("dashboard/academico/turmas/visualizar", context));
         });
 
         app.get("/portal/alunos", ctx -> {
@@ -579,6 +609,9 @@ public class SyngeApplication {
         // ACADÊMICO — TURMAS
         app.get("/api/academico/turmas", turmaController::listar);
         app.post("/api/academico/turmas", turmaController::criar);
+        app.get("/api/academico/turmas/{id}", turmaController::buscarPorId);
+        app.put("/api/academico/turmas/{id}", turmaController::editar);
+        app.delete("/api/academico/turmas/{id}", turmaController::apagar);
         app.patch("/api/academico/turmas/{id}/encerrar", turmaController::encerrar);
         app.get("/api/academico/turmas/{id}/capacidade", turmaController::capacidade);
 
