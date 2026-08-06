@@ -41,6 +41,7 @@ public class TurmaService {
         return u.getTenantId();
     }
 
+
     public TurmaResponseDTO criar(CriarTurmaDTO dto) {
         if (dto == null) throw new ValidationException("Dados obrigatórios ausentes.");
         if (dto.getIdAnoLetivo() == null) throw new ValidationException("idAnoLetivo é obrigatório.");
@@ -115,7 +116,20 @@ public class TurmaService {
 
     public List<TurmaResponseDTO> listar(UUID idAnoLetivo, UUID idSerie) {
         UUID tenantId = tenant();
-        return turmaRepository.listar(tenantId, idAnoLetivo, idSerie).stream().map(this::toDto).collect(Collectors.toList());
+
+        List<Turma> turmas;
+
+        if (idAnoLetivo == null && idSerie == null) {
+            // Lista todas as turmas do tenant
+            turmas = turmaRepository.listarTodas(tenantId);
+        } else {
+            // Mantém o comportamento atual com filtros
+            turmas = turmaRepository.listar(tenantId, idAnoLetivo, idSerie);
+        }
+
+        return turmas.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     public int consultarCapacidadeMatriculados(UUID idTurma) {

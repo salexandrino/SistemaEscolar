@@ -95,6 +95,22 @@ public class TurmaRepository extends BaseDAO {
         return Optional.empty();
     }
 
+    public List<Turma> listarTodas(UUID tenantId) {
+        String sql = "SELECT * FROM turma WHERE tenant_id = ? ORDER BY nome ASC";
+        List<Turma> lista = new ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, tenantId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(map(rs));
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar todas as turmas do tenant {}: {}", tenantId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao listar turmas.", e);
+        }
+        return lista;
+    }
+
+
     public List<Turma> listar(UUID tenantId, UUID idAnoLetivo, UUID idSerie) {
         String sql = "SELECT * FROM turma WHERE tenant_id = ? AND id_ano_letivo = ? AND id_serie = ? ORDER BY criado_em DESC";
         List<Turma> lista = new ArrayList<>();

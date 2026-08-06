@@ -23,8 +23,9 @@ public class TurmaController {
     }
 
     public void listar(Context ctx) {
-        UUID idAnoLetivo = UUID.fromString(ctx.queryParam("idAnoLetivo"));
-        UUID idSerie = UUID.fromString(ctx.queryParam("idSerie"));
+        UUID idAnoLetivo = ctx.queryParamAsClass("idAnoLetivo", UUID.class).get();
+        UUID idSerie = ctx.queryParamAsClass("idSerie", UUID.class).get();
+
         List<TurmaResponseDTO> lista = service.listar(idAnoLetivo, idSerie);
         ctx.json(lista);
     }
