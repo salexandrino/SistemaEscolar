@@ -162,8 +162,17 @@ public class AlunoRepository extends BaseDAO {
                 "tipo_condicao = ?, recursos_acessibilidade = ?, atualizado_em = CURRENT_TIMESTAMP " +
                 "WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            // 1: nome
             ps.setString(1, a.getNome());
-            ps.setObject(2, a.getDataNascimento());
+
+            // 2: data_nascimento (DATE)
+            if (a.getDataNascimento() != null) {
+                ps.setObject(2, java.sql.Date.valueOf(a.getDataNascimento()), Types.DATE);
+            } else {
+                ps.setNull(2, Types.DATE);
+            }
+
+            // 3..14: strings simples (aceitam null)
             ps.setString(3, a.getEmail());
             ps.setString(4, a.getTelefone());
             ps.setString(5, a.getCodigoInep());
@@ -176,6 +185,8 @@ public class AlunoRepository extends BaseDAO {
             ps.setString(12, a.getMunicipioNascimento());
             ps.setString(13, a.getCertidaoNascimento());
             ps.setString(14, a.getNis());
+
+            // 15..23: endereço
             ps.setString(15, a.getCep());
             ps.setString(16, a.getEndereco());
             ps.setString(17, a.getNumero());
@@ -185,12 +196,19 @@ public class AlunoRepository extends BaseDAO {
             ps.setString(21, a.getEstado());
             ps.setString(22, a.getZona());
             ps.setString(23, a.getLocalizacaoDiferenciada());
+
+            // 24: usa_transporte_escolar (boolean)
             ps.setBoolean(24, a.isUsaTransporteEscolar());
+
+            // 25..27: strings adicionais
             ps.setString(25, a.getResponsavelTransporte());
             ps.setString(26, a.getTipoCondicao());
             ps.setString(27, a.getRecursosAcessibilidade());
+
+            // 28..29: id e tenant
             ps.setObject(28, a.getId());
             ps.setObject(29, a.getTenantId());
+
             int affected = ps.executeUpdate();
             if (affected == 0) throw new RuntimeException("Nenhum registro atualizado.");
         } catch (SQLException e) {
