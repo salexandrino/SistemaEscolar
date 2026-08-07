@@ -95,9 +95,30 @@ public class DashboardController {
 
         // Puxa todos os usuários do banco (seja criado na tela ou no cadastro geral)
         List<Usuario> listaUsuarios = usuarioRepository.findAll();
-        thymeleafContext.setVariable("usuarios", listaUsuarios);
 
+        // Suporta filtro via query param: ?status=pendente|inativos|todos
         String status = ctx.queryParam("status");
+        List<Usuario> listaFiltrada;
+        if (status != null) {
+            switch (status) {
+                case "pendente":
+                    listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAprovado()).collect(java.util.stream.Collectors.toList());
+                    break;
+                case "inativos":
+                    listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAtivo()).collect(java.util.stream.Collectors.toList());
+                    break;
+                case "todos":
+                    listaFiltrada = listaUsuarios;
+                    break;
+                default:
+                    listaFiltrada = listaUsuarios.stream().filter(Usuario::isAtivo).collect(java.util.stream.Collectors.toList());
+            }
+        } else {
+            // padrão: mostrar somente usuários ativos
+            listaFiltrada = listaUsuarios.stream().filter(Usuario::isAtivo).collect(java.util.stream.Collectors.toList());
+        }
+
+        thymeleafContext.setVariable("usuarios", listaFiltrada);
         thymeleafContext.setVariable("filtroStatus", status);
 
         thymeleafContext.setVariable("content", "dashboard/usuarios/index");
