@@ -23,11 +23,25 @@ public class TurmaController {
     }
 
     public void listar(Context ctx) {
-        UUID idAnoLetivo = ctx.queryParamAsClass("idAnoLetivo", UUID.class).get();
-        UUID idSerie = ctx.queryParamAsClass("idSerie", UUID.class).get();
+        UUID idAnoLetivo = null;
+        UUID idSerie = null;
 
-        List<TurmaResponseDTO> lista = service.listar(idAnoLetivo, idSerie);
-        ctx.json(lista);
+        try {
+            String pAno = ctx.queryParam("idAnoLetivo");
+            String pSerie = ctx.queryParam("idSerie");
+
+            if (pAno != null && !pAno.isBlank()) idAnoLetivo = UUID.fromString(pAno);
+            if (pSerie != null && !pSerie.isBlank()) idSerie = UUID.fromString(pSerie);
+
+            List<TurmaResponseDTO> lista = service.listar(idAnoLetivo, idSerie);
+            ctx.json(lista);
+        } catch (IllegalArgumentException e) {
+            // UUID#fromString may throw IllegalArgumentException
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of("message", "Parâmetro idAnoLetivo ou idSerie inválido."));
+        } catch (Exception e) {
+            // Protege contra exceções que podem causar retorno HTML/redirect
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of("message", "Erro interno ao listar turmas."));
+        }
     }
 
     public void criar(Context ctx) {
