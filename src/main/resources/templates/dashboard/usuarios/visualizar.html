@@ -105,14 +105,46 @@
                         onclick="executarAcaoUsuario('/users/' + this.dataset.usuarioId + '/reativar', 'Usuário reativado com sucesso.')">
                     <i class="bi bi-person-check"></i> Reativar
                 </button>
+                <!-- Botão que abre o modal de exclusão definitiva -->
                 <button th:unless="${usuario.ativo}" type="button" class="btn btn-danger fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}"
-                        onclick="confirmarExclusaoUsuario(this.dataset.usuarioId)">
+                        th:attr="data-usuario-id=${usuario.id}, data-usuario-nome=${usuario.nomeCompleto}"
+                        onclick="abrirModalExcluirUsuario(this.dataset.usuarioId, this.dataset.usuarioNome)">
                     <i class="bi bi-trash3"></i> Excluir Definitivamente
                 </button>
                 <a th:href="'/dashboard/usuarios/editar/' + ${usuario.id}" class="btn btn-warning text-dark fw-bold px-4">
                     <i class="bi bi-pencil"></i> Editar Cadastro
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exclusão Definitiva do Usuário (igual ao das escolas) -->
+    <div class="modal fade" id="modalExcluirUsuario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Excluir Usuário Definitivamente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-2">Você está prestes a excluir <strong>permanentemente</strong> o usuário:</p>
+                    <p class="fw-bold fs-5 text-danger" id="nomeUsuarioExcluir">—</p>
+                    <div class="alert alert-warning py-2 mb-3">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Esta ação <strong>não pode ser desfeita</strong>. Todos os dados vinculados ao usuário serão removidos permanentemente.
+                    </div>
+                    <label class="form-label fw-semibold">Digite <code>EXCLUIR</code> para confirmar:</label>
+                    <input type="text" id="inputConfirmacaoExcluirUsuario" class="form-control" placeholder="EXCLUIR" autocomplete="off">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnConfirmarExclusaoUsuario" class="btn btn-danger" disabled
+                            onclick="executarExclusaoUsuario()">
+                        <i class="bi bi-trash3 me-1"></i> Excluir Definitivamente
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -147,13 +179,48 @@
             }
         }
 
+        // Substitui o prompt por modal de confirmação (igual ao das escolas)
+        let _idUsuarioParaExcluir = null;
+
+        function abrirModalExcluirUsuario(id, nome) {
+            _idUsuarioParaExcluir = id;
+            document.getElementById('nomeUsuarioExcluir').textContent = nome || '—';
+            document.getElementById('inputConfirmacaoExcluirUsuario').value = '';
+            document.getElementById('btnConfirmarExclusaoUsuario').disabled = true;
+            new bootstrap.Modal(document.getElementById('modalExcluirUsuario')).show();
+        }
+
+        // Habilita o botão só quando o usuário digitar EXCLUIR corretamente
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('inputConfirmacaoExcluirUsuario');
+            if (input) {
+                input.addEventListener('input', function () {
+                    const btn = document.getElementById('btnConfirmarExclusaoUsuario');
+                    btn.disabled = (this.value !== 'EXCLUIR');
+                });
+            }
+        });
+
+        // Executar o DELETE no backend para exclusão definitiva
+        async function executarExclusaoUsuario() {
+            if (!_idUsuarioParaExcluir) return;
+            try {
+                const response = await fetch('/users/' + _idUsuarioParaExcluir + '/excluir', { method: 'DELETE' });
+                if (response.ok) {
+                    window.location.href = '/dashboard/usuarios';
+                } else {
+                    const data = await response.json().catch(() => ({}));
+                    alert(data.message || 'Não foi possível excluir o usuário. Verifique se há restrições.');
+                    bootstrap.Modal.getInstance(document.getElementById('modalExcluirUsuario')).hide();
+                }
+            } catch (e) {
+                alert('Erro de conexão ao tentar excluir o usuário.');
+            }
+        }
+
+        // Mantém a compatibilidade com o comportamento antigo caso ainda seja usado
         function confirmarExclusaoUsuario(id) {
-            const digitado = window.prompt(
-                'ATENÇÃO: isso exclui o usuário DEFINITIVAMENTE e não pode ser desfeito.\n\n' +
-                'Digite EXCLUIR para confirmar:'
-            );
-            if (digitado !== 'EXCLUIR') return;
-            executarAcaoUsuario('/users/' + id + '/excluir', 'Usuário excluído definitivamente com sucesso.', 'DELETE');
+            abrirModalExcluirUsuario(id, '—');
         }
     </script>
 </div>
