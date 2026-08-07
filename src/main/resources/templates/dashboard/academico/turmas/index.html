@@ -154,14 +154,19 @@
 
             try{
 
-                const response=await fetch("/api/academico/turmas");
+                const response=await fetch("/api/academico/turmas", { credentials: 'include' });
 
                 if(!response.ok)
-                    throw new Error("Erro ao carregar turmas.");
+                    throw new Error("Erro ao carregar turmas: " + response.status);
+
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    throw new Error('Resposta inesperada do servidor (não-JSON). Provável redirect para login.');
+                }
 
                 const turmas=await response.json();
 
-                if(turmas.length===0){
+                if(!Array.isArray(turmas) || turmas.length===0){
 
                     mostrarVazio();
                     return;
@@ -239,7 +244,8 @@
                 return;
 
             const response=await fetch(`/api/academico/turmas/${id}`,{
-                method:"DELETE"
+                method:"DELETE",
+                credentials: 'include'
             });
 
             if(response.status===204){
