@@ -5,20 +5,20 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <h2>SYNGE</h2>
+                <h2>Kutuar Educação</h2>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#sobreModal">Sobre</a>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#equipeModal">Equipe</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <span th:text="'© 2026 SYNGE. Gestão Escolar Inteligente.'">© 2026 SYNGE.</span>
+                <span th:text="'© 2026 Kutuar Educação. Gestão Escolar Inteligente.'">© 2026 Kutuar Educação.</span>
         </div>
     </div>
 </footer>
 
 <!-- FOOTER ADMINISTRATIVO -->
 <footer th:fragment="adminFooter" class="bg-primary text-white text-center py-3" style="margin-left: 280px;">
-    <small>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> SYNGE - Sistema de Gestão Escolar. Todos os direitos reservados.</small>
+    <small>© <span th:text="${#dates.year(#dates.createNow())}">2026</span> Kutuar Educação - Sistema de Gestão Escolar. Todos os direitos reservados.</small>
 </footer>
 </body>
 </html>
