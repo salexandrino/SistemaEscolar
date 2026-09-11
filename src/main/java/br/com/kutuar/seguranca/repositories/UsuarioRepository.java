@@ -218,10 +218,10 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         return false;
     }
 
-    public Escola save(Usuario usuario) {
+    public Usuario save(Usuario usuario) {
         // Backwards-compatible: delegate to tenant-aware save using tenantId from entity
         save(usuario, usuario.getTenantId());
-        return null;
+        return usuario;
     }
 
     // Tenant-aware save (preferred)

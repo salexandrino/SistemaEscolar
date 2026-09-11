@@ -17,9 +17,6 @@ import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.strategies.ValidadorCpf;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
-import br.com.kutuar.config.DatabaseConfig;
-
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -239,38 +236,26 @@ public class AlunoService {
         Matricula mAtual = matriculaRepository.obterAtivaPorAluno(tenantId, idAluno)
                 .orElseThrow(() -> new ValidationException("Aluno não possui matrícula ativa para transferir."));
 
-        try (Connection conn = DatabaseConfig.getConnection()) {
-            conn.setAutoCommit(false);
-            try {
-                matriculaRepository.atualizarStatus(tenantId, mAtual.getId(), "TRANSFERIDA");
+        Matricula mNova = new Matricula();
+        mNova.setId(UUID.randomUUID());
+        mNova.setTenantId(tenantId);
+        mNova.setIdAluno(idAluno);
+        mNova.setIdTurma(dto.getIdNovaTurma());
+        mNova.setDataMatricula(LocalDate.now());
+        mNova.setStatus("ATIVA");
+        mNova.setCriadoEm(LocalDateTime.now());
+        mNova.setAtualizadoEm(LocalDateTime.now());
 
-                Matricula mNova = new Matricula();
-                mNova.setId(UUID.randomUUID());
-                mNova.setTenantId(tenantId);
-                mNova.setIdAluno(idAluno);
-                mNova.setIdTurma(dto.getIdNovaTurma());
-                mNova.setDataMatricula(LocalDate.now());
-                mNova.setStatus("ATIVA");
-                mNova.setCriadoEm(LocalDateTime.now());
-                mNova.setAtualizadoEm(LocalDateTime.now());
-                matriculaRepository.criar(mNova);
+        HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
+        h.setId(UUID.randomUUID());
+        h.setTenantId(tenantId);
+        h.setIdAluno(idAluno);
+        h.setSituacaoAnterior("ATIVO");
+        h.setSituacaoNova("ATIVO");
+        h.setMotivo("Transferência de turma: " + dto.getMotivo());
+        h.setCriadoEm(LocalDateTime.now());
 
-                HistoricoSituacaoAluno h = new HistoricoSituacaoAluno();
-                h.setId(UUID.randomUUID());
-                h.setTenantId(tenantId);
-                h.setIdAluno(idAluno);
-                h.setSituacaoAnterior("ATIVO");
-                h.setSituacaoNova("ATIVO");
-                h.setMotivo("Transferência de turma: " + dto.getMotivo());
-                h.setCriadoEm(LocalDateTime.now());
-                historicoRepository.criar(h);
-
-                conn.commit();
-            } catch (Exception e) {
-                conn.rollback();
-                throw e;
-            }
-        }
+        matriculaRepository.transferir(mAtual, mNova, h);
     }
 
     public DocumentoAlunoDTO adicionarDocumento(UUID idAluno, CriarDocumentoAlunoDTO dto) {

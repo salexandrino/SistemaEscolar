@@ -21,4 +21,4 @@ ALTER TABLE escola ADD COLUMN IF NOT EXISTS cnpj VARCHAR(18);
 ALTER TABLE escola ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'ATIVA';
 
 -- 🔐 NOVA COLUNA: Senha necessária para validação no auto-cadastro de novos usuários
-ALTER TABLE escola ADD COLUMN IF NOT EXISTS senha_cadastro VARCHAR(100) DEFAULT 'synge123';
+ALTER TABLE escola ADD COLUMN IF NOT EXISTS senha_cadastro VARCHAR(100);

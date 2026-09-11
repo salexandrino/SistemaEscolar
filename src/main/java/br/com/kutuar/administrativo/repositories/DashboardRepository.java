@@ -1,6 +1,6 @@
 package br.com.kutuar.administrativo.repositories;
 
-import br.com.kutuar.config.DatabaseConfig;
+import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import br.com.kutuar.seguranca.enums.Perfil;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DashboardRepository {
+public class DashboardRepository extends BaseDAO {
 
     public DashboardRepository() {
     }
@@ -26,7 +26,7 @@ public class DashboardRepository {
                 """;
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -48,7 +48,7 @@ public class DashboardRepository {
                 """;
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -70,7 +70,7 @@ public class DashboardRepository {
                 """;
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -91,7 +91,7 @@ public class DashboardRepository {
                 """;
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -113,7 +113,7 @@ public class DashboardRepository {
                 """;
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -138,7 +138,7 @@ public class DashboardRepository {
         List<Escola> escolas = new ArrayList<>();
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
@@ -175,7 +175,7 @@ public class DashboardRepository {
         List<Usuario> usuarios = new ArrayList<>();
 
         try (
-                Connection connection = DatabaseConfig.getConnection();
+                Connection connection = getConnection();
                 PreparedStatement ps = connection.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {

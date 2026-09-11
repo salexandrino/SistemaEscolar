@@ -17,7 +17,7 @@ public class TesteAutenticacao {
     private static void testarValidacaoDeEmailCorreto() {
         try {
             // Testando o utilitário que você usa no AuthService
-            ValidationUtil.validateEmail("admin@synge.com");
+            ValidationUtil.validateEmail("admin@kutuar.com");
             System.out.println("  • Validação de e-mail válido: OK");
         } catch (Exception e) {
             throw new RuntimeException("❌ Falha: O sistema rejeitou um e-mail válido.");

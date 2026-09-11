@@ -1,10 +1,10 @@
 services:
   postgres:
     image: postgres:17
-    container_name: synge-postgres
+    container_name: kutuar-postgres
 
     environment:
-      POSTGRES_DB: synge
+      POSTGRES_DB: kutuar
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 

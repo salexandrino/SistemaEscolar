@@ -1,6 +1,5 @@
 package br.com.kutuar.seguranca.repositories;
 
-import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import br.com.kutuar.seguranca.repositories.base.DAO;
 import br.com.kutuar.seguranca.models.RecuperacaoSenha;
@@ -16,7 +15,7 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
 
     private static final Logger logger = LoggerFactory.getLogger(RecuperacaoSenhaRepository.class);
 
-    public Escola save(RecuperacaoSenha recuperacaoSenha) {
+    public RecuperacaoSenha save(RecuperacaoSenha recuperacaoSenha) {
         String sql = "INSERT INTO recuperacao_senha (id, usuario_id, codigo, expiracao, utilizado, criado_em) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -36,7 +35,7 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
             logger.error("Erro ao salvar código de recuperação para usuário ID {}: {}", recuperacaoSenha.getUsuarioId(), e.getMessage(), e);
             throw new RuntimeException("Erro ao salvar código de recuperação no banco de dados.", e);
         }
-        return null;
+        return recuperacaoSenha;
     }
 
     public Optional<RecuperacaoSenha> findByCodigoAndUsuarioId(String codigo, UUID usuarioId) {

@@ -6,4 +6,4 @@
 
 UPDATE usuario
 SET senha_hash = '$2a$10$1jxglOT6XQDLZsZqgavVjuqwJtNSwLn3yJrTt.r/ktKBHdfl6xMoe'
-WHERE email = 'synge.gestao@gmail.com';
+WHERE email = 'admin@kutuar.com.br';

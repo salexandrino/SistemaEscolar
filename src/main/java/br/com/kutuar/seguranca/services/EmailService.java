@@ -64,13 +64,13 @@ public class EmailService {
     }
 
     public void enviarCodigoRecuperacaoSenha(String destinatario, String nomeUsuario, String codigo) {
-        String assunto = "SYNGE — Código para redefinir sua senha";
+        String assunto = "Kutuar Educação — Código para redefinir sua senha";
         String corpo = "Olá" + (nomeUsuario != null ? ", " + nomeUsuario : "") + ",\n\n"
-                + "Recebemos uma solicitação para redefinir sua senha no SYNGE.\n\n"
+                + "Recebemos uma solicitação para redefinir sua senha na Kutuar Educação.\n\n"
                 + "Seu código de verificação é: " + codigo + "\n\n"
                 + "Esse código expira em 15 minutos. Se você não solicitou essa alteração, "
                 + "pode ignorar este e-mail com segurança — sua senha atual continua válida.\n\n"
-                + "Equipe SYNGE";
+                + "Equipe Kutuar Educação";
 
         if (!configurado) {
             // Modo desenvolvimento: sem SMTP configurado, só loga (não quebra o fluxo).
@@ -90,13 +90,13 @@ public class EmailService {
     }
 
     public void enviarCredenciaisGestor(String destinatario, String nomeGestor, String cpf, String senhaTemporaria) {
-        String assunto = "SYNGE — Acesso do Gestor criado";
+        String assunto = "Kutuar Educação — Acesso do Gestor criado";
         String corpo = "Olá" + (nomeGestor != null ? ", " + nomeGestor : "") + ",\n\n"
-                + "Uma conta de Gestor foi criada para você no SYNGE.\n\n"
+                + "Uma conta de Gestor foi criada para você na Kutuar Educação.\n\n"
                 + "CPF de login: " + cpf + "\n"
                 + "Senha temporária: " + senhaTemporaria + "\n\n"
                 + "Por segurança, altere essa senha assim que fizer o primeiro acesso.\n\n"
-                + "Equipe SYNGE";
+                + "Equipe Kutuar Educação";
 
         if (!configurado) {
             logger.info("[E-MAIL SIMULADO] Para: {} | Assunto: {} | CPF: {}", destinatario, assunto, cpf);

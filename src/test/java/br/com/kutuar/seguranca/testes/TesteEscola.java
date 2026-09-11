@@ -15,10 +15,10 @@ public class TesteEscola {
 
     private static void testarCriacaoDeEscolaValida() {
         Escola escola = new Escola();
-        escola.setNome("Escola Técnica Synge");
+        escola.setNome("Escola Técnica Kutuar");
         escola.setCnpj("12.345.678/0001-99");
 
-        if (!escola.getNome().equals("Escola Técnica Synge")) {
+        if (!escola.getNome().equals("Escola Técnica Kutuar")) {
             throw new RuntimeException("❌ Falha: O nome da escola não foi salvo corretamente no modelo.");
         }
         System.out.println("  • Criação de escola válida: OK");

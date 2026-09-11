@@ -43,7 +43,7 @@ public class AuthServiceTest {
         // Inicializa um usuário mockado para os testes
         superAdminFake = new Usuario();
         superAdminFake.setId(UUID.randomUUID());
-        superAdminFake.setEmail("admin@synge.com");
+        superAdminFake.setEmail("admin@kutuar.com");
         superAdminFake.setSenhaHash("$2a$10$CrivoDeHashFakeAqui");
         superAdminFake.setPerfil(Perfil.SUPER_ADMIN);
         superAdminFake.setCpf("123.456.789-00");
@@ -53,7 +53,7 @@ public class AuthServiceTest {
     @DisplayName("Deve autenticar o SuperAdmin com sucesso e retornar o Token")
     void deveAutenticarSuperAdminComSucesso() {
         // GIVEN (Configuração do comportamento dos mocks)
-        String email = "admin@synge.com";
+        String email = "admin@kutuar.com";
         String senhaPura = "123456";
         String tokenEsperado = "jwt-token-de-teste";
 
@@ -77,7 +77,7 @@ public class AuthServiceTest {
     @DisplayName("Deve lançar exceção quando a senha do SuperAdmin estiver incorreta")
     void deveLancarExcecaoQuandoSenhaIncorreta() {
         // GIVEN
-        String email = "admin@synge.com";
+        String email = "admin@kutuar.com";
         String senhaIncorreta = "senha_errada";
 
         when(usuarioRepository.findSuperAdminByEmail(email)).thenReturn(Optional.of(superAdminFake));

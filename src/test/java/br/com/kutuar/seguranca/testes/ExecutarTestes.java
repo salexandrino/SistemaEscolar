@@ -4,7 +4,7 @@ public class ExecutarTestes {
 
     public static void main(String[] args) {
         System.out.println("==================================================");
-        System.out.println("        SUITE DE TESTES AUTOMATIZADOS - SYNGE      ");
+        System.out.println("        SUITE DE TESTES AUTOMATIZADOS - KUTUAR      ");
         System.out.println("==================================================");
 
         try {

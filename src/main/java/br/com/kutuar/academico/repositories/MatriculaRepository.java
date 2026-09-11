@@ -1,6 +1,7 @@
 package br.com.kutuar.academico.repositories;
 
 import br.com.kutuar.academico.models.Matricula;
+import br.com.kutuar.academico.models.HistoricoSituacaoAluno;
 import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,53 @@ public class MatriculaRepository extends BaseDAO {
         } catch (SQLException e) {
             logger.error("Erro ao matricular aluno {}: {}", m.getIdAluno(), e.getMessage(), e);
             throw new RuntimeException("Erro ao matricular aluno.", e);
+        }
+    }
+
+    public void transferir(Matricula atual, Matricula nova, HistoricoSituacaoAluno historico) {
+        String atualizarSql = "UPDATE matricula SET status = ?, atualizado_em = CURRENT_TIMESTAMP WHERE id = ? AND tenant_id = ?";
+        String criarSql = "INSERT INTO matricula (id, tenant_id, id_aluno, id_turma, data_matricula, status, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String historicoSql = "INSERT INTO historico_situacao_aluno (id, tenant_id, id_aluno, situacao_anterior, situacao_nova, motivo, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement atualizar = conn.prepareStatement(atualizarSql);
+                 PreparedStatement criar = conn.prepareStatement(criarSql);
+                 PreparedStatement inserirHistorico = conn.prepareStatement(historicoSql)) {
+                atualizar.setString(1, "TRANSFERIDA");
+                atualizar.setObject(2, atual.getId());
+                atualizar.setObject(3, atual.getTenantId());
+                if (atualizar.executeUpdate() != 1) {
+                    throw new IllegalStateException("Matrícula ativa não encontrada para transferência.");
+                }
+
+                criar.setObject(1, nova.getId());
+                criar.setObject(2, nova.getTenantId());
+                criar.setObject(3, nova.getIdAluno());
+                criar.setObject(4, nova.getIdTurma());
+                criar.setObject(5, nova.getDataMatricula());
+                criar.setString(6, nova.getStatus());
+                criar.setObject(7, nova.getCriadoEm());
+                criar.setObject(8, nova.getAtualizadoEm());
+                criar.executeUpdate();
+
+                inserirHistorico.setObject(1, historico.getId());
+                inserirHistorico.setObject(2, historico.getTenantId());
+                inserirHistorico.setObject(3, historico.getIdAluno());
+                inserirHistorico.setString(4, historico.getSituacaoAnterior());
+                inserirHistorico.setString(5, historico.getSituacaoNova());
+                inserirHistorico.setString(6, historico.getMotivo());
+                inserirHistorico.setObject(7, historico.getCriadoEm());
+                inserirHistorico.executeUpdate();
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao transferir aluno {} para a turma {}: {}",
+                    nova.getIdAluno(), nova.getIdTurma(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao transferir aluno.", e);
         }
     }
 

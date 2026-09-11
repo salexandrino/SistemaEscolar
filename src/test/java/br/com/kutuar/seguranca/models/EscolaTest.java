@@ -15,10 +15,10 @@ class EscolaTest {
     @DisplayName("Nome e CNPJ da escola devem ser preservados corretamente no model")
     void criacaoDeEscolaValidaDevePreservarDados() {
         Escola escola = new Escola();
-        escola.setNome("Escola Técnica Synge");
+        escola.setNome("Escola Técnica Kutuar");
         escola.setCnpj("12.345.678/0001-99");
 
-        assertEquals("Escola Técnica Synge", escola.getNome(),
+        assertEquals("Escola Técnica Kutuar", escola.getNome(),
                 "O nome da escola não foi salvo corretamente no model.");
         assertEquals("12.345.678/0001-99", escola.getCnpj());
     }

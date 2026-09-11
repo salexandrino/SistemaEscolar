@@ -21,7 +21,7 @@ SELECT
     NULL,
     'Administrador Master',
     '000.000.000-00',
-    'synge.gestao@gmail.com',
+    'admin@kutuar.com.br',
     '(00)00000-0000',
     '$2a$10$msYsuhuC7CWfiggSVMwdMugr0DL.sgwHC8WrDiD4zLh/RdA3cqj3y',
     'SUPER_ADMIN',
@@ -34,5 +34,5 @@ SELECT
     WHERE NOT EXISTS (
     SELECT 1
     FROM usuario
-    WHERE email = 'synge.gestao@gmail.com'
+    WHERE email = 'admin@kutuar.com.br'
 );

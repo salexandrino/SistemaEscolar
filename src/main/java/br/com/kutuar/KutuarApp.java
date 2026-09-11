@@ -98,7 +98,7 @@ public class KutuarApp {
     private static final Logger logger = LoggerFactory.getLogger(KutuarApp.class);
 
     public static void main(String[] args) throws SQLException {
-        logger.info("Iniciando SYNGE...");
+        logger.info("Iniciando Kutuar Educação...");
 
         try {
             DatabaseConfig.init();
@@ -742,7 +742,7 @@ public class KutuarApp {
                         Map.of("name", "Gestão Completa", "description", "Inclui módulos acadêmico, financeiro, relatórios, permissões e suporte especializado.", "featured", true)
                 ),
                 "testimonials", List.of(
-                        Map.of("photo", "/images/avatar-ana.svg", "name", "Ana Ribeiro", "role", "Diretora Escolar", "comment", "O SYNGE reduziu retrabalho e deu visibilidade diária para a nossa equipe pedagógica e financeira."),
+                        Map.of("photo", "/images/avatar-ana.svg", "name", "Ana Ribeiro", "role", "Diretora Escolar", "comment", "A Kutuar Educação reduziu retrabalho e deu visibilidade diária para a nossa equipe pedagógica e financeira."),
                         Map.of("photo", "/images/avatar-marcos.svg", "name", "Marcos Lima", "role", "Coordenador Administrativo", "comment", "A centralização dos dados tornou a gestão mais rápida, organizada e confiável para todos os setores."),
                         Map.of("photo", "/images/avatar-julia.svg", "name", "Júlia Costa", "role", "Gestora Financeira", "comment", "Hoje acompanhamos recebíveis, inadimplência e indicadores em poucos minutos, sem planilhas paralelas.")
                 )
