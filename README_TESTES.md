@@ -10,7 +10,7 @@ administrador e como testar os principais fluxos (CRUDs).
 
 ### Pré-requisitos
 
-- **Java 21** (JDK)
+- **Java 25** (JDK)
 - **Maven 3.9+**
 - **PostgreSQL 17** (ou compatível — o projeto usa Flyway para gerenciar o schema)
 - Uma IDE (recomendado: IntelliJ IDEA) ou apenas terminal + `mvn`
