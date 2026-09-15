@@ -236,7 +236,7 @@
         }
 
         async function apagarAno(id) {
-            if (!confirm('Tem certeza que deseja apagar este ano letivo?')) return;
+            if (!await confirmarAcao('Tem certeza que deseja apagar este ano letivo?', 'Confirmar exclusão', 'Excluir')) return;
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}`, { method: 'DELETE' });
                 if (response.status === 204) { mostrarAlerta('Ano letivo apagado.'); carregarDados(); }
@@ -245,7 +245,7 @@
         }
 
         async function arquivarAno(id) {
-            if (!confirm('Tem certeza que deseja arquivar este ano letivo?')) return;
+            if (!await confirmarAcao('Tem certeza que deseja arquivar este ano letivo?', 'Confirmar arquivamento', 'Arquivar')) return;
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}/arquivar`, { method: 'PATCH' });
                 if (!response.ok) { const e = await response.json(); throw new Error(e.message); }
@@ -255,7 +255,7 @@
         }
 
         async function definirAtivo(id) {
-            if (!confirm('Definir este ano como ativo? O ano ativo anterior será desativado.')) return;
+            if (!await confirmarAcao('Definir este ano como ativo? O ano ativo anterior será desativado.', 'Confirmar alteração', 'Definir ativo')) return;
             try {
                 const response = await fetch(`/api/academico/anos-letivos/${id}/definir-ativo`, { method: 'PATCH' });
                 if (!response.ok) { const e = await response.json(); throw new Error(e.message); }

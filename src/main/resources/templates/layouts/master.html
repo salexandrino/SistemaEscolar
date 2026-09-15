@@ -44,6 +44,8 @@
 
     <!-- Custom JS -->
     <script th:src="@{/js/validacoes.js}"></script>
+    <script th:src="@{/js/confirm-modal.js}"></script>
+    <div th:replace="~{fragments/modals :: deleteConfirmationModal}"></div>
 
     <!-- Dynamic Body Scripts -->
     <th:block th:replace="${bodyScripts} ?: ~{}"></th:block>

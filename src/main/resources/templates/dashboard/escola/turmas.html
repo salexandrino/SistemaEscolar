@@ -336,8 +336,8 @@
                 });
         }
 
-        function encerrarTurma(id) {
-            if(!confirm('Deseja realmente encerrar esta turma? Não poderá ser revertido facilmente.')) return;
+        async function encerrarTurma(id) {
+            if(!await confirmarAcao('Deseja realmente encerrar esta turma? Não poderá ser revertido facilmente.', 'Confirmar encerramento', 'Encerrar')) return;
             fetch(`/api/academico/turmas/\${id}/encerrar`, { method: 'PATCH' })
                 .then(response => {
                     if(response.ok) carregarTurmas();

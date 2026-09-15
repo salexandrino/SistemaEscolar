@@ -138,8 +138,8 @@
                     window.location.href = `/portal/series/editar?id=${id}`;
         }
 
-        function deletarSerie(id) {
-            if (!confirm('Tem certeza que deseja deletar esta série?')) return;
+        async function deletarSerie(id) {
+            if (!await confirmarAcao('Tem certeza que deseja deletar esta série?', 'Confirmar exclusão', 'Excluir')) return;
 
             fetch(`/api/academico/series/${id}`, {method: 'DELETE'})
                 .then(r => {

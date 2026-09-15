@@ -169,10 +169,10 @@
             }
         }
 
-        function deletarSerie() {
+        async function deletarSerie() {
             if (!serieAtual) return;
 
-            if (!confirm('Tem certeza que deseja deletar esta série? Esta ação não pode ser desfeita.')) return;
+            if (!await confirmarAcao('Tem certeza que deseja deletar esta série? Esta ação não pode ser desfeita.', 'Confirmar exclusão', 'Excluir')) return;
 
             const btn = event.target.closest('button');
             btn.disabled = true;

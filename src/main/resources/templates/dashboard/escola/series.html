@@ -149,9 +149,9 @@
             });
         }
 
-        function removerDisciplina(idDisciplina) {
+        async function removerDisciplina(idDisciplina) {
             if(!serieSelecionadaId) return;
-            if(!confirm('Deseja remover esta disciplina da matriz curricular?')) return;
+            if(!await confirmarAcao('Deseja remover esta disciplina da matriz curricular?', 'Confirmar remoção', 'Remover')) return;
             
             fetch(`/api/academico/series/\${serieSelecionadaId}/matriz/\${idDisciplina}`, { method: 'DELETE' })
                 .then(response => {

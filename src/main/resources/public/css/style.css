@@ -38,6 +38,32 @@ body {
     border-color: #003a15 !important;
 }
 
+.btn-kutuar-primary,
+.btn-kutuar-success,
+.btn-kutuar-warning,
+.btn-kutuar-danger,
+.btn-kutuar-secondary {
+    border: 1px solid transparent;
+    border-radius: .375rem;
+    color: var(--text-color-light);
+    display: inline-block;
+    font-weight: 500;
+    padding: .375rem .75rem;
+    text-decoration: none;
+    transition: filter .15s ease-in-out;
+}
+
+.btn-kutuar-primary { background-color: var(--color-primary); border-color: var(--color-primary); }
+.btn-kutuar-success { background-color: var(--color-success); border-color: var(--color-success); }
+.btn-kutuar-warning { background-color: var(--color-warning); border-color: var(--color-warning); color: #212529; }
+.btn-kutuar-danger { background-color: var(--color-danger); border-color: var(--color-danger); }
+.btn-kutuar-secondary { background-color: #6c757d; border-color: #6c757d; }
+.btn-kutuar-primary:hover,
+.btn-kutuar-success:hover,
+.btn-kutuar-warning:hover,
+.btn-kutuar-danger:hover,
+.btn-kutuar-secondary:hover { color: inherit; filter: brightness(.9); }
+
 .text-accent {
     color: var(--color-accent) !important;
 }

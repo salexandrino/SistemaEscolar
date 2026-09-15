@@ -123,8 +123,8 @@
                 }).catch(e => { console.error(e); btn.disabled = false; btn.innerText = 'Salvar'; document.getElementById('alerta-modal-professor').innerHTML = '<div class="alert alert-danger">Erro interno</div>'; });
         });
 
-        function inativarProfessor(id) {
-            if(!confirm('Deseja inativar este professor?')) return;
+        async function inativarProfessor(id) {
+            if(!await confirmarAcao('Deseja inativar este professor?', 'Confirmar inativação', 'Inativar')) return;
             fetch(`/api/academico/professores/${id}`, {method: 'DELETE'})
                 .then(r => { if(r.ok) carregarProfessores(); else r.json().then(b => alert(b.message || 'Erro')); });
         }

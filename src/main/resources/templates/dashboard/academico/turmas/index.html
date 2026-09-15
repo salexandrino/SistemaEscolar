@@ -240,7 +240,7 @@
 
         window.apagarTurma=async(id)=>{
 
-            if(!confirm("Deseja realmente apagar esta turma?"))
+            if(!await confirmarAcao("Deseja realmente apagar esta turma?", 'Confirmar exclusão', 'Excluir'))
                 return;
 
             const response=await fetch(`/api/academico/turmas/${id}`,{

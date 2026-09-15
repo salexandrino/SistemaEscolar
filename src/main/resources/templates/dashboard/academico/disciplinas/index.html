@@ -165,7 +165,7 @@
         }
 
         async function excluirDisciplina(id) {
-            if (!confirm("Deseja realmente excluir esta disciplina?")) return;
+            if (!await confirmarAcao("Deseja realmente excluir esta disciplina?", 'Confirmar exclusão', 'Excluir')) return;
             try {
                 const response = await fetch(`/api/academico/disciplinas/${id}`, { method: 'DELETE' });
                 if (response.ok) {

@@ -1,5 +1,0 @@
-ALTER TABLE usuario
-    ALTER COLUMN tenant_id DROP NOT NULL;
-
-ALTER TABLE usuario
-    ALTER COLUMN escola_id DROP NOT NULL;
