@@ -13,7 +13,7 @@ VALUES (
     '95103b03-3bc7-448e-ae45-ad173059c344',
     'Administrador Master',
     '000.000.000-00',
-    '$2a$10$1jxglOT6XQDLZsZqgavVjuqwJtNSwLn3yJrTt.r/ktKBHdfl6xMoe',
+    '$2a$10$Z5KtQWCADHNGGuxE2ZJI/uUFVtuERtVcfSIqOtz9br5EE2wjzTEFe',
     'SUPER_ADMIN',
     true,
     'admin@kutuar.com.br'
