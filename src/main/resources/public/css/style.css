@@ -259,3 +259,16 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 @media (max-width: 1200px) { .admin-dashboard .metrics-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .admin-dashboard .metrics-grid .k-col-3 { grid-column: auto; } .admin-dashboard .operations-grid .k-col-6,.admin-dashboard .operations-grid .k-col-3 { grid-column: span 6; } }
 @media (max-width: 900px) { .admin-dashboard .charts-grid > *,.admin-dashboard .operations-grid > *,.admin-dashboard .bottom-grid > * { grid-column: span 12 !important; } }
 @media (max-width: 600px) { .admin-dashboard .metrics-grid { grid-template-columns: minmax(0, 1fr); } .admin-dashboard .metrics-grid .k-col-3 { grid-column: auto; } }
+
+/* Últimas Escolas Cadastradas */
+.schools-panel { overflow: hidden; }
+.recent-schools-table-wrap { max-width: 100%; overflow-x: auto; }
+.recent-schools-table { min-width: 560px; }
+.recent-schools-table tbody tr { transition: background-color .2s ease; }
+.recent-schools-table tbody tr:hover { background: #f7fbf8; }
+.recent-schools-table th:last-child,
+.recent-schools-table td:last-child { width: 56px; text-align: center; }
+.recent-schools-table .status-badge { justify-content: center; min-width: 64px; }
+.recent-schools-table .icon-link { width: 32px; height: 32px; margin-inline: auto; border-radius: 8px; transition: background-color .2s ease, color .2s ease; }
+.recent-schools-table .icon-link:hover { color: #004B1C; background: #E5F5E5; }
+.recent-schools-table .icon-link:focus-visible { outline: 2px solid #0DB04B; outline-offset: 2px; }

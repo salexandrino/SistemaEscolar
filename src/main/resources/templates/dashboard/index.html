@@ -285,18 +285,18 @@
             </div>
 
 
-            <div class="table-responsive">
+            <div class="table-responsive recent-schools-table-wrap">
 
-                <table class="dashboard-table k-dashboard-table">
+                <table class="dashboard-table k-dashboard-table recent-schools-table">
 
                     <thead>
 
                     <tr>
-                        <th>Escola</th>
-                        <th>Cidade</th>
-                        <th>Status</th>
-                        <th>Cadastro</th>
-                        <th></th>
+                        <th scope="col">Escola</th>
+                        <th scope="col">Cidade</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Cadastro</th>
+                        <th scope="col" class="recent-schools-action-column">Ação</th>
                     </tr>
 
                     </thead>
@@ -311,7 +311,7 @@
                         <td>
 
                             <span class="table-entity-icon">
-                                <i class="bi bi-building"></i>
+                                <i class="bi bi-building" aria-hidden="true"></i>
                             </span>
 
                             <strong
@@ -363,9 +363,9 @@
                             <a
                                 class="icon-link"
                                 th:href="${'/dashboard/escolas/visualizar/' + escola.id}"
-                                aria-label="Visualizar escola">
+                                th:attr="aria-label=${'Visualizar escola ' + escola.nome}">
 
-                                <i class="bi bi-arrow-up-right"></i>
+                                <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
 
                             </a>
 
