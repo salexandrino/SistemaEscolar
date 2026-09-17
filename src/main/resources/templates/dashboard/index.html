@@ -429,29 +429,39 @@
                         ? ' alert-warning'
                         : ' alert-success'">
 
-                    <i class="bi bi-person-exclamation"></i>
+                    <i
+                        class="alert-icon bi"
+                        th:classappend="${dashboard.usuariosPendentes > 0}
+                            ? ' bi-person-exclamation'
+                            : ' bi-check-circle'"
+                        aria-hidden="true"></i>
 
 
                     <span>
 
                         <strong
                             th:text="${dashboard.usuariosPendentes > 0
-                                ? dashboard.usuariosPendentes
-                                    + ' usuário(s) aguardando aprovação'
+                                ? dashboard.usuariosPendentes +
+                                    (dashboard.usuariosPendentes == 1
+                                        ? ' usuário aguardando aprovação'
+                                        : ' usuários aguardando aprovação')
                                 : 'Nenhum usuário pendente'}">
 
                             Usuários pendentes
 
                         </strong>
 
-                        <small>
+                        <small
+                            th:text="${dashboard.usuariosPendentes > 0
+                                ? 'Consulte os novos cadastros.'
+                                : 'Não há cadastros aguardando análise.'}">
                             Consulte os novos cadastros.
                         </small>
 
                     </span>
 
 
-                    <i class="bi bi-chevron-right"></i>
+                    <i class="alert-chevron bi bi-chevron-right" aria-hidden="true"></i>
 
                 </a>
 
@@ -464,15 +474,22 @@
                         ? ' alert-danger'
                         : ' alert-success'">
 
-                    <i class="bi bi-building-exclamation"></i>
+                    <i
+                        class="alert-icon bi"
+                        th:classappend="${dashboard.escolasInativas > 0}
+                            ? ' bi-building-exclamation'
+                            : ' bi-check-circle'"
+                        aria-hidden="true"></i>
 
 
                     <span>
 
                         <strong
                             th:text="${dashboard.escolasInativas > 0
-                                ? dashboard.escolasInativas
-                                    + ' escola(s) inativa(s)'
+                                ? dashboard.escolasInativas +
+                                    (dashboard.escolasInativas == 1
+                                        ? ' escola inativa'
+                                        : ' escolas inativas')
                                 : 'Todas as escolas estão ativas'}">
 
                             Status das escolas
@@ -480,14 +497,17 @@
                         </strong>
 
 
-                        <small>
+                        <small
+                            th:text="${dashboard.escolasInativas > 0
+                                ? 'Consulte a situação das unidades.'
+                                : 'Nenhuma unidade requer atenção.'}">
                             Consulte a situação das unidades.
                         </small>
 
                     </span>
 
 
-                    <i class="bi bi-chevron-right"></i>
+                    <i class="alert-chevron bi bi-chevron-right" aria-hidden="true"></i>
 
                 </a>
 

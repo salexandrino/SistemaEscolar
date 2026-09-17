@@ -272,3 +272,20 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 .recent-schools-table .icon-link { width: 32px; height: 32px; margin-inline: auto; border-radius: 8px; transition: background-color .2s ease, color .2s ease; }
 .recent-schools-table .icon-link:hover { color: #004B1C; background: #E5F5E5; }
 .recent-schools-table .icon-link:focus-visible { outline: 2px solid #0DB04B; outline-offset: 2px; }
+
+/* Alertas Administrativos */
+.alert-list { gap: 12px; min-width: 0; }
+.admin-alert { grid-template-columns: 40px minmax(0, 1fr) 16px; gap: 12px; min-width: 0; padding: 12px; border: 1px solid transparent; transition: background-color .2s ease, border-color .2s ease, transform .2s ease; }
+.admin-alert:hover { transform: translateY(-1px); }
+.admin-alert:focus-visible { outline: 2px solid #0DB04B; outline-offset: 2px; }
+.admin-alert .alert-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; font-size: 18px; line-height: 1; }
+.admin-alert span { min-width: 0; gap: 4px; }
+.admin-alert strong { color: #1f2937; font-size: 13px; line-height: 18px; }
+.admin-alert small { font-size: 11px; line-height: 16px; }
+.admin-alert .alert-chevron { color: #64748b; font-size: 12px; }
+.admin-alert.alert-warning { background: #fff8e8; border-color: #f6dfaa; }
+.admin-alert.alert-warning .alert-icon { background: #ffefc2; color: #a86600; }
+.admin-alert.alert-danger { background: #fff0f1; border-color: #f5c9cd; }
+.admin-alert.alert-danger .alert-icon { background: #fbdfe2; color: #b4232f; }
+.admin-alert.alert-success { background: #eaf8ef; border-color: #c4e8d0; }
+.admin-alert.alert-success .alert-icon { background: #d5f0df; color: #087b35; }
