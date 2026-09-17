@@ -1,0 +1,14 @@
+.k-app-shell { min-height: 100vh; }
+.k-app-shell__content { min-height: 100vh; margin-left: 280px; display: flex; flex-direction: column; }
+.k-page { flex: 1; padding: var(--kutuar-space-5); }
+.k-page__inner { width: 100%; max-width: 1800px; margin-inline: auto; }
+.k-app-footer { padding: var(--kutuar-space-3); text-align: center; color: var(--kutuar-muted); background: var(--kutuar-surface); border-top: 1px solid var(--kutuar-border); font-size: var(--kutuar-font-sm); }
+.k-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--kutuar-space-4); }
+.k-grid--dashboard { align-items: stretch; }
+.k-col-12 { grid-column: span 12; }.k-col-8 { grid-column: span 8; }.k-col-6 { grid-column: span 6; }.k-col-4 { grid-column: span 4; }.k-col-3 { grid-column: span 3; }
+@media (max-width: 992px) { .k-col-8, .k-col-6, .k-col-4, .k-col-3 { grid-column: span 6; } }
+@media (max-width: 768px) {
+    .k-app-shell__content { margin-left: 0; }
+    .k-page { padding: var(--kutuar-space-4); }
+    .k-col-8, .k-col-6, .k-col-4, .k-col-3 { grid-column: span 12; }
+}

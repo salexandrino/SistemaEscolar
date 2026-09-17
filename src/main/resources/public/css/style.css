@@ -1,27 +1,24 @@
+@import url('./tokens.css');
+@import url('./base.css');
+@import url('./layout.css');
+@import url('./components/button.css');
+@import url('./components/card.css');
+@import url('./components/input.css');
+@import url('./components/checkbox.css');
+@import url('./components/dropdown.css');
+@import url('./components/navbar.css');
+@import url('./components/carousel.css');
+@import url('./pages/dashboard.css');
+
 :root {
-    --color-primary: #004B1C; /* Verde Escuro */
-    --color-accent: #0DB04B; /* Verde Intermediário */
-    --color-bg-light: #E5F5E5; /* Verde Claro Menta */
-    
     /* Tons adicionais de verde */
     --color-green-light: #90EE90; /* Verde Claro */
     --color-green-lime: #32CD32; /* Verde Limão */
     --color-green-forest: #228B22; /* Verde Floresta */
     --color-green-sea: #2E8B57; /* Verde Mar */
 
-    /* Cores de texto */
-    --text-color-dark: #333;
-    --text-color-light: #fff;
-
-    /* Cores de feedback */
-    --color-success: #28a745;
+    /* Cor informativa legada ainda usada em telas não migradas. */
     --color-info: #17a2b8;
-    --color-warning: #ffc107;
-    --color-danger: #dc3545;
-    --kutuar-border: #e2e8e6;
-    --kutuar-muted: #64748b;
-    --kutuar-radius: 14px;
-    --kutuar-shadow: 0 6px 20px rgba(0, 75, 28, .07);
 }
 
 /* Dashboard do Super Administrador */
@@ -247,3 +244,17 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 .senha-icone-olho:hover {
     color: #1a7332;
 }
+
+/* Camada de compatibilidade para os primeiros templates migrados. */
+.admin-dashboard .k-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.admin-dashboard .k-card { background: var(--kutuar-surface); border: 1px solid var(--kutuar-border); border-radius: var(--kutuar-radius-lg); box-shadow: var(--kutuar-shadow-sm); }
+.admin-dashboard .metrics-grid .k-col-3 { grid-column: span 3; }
+.admin-dashboard .charts-grid .k-col-8 { grid-column: span 8; }
+.admin-dashboard .charts-grid .k-col-4 { grid-column: span 4; }
+.admin-dashboard .operations-grid .k-col-6 { grid-column: span 6; }
+.admin-dashboard .operations-grid .k-col-3 { grid-column: span 3; }
+.admin-dashboard .bottom-grid .k-col-8 { grid-column: span 8; }
+.admin-dashboard .bottom-grid .k-col-4 { grid-column: span 4; }
+@media (max-width: 1200px) { .admin-dashboard .metrics-grid .k-col-3 { grid-column: span 4; } .admin-dashboard .operations-grid .k-col-6,.admin-dashboard .operations-grid .k-col-3 { grid-column: span 6; } }
+@media (max-width: 900px) { .admin-dashboard .charts-grid > *,.admin-dashboard .operations-grid > *,.admin-dashboard .bottom-grid > * { grid-column: span 12 !important; } }
+@media (max-width: 600px) { .admin-dashboard .metrics-grid .k-col-3 { grid-column: span 12; } }

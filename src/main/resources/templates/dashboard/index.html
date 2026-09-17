@@ -8,15 +8,15 @@
 
 <body>
 
-<div th:fragment="content" class="admin-dashboard">
+<div th:fragment="content" class="admin-dashboard k-dashboard" data-widget-layout="dashboard">
 
     <!-- =========================================================
          CABEÇALHO
          ========================================================= -->
-    <header class="dashboard-header">
+    <header class="dashboard-header k-dashboard-header">
 
         <div>
-            <span class="dashboard-eyebrow">
+            <span class="dashboard-eyebrow k-dashboard-eyebrow">
                 Visão geral da plataforma
             </span>
 
@@ -29,7 +29,7 @@
             </p>
         </div>
 
-        <div class="dashboard-date">
+        <div class="dashboard-date k-dashboard-date">
             <i class="bi bi-calendar3"></i>
 
             <span>
@@ -49,12 +49,13 @@
          MÉTRICAS PRINCIPAIS
          ========================================================= -->
     <section
-        class="metrics-grid"
+        class="metrics-grid k-grid k-grid--dashboard"
         aria-label="Indicadores principais">
 
         <!-- Total de Escolas -->
         <a
-            class="metric-card"
+            class="metric-card k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            data-widget-id="total-schools" data-widget-type="stats" data-widget-order="1"
             href="/dashboard/escolas">
 
             <span class="metric-icon">
@@ -79,7 +80,8 @@
 
         <!-- Escolas Ativas -->
         <a
-            class="metric-card metric-success"
+            class="metric-card metric-success k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            data-widget-id="active-schools" data-widget-type="stats" data-widget-order="2"
             href="/dashboard/escolas?status=ativa">
 
             <span class="metric-icon">
@@ -104,7 +106,8 @@
 
         <!-- Escolas Inativas -->
         <a
-            class="metric-card metric-danger"
+            class="metric-card metric-danger k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            data-widget-id="inactive-schools" data-widget-type="stats" data-widget-order="3"
             href="/dashboard/escolas?status=inativa">
 
             <span class="metric-icon">
@@ -129,7 +132,8 @@
 
         <!-- Usuários -->
         <a
-            class="metric-card"
+            class="metric-card k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            data-widget-id="total-users" data-widget-type="stats" data-widget-order="4"
             href="/dashboard/usuarios?status=todos">
 
             <span class="metric-icon">
@@ -154,7 +158,8 @@
 
         <!-- Usuários Pendentes -->
         <a
-            class="metric-card metric-warning"
+            class="metric-card metric-warning k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            data-widget-id="pending-users" data-widget-type="stats" data-widget-order="5"
             href="/dashboard/usuarios?status=pendente">
 
             <span class="metric-icon">
@@ -182,10 +187,10 @@
     <!-- =========================================================
          GRÁFICOS
          ========================================================= -->
-    <section class="charts-grid">
+    <section class="charts-grid k-grid k-grid--dashboard">
 
         <!-- Crescimento -->
-        <article class="dashboard-panel">
+        <article class="dashboard-panel k-card k-chart-card k-col-8 k-widget" data-widget-id="growth-chart" data-widget-type="growthChart" data-widget-order="6">
 
             <div class="panel-heading">
 
@@ -215,7 +220,7 @@
 
 
         <!-- Distribuição de usuários -->
-        <article class="dashboard-panel">
+        <article class="dashboard-panel k-card k-chart-card k-col-4 k-widget" data-widget-id="profile-chart" data-widget-type="profileChart" data-widget-order="7">
 
             <div class="panel-heading">
 
@@ -250,13 +255,13 @@
     <!-- =========================================================
          OPERAÇÕES
          ========================================================= -->
-    <section class="operations-grid">
+    <section class="operations-grid k-grid k-grid--dashboard">
 
 
         <!-- =====================================================
              ÚLTIMAS ESCOLAS
              ===================================================== -->
-        <article class="dashboard-panel schools-panel">
+        <article class="dashboard-panel schools-panel k-card k-table-card k-col-6 k-widget" data-widget-id="recent-schools" data-widget-type="recentSchools" data-widget-order="8">
 
             <div class="panel-heading">
 
@@ -282,7 +287,7 @@
 
             <div class="table-responsive">
 
-                <table class="dashboard-table">
+                <table class="dashboard-table k-dashboard-table">
 
                     <thead>
 
@@ -395,7 +400,7 @@
         <!-- =====================================================
              ALERTAS
              ===================================================== -->
-        <article class="dashboard-panel">
+        <article class="dashboard-panel k-card k-content-card k-col-3 k-widget" data-widget-id="alerts" data-widget-type="alerts" data-widget-order="9">
 
             <div class="panel-heading">
 
@@ -495,7 +500,8 @@
              ATIVIDADES RECENTES
              ===================================================== -->
         <article
-            class="dashboard-panel"
+            class="dashboard-panel k-card k-content-card k-col-3 k-widget"
+            data-widget-id="activities" data-widget-type="activities" data-widget-order="10"
             id="atividades-recentes">
 
             <div class="panel-heading">
@@ -589,11 +595,11 @@
     <!-- =========================================================
          AÇÕES RÁPIDAS + STATUS
          ========================================================= -->
-    <section class="bottom-grid">
+    <section class="bottom-grid k-grid k-grid--dashboard">
 
 
         <!-- Ações rápidas -->
-        <article class="dashboard-panel">
+        <article class="dashboard-panel k-card k-action-card k-col-8 k-widget" data-widget-id="quick-actions" data-widget-type="quickActions" data-widget-order="11">
 
             <div class="panel-heading">
 
@@ -612,11 +618,11 @@
             </div>
 
 
-            <div class="quick-actions">
+            <div class="quick-actions k-quick-actions">
 
 
                 <a
-                    class="quick-action primary"
+                    class="quick-action primary k-quick-action"
                     href="/dashboard/escolas/nova">
 
                     <i class="bi bi-plus-lg"></i>
@@ -637,7 +643,7 @@
 
 
                 <a
-                    class="quick-action"
+                    class="quick-action k-quick-action"
                     href="/dashboard/usuarios">
 
                     <i class="bi bi-people"></i>
@@ -658,7 +664,7 @@
 
 
                 <a
-                    class="quick-action"
+                    class="quick-action k-quick-action"
                     href="/dashboard/usuarios?status=pendente">
 
                     <i class="bi bi-person-check"></i>
@@ -679,7 +685,7 @@
 
 
                 <a
-                    class="quick-action"
+                    class="quick-action k-quick-action"
                     href="#atividades-recentes">
 
                     <i class="bi bi-journal-text"></i>
@@ -704,7 +710,7 @@
 
 
         <!-- Status da plataforma -->
-        <article class="dashboard-panel">
+        <article class="dashboard-panel k-card k-content-card k-col-4 k-widget" data-widget-id="platform-status" data-widget-type="status" data-widget-order="12">
 
             <div class="panel-heading">
 
