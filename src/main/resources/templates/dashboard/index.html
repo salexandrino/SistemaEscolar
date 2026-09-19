@@ -990,11 +990,17 @@
 
                             cutout: '66%',
 
+                            onResize: (chart, size) => {
+                                chart.options.plugins.legend.position =
+                                    size.width < 400 ? 'bottom' : 'right';
+                            },
+
                             plugins: {
 
                                 legend: {
 
-                                    position: 'right',
+                                    position: perfisCanvas.parentElement.clientWidth < 400
+                                        ? 'bottom' : 'right',
 
                                     labels: {
 
