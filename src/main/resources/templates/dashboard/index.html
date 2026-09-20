@@ -54,11 +54,11 @@
 
         <!-- Total de Escolas -->
         <a
-            class="metric-card k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            class="metric-card k-card k-card--interactive k-stat-card k-widget"
             data-widget-id="total-schools" data-widget-type="stats" data-widget-order="1"
             href="/dashboard/escolas">
 
-            <span class="metric-icon">
+            <span class="metric-icon" aria-hidden="true">
                 <i class="bi bi-buildings"></i>
             </span>
 
@@ -66,12 +66,12 @@
                 Total de Escolas
             </span>
 
-            <strong
+            <strong class="metric-value"
                 th:text="${dashboard.totalEscolas}">
                 0
             </strong>
 
-            <small>
+            <small class="metric-description">
                 escolas cadastradas
             </small>
 
@@ -80,11 +80,11 @@
 
         <!-- Escolas Ativas -->
         <a
-            class="metric-card metric-success k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            class="metric-card metric-success k-card k-card--interactive k-stat-card k-widget"
             data-widget-id="active-schools" data-widget-type="stats" data-widget-order="2"
             href="/dashboard/escolas?status=ativa">
 
-            <span class="metric-icon">
+            <span class="metric-icon" aria-hidden="true">
                 <i class="bi bi-check-circle"></i>
             </span>
 
@@ -92,12 +92,12 @@
                 Escolas Ativas
             </span>
 
-            <strong
+            <strong class="metric-value"
                 th:text="${dashboard.escolasAtivas}">
                 0
             </strong>
 
-            <small>
+            <small class="metric-description">
                 em operação
             </small>
 
@@ -106,11 +106,11 @@
 
         <!-- Escolas Inativas -->
         <a
-            class="metric-card metric-danger k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            class="metric-card metric-danger k-card k-card--interactive k-stat-card k-widget"
             data-widget-id="inactive-schools" data-widget-type="stats" data-widget-order="3"
             href="/dashboard/escolas?status=inativa">
 
-            <span class="metric-icon">
+            <span class="metric-icon" aria-hidden="true">
                 <i class="bi bi-slash-circle"></i>
             </span>
 
@@ -118,12 +118,12 @@
                 Escolas Inativas
             </span>
 
-            <strong
+            <strong class="metric-value"
                 th:text="${dashboard.escolasInativas}">
                 0
             </strong>
 
-            <small>
+            <small class="metric-description">
                 requerem atenção
             </small>
 
@@ -132,11 +132,11 @@
 
         <!-- Usuários -->
         <a
-            class="metric-card k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            class="metric-card k-card k-card--interactive k-stat-card k-widget"
             data-widget-id="total-users" data-widget-type="stats" data-widget-order="4"
             href="/dashboard/usuarios?status=todos">
 
-            <span class="metric-icon">
+            <span class="metric-icon" aria-hidden="true">
                 <i class="bi bi-people"></i>
             </span>
 
@@ -144,12 +144,12 @@
                 Usuários Cadastrados
             </span>
 
-            <strong
+            <strong class="metric-value"
                 th:text="${dashboard.totalUsuarios}">
                 0
             </strong>
 
-            <small>
+            <small class="metric-description">
                 em todos os perfis
             </small>
 
@@ -158,11 +158,11 @@
 
         <!-- Usuários Pendentes -->
         <a
-            class="metric-card metric-warning k-card k-card--interactive k-stat-card k-col-3 k-widget"
+            class="metric-card metric-warning k-card k-card--interactive k-stat-card k-widget"
             data-widget-id="pending-users" data-widget-type="stats" data-widget-order="5"
             href="/dashboard/usuarios?status=pendente">
 
-            <span class="metric-icon">
+            <span class="metric-icon" aria-hidden="true">
                 <i class="bi bi-clock-history"></i>
             </span>
 
@@ -170,12 +170,12 @@
                 Usuários Pendentes
             </span>
 
-            <strong
+            <strong class="metric-value"
                 th:text="${dashboard.usuariosPendentes}">
                 0
             </strong>
 
-            <small>
+            <small class="metric-description">
                 aguardando análise
             </small>
 
