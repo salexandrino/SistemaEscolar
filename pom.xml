@@ -30,11 +30,13 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
             <version>${javalin.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -42,11 +44,14 @@
             <version>${jackson.version}</version>
         </dependency>
 
+
+        <!-- Thymeleaf -->
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>${thymeleaf.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -54,17 +59,20 @@
             <version>${dotenv.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>${hikaricp.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -78,6 +86,7 @@
             <version>${flyway.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -90,11 +99,13 @@
             <version>${logback.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -116,11 +127,13 @@
             <scope>runtime</scope>
         </dependency>
 
+
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -157,6 +170,8 @@
             <scope>test</scope>
         </dependency>
 
+
+        <!-- Envio de e-mail (recuperação de senha) -->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
@@ -167,7 +182,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -176,6 +190,7 @@
                     <release>21</release>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -194,11 +209,13 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
 
                             <transformers>
+
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>br.com.kutuar.KutuarApp</mainClass>
                                 </transformer>
 
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+
                             </transformers>
 
                         </configuration>

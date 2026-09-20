@@ -39,8 +39,7 @@ public class FlywayConfig {
             // flyway_schema_history para bater com os arquivos atuais — ele NÃO
             // re-executa nenhum SQL. Depois que subir com sucesso uma vez em
             // produção, esta linha pode ser removida com segurança.
-            logger.info("Executando flyway.repair() para corrigir checksums desatualizados (V4/V5)...");
-            flyway.repair();
+
 
             logger.info("Aplicando as migrações na nuvem...");
             flyway.migrate();

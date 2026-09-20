@@ -1,61 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-BR"
-      xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/master-admin :: html}">
-
-<div th:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Escolas</h2>
-        <a href="/dashboard/escolas/nova" class="btn btn-success">
-            <i class="bi bi-building-add"></i> Nova Escola
-        </a>
+<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body><div th:fragment="content">
+  <header class="d-flex justify-content-between align-items-center gap-3 mb-4 flex-wrap"><div><span class="k-dashboard-eyebrow">Gestão escolar</span><h2 class="mb-0">Escolas</h2></div><div th:replace="~{components/button :: button('Nova Escola', 'bi-building-add', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div></header>
+  <section class="k-card k-card--bordered k-table-card" aria-labelledby="schools-title"><header class="k-card__header"><div class="k-card__heading"><i class="bi bi-buildings k-card__icon" aria-hidden="true"></i><h3 id="schools-title" class="k-card__title">Escolas cadastradas</h3><p class="k-card__subtitle">Consulte os dados e acesse as ações de cada unidade.</p></div></header>
+    <div class="k-card__body">
+      <div class="k-grid p-3 border-bottom"><div class="k-col-6"><div th:replace="~{components/input :: input('Buscar escola', 'busca', 'buscaEscola', 'search', null, 'Nome, CNPJ ou cidade', false, false, false, null, 'Filtro visual; a busca será conectada em uma próxima etapa.', 'bi-search', null)}"></div></div><div class="k-col-3"><div class="k-field"><label class="k-field__label" for="statusEscola">Status</label><select class="k-select" id="statusEscola" name="status"><option>Todos</option><option>ATIVA</option><option>INATIVA</option></select></div></div><div class="k-col-3 d-flex align-items-end"><div th:replace="~{components/checkbox :: checkbox('somenteComResponsavel', 'somenteComResponsavel', 'Somente com responsável', false, false, 'true')}"></div></div></div>
+      <div class="table-responsive"><table class="k-dashboard-table"><thead><tr><th>Nome</th><th>CNPJ</th><th>Cidade</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+        <tr th:each="escola : ${escolas}"><td th:text="${escola.nome}">Nome</td><td th:text="${escola.cnpj}">CNPJ</td><td><span th:text="${escola.cidade}">Cidade</span> / <span th:text="${escola.estado}">UF</span></td><td th:text="${escola.responsavel != null ? escola.responsavel : 'Não atribuído'}">Responsável</td><td><span class="status-badge" th:classappend="${escola.status == 'ATIVA'} ? ' is-active' : ' is-inactive'" th:text="${escola.status}">ATIVA</span></td><td><div class="k-dropdown dropdown" data-k-dropdown><button class="k-button k-button--ghost k-button--sm k-dropdown__trigger" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:attr="aria-label=${'Ações para ' + escola.nome}"><i class="bi bi-three-dots-vertical" aria-hidden="true"></i><span>Ações</span></button><div class="dropdown-menu dropdown-menu-end k-dropdown__menu"><a class="k-dropdown__item" th:href="@{/dashboard/escolas/visualizar/{id}(id=${escola.id})}"><i class="bi bi-eye" aria-hidden="true"></i>Visualizar</a><a class="k-dropdown__item" th:href="@{/dashboard/escolas/editar/{id}(id=${escola.id})}"><i class="bi bi-pencil" aria-hidden="true"></i>Editar</a></div></div></td></tr>
+        <tr th:if="${#lists.isEmpty(escolas)}"><td colspan="6" class="empty-state">Nenhuma escola cadastrada.</td></tr>
+      </tbody></table></div>
     </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Nome</th>
-                        <th>CNPJ</th>
-                        <th>Cidade</th>
-                        <th>Responsável</th>
-                        <th>Status</th>
-                        <th width="180">Ações</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="escola : ${escolas}">
-                        <td th:text="${escola.nome}">Nome</td>
-                        <td th:text="${escola.cnpj}">CNPJ</td>
-                        <td>
-                            <span th:text="${escola.cidade}">Cidade</span> /
-                            <span th:text="${escola.estado}">UF</span>
-                        </td>
-                        <td th:text="${escola.responsavel != null ? escola.responsavel : 'Não atribuído'}">Responsável</td>
-                        <td>
-                            <span class="badge bg-success" th:if="${escola.status == 'ATIVA'}">ATIVA</span>
-                            <span class="badge bg-danger" th:if="${escola.status == 'INATIVA'}">INATIVA</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/dashboard/escolas/visualizar/{id}(id=${escola.id})}" class="btn btn-primary btn-sm">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a th:href="@{/dashboard/escolas/editar/{id}(id=${escola.id})}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(escolas)}">
-                        <td colspan="6" class="text-center py-4 text-muted">
-                            Nenhuma escola cadastrada.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-</html>
+  </section>
+</div></body></html>

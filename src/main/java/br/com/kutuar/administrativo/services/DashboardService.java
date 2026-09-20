@@ -28,6 +28,10 @@ public class DashboardService {
 
         dto.setEscolasRecentes(dashboardRepository.findUltimasEscolas());
         dto.setUsuariosRecentes(dashboardRepository.findUltimosUsuarios());
+        dto.setMeses(dashboardRepository.findMesesCrescimento());
+        dto.setCrescimentoEscolas(dashboardRepository.findCrescimentoMensal("escola"));
+        dto.setCrescimentoUsuarios(dashboardRepository.findCrescimentoMensal("usuario"));
+        dto.setUsuariosPorPerfil(dashboardRepository.countUsuariosPorPerfil());
 
 
         return dto;

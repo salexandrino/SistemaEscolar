@@ -1,0 +1,5 @@
+<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body>
+<th:block th:fragment="button(label, icon, variant, size, disabled, loading, type, href)">
+  <a th:if="${href != null}" th:href="${href}" th:class="${'k-button k-button--' + (variant ?: 'primary') + ' k-button--' + (size ?: 'md')}" th:attr="aria-disabled=${disabled ?: false},tabindex=${disabled == true ? '-1' : null}"><span th:if="${loading}" class="k-button__spinner" aria-hidden="true"></span><i th:if="${!loading and icon != null}" th:class="${'bi ' + icon}" aria-hidden="true"></i><span th:text="${loading ? 'Carregando…' : label}">Ação</span></a>
+  <button th:unless="${href != null}" th:type="${type ?: 'button'}" th:class="${'k-button k-button--' + (variant ?: 'primary') + ' k-button--' + (size ?: 'md')}" th:disabled="${disabled == true or loading == true}" th:attr="aria-busy=${loading ?: false}"><span th:if="${loading}" class="k-button__spinner" aria-hidden="true"></span><i th:if="${!loading and icon != null}" th:class="${'bi ' + icon}" aria-hidden="true"></i><span th:text="${loading ? 'Carregando…' : label}">Ação</span></button>
+</th:block></body></html>

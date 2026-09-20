@@ -1,0 +1,46 @@
+:root {
+    --kutuar-primary: #004b1c;
+    --kutuar-primary-hover: #003a15;
+    --kutuar-accent: #0db04b;
+    --kutuar-accent-hover: #09963f;
+    --kutuar-primary-light: #e5f5e5;
+    --kutuar-white: #fff;
+    --kutuar-background: #f7faf8;
+    --kutuar-surface: #fff;
+    --kutuar-text: #10213a;
+    --kutuar-text-secondary: #475569;
+    --kutuar-muted: #64748b;
+    --kutuar-border: #e2e8e6;
+    --kutuar-success: #0db04b;
+    --kutuar-warning: #d88a00;
+    --kutuar-danger: #dc3545;
+    --kutuar-radius-sm: .375rem;
+    --kutuar-radius-md: .625rem;
+    --kutuar-radius-lg: .875rem;
+    --kutuar-shadow-sm: 0 2px 8px rgba(0, 75, 28, .06);
+    --kutuar-shadow-md: 0 6px 20px rgba(0, 75, 28, .09);
+    --kutuar-space-1: .25rem;
+    --kutuar-space-2: .5rem;
+    --kutuar-space-3: .75rem;
+    --kutuar-space-4: 1rem;
+    --kutuar-space-5: 1.5rem;
+    --kutuar-space-6: 2rem;
+    --kutuar-font-xs: .75rem;
+    --kutuar-font-sm: .875rem;
+    --kutuar-font-md: 1rem;
+    --kutuar-font-lg: 1.25rem;
+    --kutuar-font-xl: 1.75rem;
+    --kutuar-transition: 180ms ease;
+
+    /* Aliases temporários para telas legadas. */
+    --color-primary: var(--kutuar-primary);
+    --color-accent: var(--kutuar-accent);
+    --color-bg-light: var(--kutuar-primary-light);
+    --text-color-dark: var(--kutuar-text);
+    --text-color-light: var(--kutuar-white);
+    --color-success: var(--kutuar-success);
+    --color-warning: var(--kutuar-warning);
+    --color-danger: var(--kutuar-danger);
+    --kutuar-radius: var(--kutuar-radius-lg);
+    --kutuar-shadow: var(--kutuar-shadow-md);
+}

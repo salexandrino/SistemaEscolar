@@ -1,178 +1,997 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Kutuar Educação - Dashboard</title>
 </head>
+
 <body>
 
-<div th:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div th:fragment="content" class="admin-dashboard k-dashboard" data-widget-layout="dashboard">
+
+    <!-- =========================================================
+         CABEÇALHO
+         ========================================================= -->
+    <header class="dashboard-header k-dashboard-header">
+
         <div>
-            <h2 class="fw-bold text-dark mb-1">Olá, SUPER_ADMIN! 👋</h2>
-            <p class="text-muted small mb-0">Bem-vindo ao painel administrativo da Kutuar Educação.</p>
-        </div>
-        <div class="text-end bg-white p-2 rounded shadow-sm border small">
-            <i class="bi bi-calendar3 text-success me-1"></i>
-            <span class="fw-semibold text-dark">Data Atual: </span>
-            <span class="text-muted" th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">04/07/2026</span>
-        </div>
-    </div>
+            <span class="dashboard-eyebrow k-dashboard-eyebrow">
+                Visão geral da plataforma
+            </span>
 
-    <div class="row g-3 mb-4">
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
-                <div class="text-success mb-2"><i class="bi bi-building h3"></i></div>
-                <span class="text-muted small d-block">Total de Escolas</span>
-                <h3 class="fw-bold text-dark mt-1" th:text="${dashboard != null ? dashboard.totalEscolas : 0}">0</h3>
-                <a href="/dashboard/escolas" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
-                <div class="text-success mb-2"><i class="bi bi-check-circle-fill h3"></i></div>
-                <span class="text-muted small d-block">Escolas Ativas</span>
-                <h3 class="fw-bold text-success mt-1" th:text="${dashboard != null ? dashboard.escolasAtivas : 0}">0</h3>
-                <a href="/dashboard/escolas?status=ativa" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
-                <div class="text-danger mb-2"><i class="bi bi-x-circle-fill h3"></i></div>
-                <span class="text-muted small d-block">Escolas Inativas</span>
-                <h3 class="fw-bold text-danger mt-1">0</h3>
-                <a href="/dashboard/escolas?status=inativa" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todas &rarr;</a>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
-                <div class="text-success mb-2"><i class="bi bi-people-fill h3"></i></div>
-                <span class="text-muted small d-block">Usuários Cadastrados</span>
-                <h3 class="fw-bold text-dark mt-1" th:text="${dashboard != null ? dashboard.totalUsuarios : 0}">0</h3>
-                <a href="/dashboard/usuarios" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todos &rarr;</a>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 bg-white p-3 rounded-3 text-center">
-                <div class="text-warning mb-2"><i class="bi bi-clock-history h3"></i></div>
-                <span class="text-muted small d-block">Usuários Pendentes</span>
-                <h3 class="fw-bold text-warning mt-1" th:text="${dashboard != null ? dashboard.usuariosPendentes : 0}">0</h3>
-                <a href="/dashboard/usuarios?status=pendente" class="text-success small text-decoration-none mt-2 d-inline-block">Ver todos &rarr;</a>
-            </div>
-        </div>
-    </div>
+            <h1>
+                Olá, Super Admin! 👋
+            </h1>
 
-    <div class="row g-4 mb-4">
-        <div class="col-lg-7">
-            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
-                <h5 class="fw-bold text-dark mb-1">Resumo Geral</h5>
-                <p class="text-muted small mb-3">Visão geral do sistema</p>
-                <div style="height: 250px;">
-                    <canvas id="chartResumoGeral"></canvas>
+            <p>
+                Acompanhe os principais dados da gestão educacional.
+            </p>
+        </div>
+
+        <div class="dashboard-date k-dashboard-date">
+            <i class="bi bi-calendar3"></i>
+
+            <span>
+                Data atual
+            </span>
+
+            <strong
+                th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}">
+                16/09/2026
+            </strong>
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MÉTRICAS PRINCIPAIS
+         ========================================================= -->
+    <section
+        class="metrics-grid k-grid k-grid--dashboard"
+        aria-label="Indicadores principais">
+
+        <!-- Total de Escolas -->
+        <a
+            class="metric-card k-card k-card--interactive k-stat-card k-widget"
+            data-widget-id="total-schools" data-widget-type="stats" data-widget-order="1"
+            href="/dashboard/escolas">
+
+            <span class="metric-icon" aria-hidden="true">
+                <i class="bi bi-buildings"></i>
+            </span>
+
+            <span class="metric-label">
+                Total de Escolas
+            </span>
+
+            <strong class="metric-value"
+                th:text="${dashboard.totalEscolas}">
+                0
+            </strong>
+
+            <small class="metric-description">
+                escolas cadastradas
+            </small>
+
+        </a>
+
+
+        <!-- Escolas Ativas -->
+        <a
+            class="metric-card metric-success k-card k-card--interactive k-stat-card k-widget"
+            data-widget-id="active-schools" data-widget-type="stats" data-widget-order="2"
+            href="/dashboard/escolas?status=ativa">
+
+            <span class="metric-icon" aria-hidden="true">
+                <i class="bi bi-check-circle"></i>
+            </span>
+
+            <span class="metric-label">
+                Escolas Ativas
+            </span>
+
+            <strong class="metric-value"
+                th:text="${dashboard.escolasAtivas}">
+                0
+            </strong>
+
+            <small class="metric-description">
+                em operação
+            </small>
+
+        </a>
+
+
+        <!-- Escolas Inativas -->
+        <a
+            class="metric-card metric-danger k-card k-card--interactive k-stat-card k-widget"
+            data-widget-id="inactive-schools" data-widget-type="stats" data-widget-order="3"
+            href="/dashboard/escolas?status=inativa">
+
+            <span class="metric-icon" aria-hidden="true">
+                <i class="bi bi-slash-circle"></i>
+            </span>
+
+            <span class="metric-label">
+                Escolas Inativas
+            </span>
+
+            <strong class="metric-value"
+                th:text="${dashboard.escolasInativas}">
+                0
+            </strong>
+
+            <small class="metric-description">
+                requerem atenção
+            </small>
+
+        </a>
+
+
+        <!-- Usuários -->
+        <a
+            class="metric-card k-card k-card--interactive k-stat-card k-widget"
+            data-widget-id="total-users" data-widget-type="stats" data-widget-order="4"
+            href="/dashboard/usuarios?status=todos">
+
+            <span class="metric-icon" aria-hidden="true">
+                <i class="bi bi-people"></i>
+            </span>
+
+            <span class="metric-label">
+                Usuários Cadastrados
+            </span>
+
+            <strong class="metric-value"
+                th:text="${dashboard.totalUsuarios}">
+                0
+            </strong>
+
+            <small class="metric-description">
+                em todos os perfis
+            </small>
+
+        </a>
+
+
+        <!-- Usuários Pendentes -->
+        <a
+            class="metric-card metric-warning k-card k-card--interactive k-stat-card k-widget"
+            data-widget-id="pending-users" data-widget-type="stats" data-widget-order="5"
+            href="/dashboard/usuarios?status=pendente">
+
+            <span class="metric-icon" aria-hidden="true">
+                <i class="bi bi-clock-history"></i>
+            </span>
+
+            <span class="metric-label">
+                Usuários Pendentes
+            </span>
+
+            <strong class="metric-value"
+                th:text="${dashboard.usuariosPendentes}">
+                0
+            </strong>
+
+            <small class="metric-description">
+                aguardando análise
+            </small>
+
+        </a>
+
+    </section>
+
+
+    <!-- =========================================================
+         GRÁFICOS
+         ========================================================= -->
+    <section class="charts-grid k-grid k-grid--dashboard">
+
+        <!-- Crescimento -->
+        <article class="dashboard-panel k-card k-chart-card k-col-8 k-widget" data-widget-id="growth-chart" data-widget-type="growthChart" data-widget-order="6">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </span>
+
+                    <h2>
+                        Crescimento da Plataforma
+                    </h2>
+
+                    <p>
+                        Evolução acumulada nos últimos seis meses
+                    </p>
+
                 </div>
-            </div>
-        </div>
 
-        <div class="col-lg-5">
-            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
-                <h5 class="fw-bold text-dark mb-3">Distribuição de Usuários por Perfil</h5>
-                <div style="height: 230px;" class="d-flex justify-content-center">
-                    <canvas id="chartPerfilUsuarios"></canvas>
+            </div>
+
+            <div class="chart-wrap">
+                <canvas id="chartCrescimento"></canvas>
+            </div>
+
+        </article>
+
+
+        <!-- Distribuição de usuários -->
+        <article class="dashboard-panel k-card k-chart-card k-col-4 k-widget" data-widget-id="profile-chart" data-widget-type="profileChart" data-widget-order="7">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-pie-chart"></i>
+                    </span>
+
+                    <h2>
+                        Distribuição por Perfil
+                    </h2>
+
+                    <p
+                        th:text="${'Total de ' + dashboard.totalUsuarios + ' usuário(s) cadastrado(s)'}">
+                        Usuários cadastrados
+                    </p>
+
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
-                <h5 class="fw-bold text-dark mb-3">Ações Rápidas</h5>
-                <div class="row g-2 text-center">
-                    <div class="col-6">
-                        <a href="/dashboard/escolas/nova" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
-                            <i class="bi bi-plus-circle-fill text-success h3 mb-2"></i>
-                            <span class="small fw-semibold d-block">Nova Escola</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="/dashboard/usuarios" class="btn btn-light border p-3 w-100 h-100 rounded-3 text-dark text-decoration-none shadow-xs d-flex flex-column align-items-center justify-content-center">
-                            <i class="bi bi-person-gear text-success h3 mb-2"></i>
-                            <span class="small fw-semibold d-block">Gerenciar Usuários</span>
-                        </a>
-                    </div>
+            </div>
+
+            <div class="chart-wrap chart-donut">
+                <canvas id="chartPerfis"></canvas>
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================================
+         OPERAÇÕES
+         ========================================================= -->
+    <section class="operations-grid k-grid k-grid--dashboard">
+
+
+        <!-- =====================================================
+             ÚLTIMAS ESCOLAS
+             ===================================================== -->
+        <article class="dashboard-panel schools-panel k-card k-table-card k-col-6 k-widget" data-widget-id="recent-schools" data-widget-type="recentSchools" data-widget-order="8">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-building"></i>
+                    </span>
+
+                    <h2>
+                        Últimas Escolas Cadastradas
+                    </h2>
+
                 </div>
-            </div>
-        </div>
 
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 bg-white p-4 h-100 rounded-3">
-                <h5 class="fw-bold text-dark mb-3">Atividades Recentes</h5>
-                <div class="d-flex flex-column gap-3">
-                    <div class="d-flex align-items-center justify-content-between border-bottom pb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light p-2 rounded-circle me-3 text-success"><i class="bi bi-building"></i></div>
-                            <div>
-                                <p class="mb-0 small fw-semibold text-dark">Escola "Colégio Exemplo" foi ativada</p>
-                                <span class="text-muted small">por SUPER_ADMIN</span>
-                            </div>
-                        </div>
-                        <span class="text-muted small">Hoje, 10:10</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between border-bottom pb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-light p-2 rounded-circle me-3 text-success"><i class="bi bi-person-plus"></i></div>
-                            <div>
-                                <p class="mb-0 small fw-semibold text-dark">Novo usuário "João Silva" cadastrado</p>
-                                <span class="text-muted small">por GESTOR da Escola A</span>
-                            </div>
-                        </div>
-                        <span class="text-muted small">Hoje, 09:45</span>
-                    </div>
+                <a href="/dashboard/escolas">
+                    Ver todas
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="dashboard-table k-dashboard-table">
+
+                    <thead>
+
+                    <tr>
+                        <th>Escola</th>
+                        <th>Cidade</th>
+                        <th>Status</th>
+                        <th>Cadastro</th>
+                        <th></th>
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    <!-- Lista de escolas -->
+                    <tr
+                        th:each="escola : ${dashboard.escolasRecentes}">
+
+                        <td>
+
+                            <span class="table-entity-icon">
+                                <i class="bi bi-building"></i>
+                            </span>
+
+                            <strong
+                                th:text="${escola.nome}">
+                                Escola
+                            </strong>
+
+                        </td>
+
+
+                        <td
+                            th:text="${#strings.isEmpty(escola.cidade)
+                                ? 'Não informado'
+                                : escola.cidade}">
+                            Cidade
+                        </td>
+
+
+                        <td>
+
+                            <span
+                                class="status-badge"
+                                th:classappend="${escola.status == 'ATIVA'}
+                                    ? ' is-active'
+                                    : ' is-inactive'"
+                                th:text="${escola.status}">
+                                ATIVA
+                            </span>
+
+                        </td>
+
+
+                        <td
+                            th:text="${#temporals.format(
+                                escola.criadoEm,
+                                'dd/MM/yyyy'
+                            )}">
+                            Data
+                        </td>
+
+
+                        <td>
+
+                            <!--
+                                IMPORTANTE:
+                                Não usar @{/...} aqui porque o projeto
+                                não está usando IWebContext.
+                            -->
+                            <a
+                                class="icon-link"
+                                th:href="${'/dashboard/escolas/visualizar/' + escola.id}"
+                                aria-label="Visualizar escola">
+
+                                <i class="bi bi-arrow-up-right"></i>
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+
+                    <!-- Estado vazio -->
+                    <tr
+                        th:if="${#lists.isEmpty(dashboard.escolasRecentes)}">
+
+                        <td
+                            colspan="5"
+                            class="empty-state">
+
+                            Nenhuma escola cadastrada ainda.
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </article>
+
+
+        <!-- =====================================================
+             ALERTAS
+             ===================================================== -->
+        <article class="dashboard-panel k-card k-content-card k-col-3 k-widget" data-widget-id="alerts" data-widget-type="alerts" data-widget-order="9">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </span>
+
+                    <h2>
+                        Alertas Administrativos
+                    </h2>
+
                 </div>
-                <a href="#" class="text-success small text-decoration-none mt-3 d-inline-block">Ver todas as atividades &rarr;</a>
-            </div>
-        </div>
-    </div>
 
+            </div>
+
+
+            <div class="alert-list">
+
+                <!-- Usuários pendentes -->
+                <a
+                    href="/dashboard/usuarios?status=pendente"
+                    class="admin-alert"
+                    th:classappend="${dashboard.usuariosPendentes > 0}
+                        ? ' alert-warning'
+                        : ' alert-success'">
+
+                    <i class="bi bi-person-exclamation"></i>
+
+
+                    <span>
+
+                        <strong
+                            th:text="${dashboard.usuariosPendentes > 0
+                                ? dashboard.usuariosPendentes
+                                    + ' usuário(s) aguardando aprovação'
+                                : 'Nenhum usuário pendente'}">
+
+                            Usuários pendentes
+
+                        </strong>
+
+                        <small>
+                            Consulte os novos cadastros.
+                        </small>
+
+                    </span>
+
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </a>
+
+
+                <!-- Escolas inativas -->
+                <a
+                    href="/dashboard/escolas?status=inativa"
+                    class="admin-alert"
+                    th:classappend="${dashboard.escolasInativas > 0}
+                        ? ' alert-danger'
+                        : ' alert-success'">
+
+                    <i class="bi bi-building-exclamation"></i>
+
+
+                    <span>
+
+                        <strong
+                            th:text="${dashboard.escolasInativas > 0
+                                ? dashboard.escolasInativas
+                                    + ' escola(s) inativa(s)'
+                                : 'Todas as escolas estão ativas'}">
+
+                            Status das escolas
+
+                        </strong>
+
+
+                        <small>
+                            Consulte a situação das unidades.
+                        </small>
+
+                    </span>
+
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- =====================================================
+             ATIVIDADES RECENTES
+             ===================================================== -->
+        <article
+            class="dashboard-panel k-card k-content-card k-col-3 k-widget"
+            data-widget-id="activities" data-widget-type="activities" data-widget-order="10"
+            id="atividades-recentes">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+
+                    <h2>
+                        Atividades Recentes
+                    </h2>
+
+                </div>
+
+
+                <a href="/dashboard/usuarios?status=todos">
+
+                    Ver todas
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="activity-list">
+
+                <div
+                    class="activity-item"
+                    th:each="usuario : ${dashboard.usuariosRecentes}">
+
+
+                    <span class="activity-dot">
+                        <i class="bi bi-person-plus"></i>
+                    </span>
+
+
+                    <div>
+
+                        <strong
+                            th:text="${'Usuário &quot;'
+                                + usuario.nomeCompleto
+                                + '&quot; cadastrado'}">
+
+                            Usuário cadastrado
+
+                        </strong>
+
+
+                        <small
+                            th:text="${'Perfil ' + usuario.perfil}">
+
+                            Perfil
+
+                        </small>
+
+                    </div>
+
+
+                    <time
+                        th:text="${#temporals.format(
+                            usuario.criadoEm,
+                            'dd/MM, HH:mm'
+                        )}">
+
+                        Data
+
+                    </time>
+
+                </div>
+
+
+                <div
+                    class="empty-state"
+                    th:if="${#lists.isEmpty(dashboard.usuariosRecentes)}">
+
+                    Nenhuma atividade recente.
+
+                </div>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================================
+         AÇÕES RÁPIDAS + STATUS
+         ========================================================= -->
+    <section class="bottom-grid k-grid k-grid--dashboard">
+
+
+        <!-- Ações rápidas -->
+        <article class="dashboard-panel k-card k-action-card k-col-8 k-widget" data-widget-id="quick-actions" data-widget-type="quickActions" data-widget-order="11">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-lightning-charge"></i>
+                    </span>
+
+                    <h2>
+                        Ações Rápidas
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-actions k-quick-actions">
+
+
+                <a
+                    class="quick-action primary k-quick-action"
+                    href="/dashboard/escolas/nova">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    <span>
+
+                        <strong>
+                            Nova Escola
+                        </strong>
+
+                        <small>
+                            Cadastrar unidade
+                        </small>
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="quick-action k-quick-action"
+                    href="/dashboard/usuarios">
+
+                    <i class="bi bi-people"></i>
+
+                    <span>
+
+                        <strong>
+                            Gerenciar Usuários
+                        </strong>
+
+                        <small>
+                            Visualizar e editar
+                        </small>
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="quick-action k-quick-action"
+                    href="/dashboard/usuarios?status=pendente">
+
+                    <i class="bi bi-person-check"></i>
+
+                    <span>
+
+                        <strong>
+                            Aprovar Usuários
+                        </strong>
+
+                        <small>
+                            Revisar pendências
+                        </small>
+
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="quick-action k-quick-action"
+                    href="#atividades-recentes">
+
+                    <i class="bi bi-journal-text"></i>
+
+                    <span>
+
+                        <strong>
+                            Ver Atividades
+                        </strong>
+
+                        <small>
+                            Cadastros recentes
+                        </small>
+
+                    </span>
+
+                </a>
+
+            </div>
+
+        </article>
+
+
+        <!-- Status da plataforma -->
+        <article class="dashboard-panel k-card k-content-card k-col-4 k-widget" data-widget-id="platform-status" data-widget-type="status" data-widget-order="12">
+
+            <div class="panel-heading">
+
+                <div>
+
+                    <span class="panel-icon">
+                        <i class="bi bi-heart-pulse"></i>
+                    </span>
+
+                    <h2>
+                        Status da Plataforma
+                    </h2>
+
+                </div>
+
+
+                <span class="operational-badge">
+
+                    <i class="bi bi-circle-fill"></i>
+
+                    Operacional
+
+                </span>
+
+            </div>
+
+
+            <div class="platform-status">
+
+
+                <div>
+
+                    <i class="bi bi-database-check"></i>
+
+                    <span>
+
+                        <strong>
+                            Banco conectado
+                        </strong>
+
+                        <small>
+                            Dados atualizados
+                        </small>
+
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <i class="bi bi-wifi"></i>
+
+                    <span>
+
+                        <strong>
+                            Sistema online
+                        </strong>
+
+                        <small>
+                            Serviços disponíveis
+                        </small>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================================
+         CHART.JS
+         ========================================================= -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Gráfico de Linha (Resumo Geral)
-        const ctxResumo = document.getElementById('chartResumoGeral').getContext('2d');
-        new Chart(ctxResumo, {
-            type: 'line',
-            data: {
-                labels: ['Dez', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
-                datasets: [{
-                    label: 'Usuários cadastrados',
-                    data: [65, 105, 120, 140, 150, 165],
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }, {
-                    label: 'Novos usuários (mês)',
-                    data: [15, 22, 28, 30, 42, 50],
-                    borderColor: '#a3cfbb',
-                    backgroundColor: 'transparent',
-                    tension: 0.3
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
 
-        // Gráfico de Rosca (Perfis)
-        const ctxPerfil = document.getElementById('chartPerfilUsuarios').getContext('2d');
-        new Chart(ctxPerfil, {
-            type: 'doughnut',
-            data: {
-                labels: ['SUPER_ADMIN', 'GESTOR', 'SECRETARIA', 'PROFESSOR', 'ALUNO'],
-                datasets: [{
-                    data: [2, 15, 21, 68, 50],
-                    backgroundColor: ['#0a4b29', '#198754', '#479f76', '#75b798', '#a3cfbb']
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+
+    <script th:inline="javascript">
+
+        (() => {
+
+            const labels =
+                /*[[${dashboard.meses}]]*/
+                [];
+
+            const escolas =
+                /*[[${dashboard.crescimentoEscolas}]]*/
+                [];
+
+            const usuarios =
+                /*[[${dashboard.crescimentoUsuarios}]]*/
+                [];
+
+            const perfis =
+                /*[[${dashboard.usuariosPorPerfil}]]*/
+                {};
+
+
+            /* =====================================================
+               GRÁFICO DE CRESCIMENTO
+               ===================================================== */
+
+            const crescimentoCanvas =
+                document.getElementById('chartCrescimento');
+
+
+            if (crescimentoCanvas) {
+
+                new Chart(
+                    crescimentoCanvas,
+                    {
+                        type: 'line',
+
+                        data: {
+
+                            labels: labels,
+
+                            datasets: [
+
+                                {
+                                    label: 'Escolas',
+                                    data: escolas,
+
+                                    borderColor: '#007a34',
+
+                                    backgroundColor:
+                                        'rgba(13,176,75,.10)',
+
+                                    fill: true,
+
+                                    tension: .35
+                                },
+
+                                {
+                                    label: 'Usuários',
+
+                                    data: usuarios,
+
+                                    borderColor: '#63c895',
+
+                                    backgroundColor:
+                                        'rgba(99,200,149,.08)',
+
+                                    fill: false,
+
+                                    tension: .35
+                                }
+
+                            ]
+
+                        },
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio: false,
+
+                            plugins: {
+
+                                legend: {
+
+                                    labels: {
+                                        usePointStyle: true
+                                    }
+
+                                }
+
+                            },
+
+                            scales: {
+
+                                y: {
+
+                                    beginAtZero: true,
+
+                                    ticks: {
+                                        precision: 0
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =====================================================
+               GRÁFICO DE PERFIS
+               ===================================================== */
+
+            const perfisCanvas =
+                document.getElementById('chartPerfis');
+
+
+            if (perfisCanvas) {
+
+                new Chart(
+                    perfisCanvas,
+                    {
+                        type: 'doughnut',
+
+                        data: {
+
+                            labels:
+                                Object.keys(perfis),
+
+                            datasets: [
+
+                                {
+
+                                    data:
+                                        Object.values(perfis),
+
+                                    backgroundColor: [
+                                        '#004B1C',
+                                        '#087B35',
+                                        '#0DB04B',
+                                        '#63C895',
+                                        '#A7DFBD'
+                                    ],
+
+                                    borderColor:
+                                        '#FFFFFF',
+
+                                    borderWidth:
+                                        3
+
+                                }
+
+                            ]
+
+                        },
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio: false,
+
+                            cutout: '66%',
+
+                            plugins: {
+
+                                legend: {
+
+                                    position: 'right',
+
+                                    labels: {
+
+                                        usePointStyle: true,
+
+                                        boxWidth: 9,
+
+                                        padding: 14
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+
+        })();
+
     </script>
+
 </div>
 
 </body>
