@@ -1,5 +1,7 @@
 package br.com.kutuar.administrativo.repositories;
 
+import br.com.kutuar.administrativo.dto.AtividadeRecenteDTO;
+import br.com.kutuar.administrativo.dto.UltimoAcessoDTO;
 import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import br.com.kutuar.seguranca.enums.Perfil;
 import br.com.kutuar.seguranca.models.Escola;
@@ -11,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -189,6 +192,149 @@ public class DashboardRepository extends BaseDAO {
             return perfis;
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao contar usuários por perfil.", e);
+        }
+    }
+    /**
+     * Uso exclusivo do Super Admin: consulta global, sem filtro por tenant_id.
+     */
+    public List<UltimoAcessoDTO> findUltimosAcessos(int limite) {
+        String sql = """
+                SELECT u.id AS id_usuario,
+                       COALESCE(u.nome_completo, 'Não informado') AS nome_completo,
+                       u.perfil,
+                       u.ultimo_login,
+                       e.nome AS nome_escola
+                FROM usuario u
+                LEFT JOIN escola e ON e.id = u.escola_id
+                WHERE u.ultimo_login IS NOT NULL
+                ORDER BY u.ultimo_login DESC NULLS LAST, u.id DESC
+                LIMIT ?
+                """;
+        List<UltimoAcessoDTO> acessos = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limite);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    UltimoAcessoDTO dto = new UltimoAcessoDTO();
+                    dto.setIdUsuario(rs.getObject("id_usuario", UUID.class));
+                    dto.setNomeCompleto(rs.getString("nome_completo"));
+                    dto.setPerfil(rs.getString("perfil"));
+                    dto.setUltimoLogin(rs.getObject("ultimo_login", LocalDateTime.class));
+                    dto.setNomeEscola(rs.getString("nome_escola"));
+                    acessos.add(dto);
+                }
+            }
+            return acessos;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar últimos acessos.", e);
+        }
+    }
+
+    /**
+     * Uso exclusivo do Super Admin: consulta global, sem filtro por tenant_id.
+     */
+    public long countUsuariosBloqueados() {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE bloqueado IS TRUE";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            return rs.getLong(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar usuários bloqueados.", e);
+        }
+    }
+
+    /**
+     * Uso exclusivo do Super Admin: consulta global, sem filtro por tenant_id.
+     */
+    public long countUsuariosSemAcessoRecente(int dias) {
+        String sql = """
+                SELECT COUNT(*)
+                FROM usuario
+                WHERE ativo IS TRUE
+                  AND (ultimo_login IS NULL OR ultimo_login < CURRENT_TIMESTAMP - (? * INTERVAL '1 day'))
+                """;
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, dias);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar usuários sem acesso recente.", e);
+        }
+    }
+
+    /**
+     * Uso exclusivo do Super Admin: consulta global, sem filtro por tenant_id.
+     */
+    public long countTentativasLoginSuspeitas() {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE tentativas_login >= 3";
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            return rs.getLong(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar tentativas de login suspeitas.", e);
+        }
+    }
+
+    /**
+     * Uso exclusivo do Super Admin: consulta global, sem filtro por tenant_id.
+     */
+    public List<AtividadeRecenteDTO> findAtividadesRecentes(int limite) {
+        String sql = """
+                SELECT tipo, descricao, ocorrido_em, referencia_id
+                FROM (
+                    SELECT 'ESCOLA_CADASTRADA' AS tipo,
+                           'Escola cadastrada: ' || COALESCE(nome, 'Não informado') AS descricao,
+                           criado_em AS ocorrido_em,
+                           id AS referencia_id
+                    FROM escola
+                    WHERE criado_em IS NOT NULL
+
+                    UNION ALL
+
+                    SELECT 'USUARIO_CADASTRADO' AS tipo,
+                           'Usuário cadastrado: ' || COALESCE(nome_completo, 'Não informado') AS descricao,
+                           criado_em AS ocorrido_em,
+                           id AS referencia_id
+                    FROM usuario
+                    WHERE criado_em IS NOT NULL
+
+                    UNION ALL
+
+                    SELECT 'USUARIO_LOGOU' AS tipo,
+                           'Login realizado: ' || COALESCE(nome_completo, 'Não informado') AS descricao,
+                           ultimo_login AS ocorrido_em,
+                           id AS referencia_id
+                    FROM usuario
+                    WHERE ultimo_login IS NOT NULL
+                ) atividades
+                ORDER BY ocorrido_em DESC NULLS LAST, referencia_id DESC
+                LIMIT ?
+                """;
+        List<AtividadeRecenteDTO> atividades = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, limite);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    AtividadeRecenteDTO dto = new AtividadeRecenteDTO();
+                    dto.setTipo(rs.getString("tipo"));
+                    dto.setDescricao(rs.getString("descricao"));
+                    dto.setOcorridoEm(rs.getObject("ocorrido_em", LocalDateTime.class));
+                    dto.setReferenciaId(rs.getObject("referencia_id", UUID.class));
+                    atividades.add(dto);
+                }
+            }
+            return atividades;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar atividades recentes.", e);
         }
     }
 }
