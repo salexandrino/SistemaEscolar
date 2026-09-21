@@ -13,13 +13,13 @@ public class DashboardDTO {
     private long escolasInativas;
     private long totalUsuarios;
     private long usuariosPendentes;
-    private List<String> meses;
-    private List<Long> crescimentoEscolas;
-    private List<Long> crescimentoUsuarios;
-    private Map<String, Long> usuariosPorPerfil;
+    private List<String> meses = List.of();
+    private List<Long> crescimentoEscolas = List.of();
+    private List<Long> crescimentoUsuarios = List.of();
+    private Map<String, Long> usuariosPorPerfil = Map.of();
 
-    private List<Escola> escolasRecentes;
-    private List<Usuario> usuariosRecentes;
+    private List<Escola> escolasRecentes = List.of();
+    private List<Usuario> usuariosRecentes = List.of();
 
     public long getTotalEscolas() {
         return totalEscolas;
@@ -66,7 +66,7 @@ public class DashboardDTO {
     }
 
     public void setEscolasRecentes(List<Escola> escolasRecentes) {
-        this.escolasRecentes = escolasRecentes;
+        this.escolasRecentes = escolasRecentes == null ? List.of() : escolasRecentes;
     }
 
     public List<Usuario> getUsuariosRecentes() {
@@ -74,15 +74,15 @@ public class DashboardDTO {
     }
 
     public void setUsuariosRecentes(List<Usuario> usuariosRecentes) {
-        this.usuariosRecentes = usuariosRecentes;
+        this.usuariosRecentes = usuariosRecentes == null ? List.of() : usuariosRecentes;
     }
 
     public List<String> getMeses() { return meses; }
-    public void setMeses(List<String> meses) { this.meses = meses; }
+    public void setMeses(List<String> meses) { this.meses = meses == null ? List.of() : meses; }
     public List<Long> getCrescimentoEscolas() { return crescimentoEscolas; }
-    public void setCrescimentoEscolas(List<Long> crescimentoEscolas) { this.crescimentoEscolas = crescimentoEscolas; }
+    public void setCrescimentoEscolas(List<Long> crescimentoEscolas) { this.crescimentoEscolas = crescimentoEscolas == null ? List.of() : crescimentoEscolas; }
     public List<Long> getCrescimentoUsuarios() { return crescimentoUsuarios; }
-    public void setCrescimentoUsuarios(List<Long> crescimentoUsuarios) { this.crescimentoUsuarios = crescimentoUsuarios; }
+    public void setCrescimentoUsuarios(List<Long> crescimentoUsuarios) { this.crescimentoUsuarios = crescimentoUsuarios == null ? List.of() : crescimentoUsuarios; }
     public Map<String, Long> getUsuariosPorPerfil() { return usuariosPorPerfil; }
-    public void setUsuariosPorPerfil(Map<String, Long> usuariosPorPerfil) { this.usuariosPorPerfil = usuariosPorPerfil; }
+    public void setUsuariosPorPerfil(Map<String, Long> usuariosPorPerfil) { this.usuariosPorPerfil = usuariosPorPerfil == null ? Map.of() : usuariosPorPerfil; }
 }
