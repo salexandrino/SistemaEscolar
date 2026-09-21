@@ -38,6 +38,13 @@ class EscolaPaginacaoServiceTest {
         verify(repository).findAllPaginated(null, null, 1, 0);
     }
 
+    @Test void parametrosAusentesUsamPadroesDoService() {
+        var pagina = service.listarPaginadas(null, null, null, null, admin);
+        assertEquals(EscolaService.DEFAULT_PAGE, pagina.page());
+        assertEquals(EscolaService.DEFAULT_PAGE_SIZE, pagina.size());
+        verify(repository).findAllPaginated(null, null, EscolaService.DEFAULT_PAGE_SIZE, 0);
+    }
+
     @Test void limitaTamanhoEImpedeOverflow() {
         var pagina = service.listarPaginadas(null, null, Integer.MAX_VALUE, Integer.MAX_VALUE, admin);
         assertEquals(100, pagina.size());

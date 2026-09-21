@@ -4,6 +4,8 @@ import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.enums.*;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.exceptions.AuthorizationException;
+import br.com.kutuar.seguranca.middlewares.RoleBasedMiddleware;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
@@ -19,7 +21,10 @@ class EscolaPaginacaoControllerTest {
     private final Context ctx = mock(Context.class);
     private final AuthUser admin = new AuthUser(null, null, null, Perfil.SUPER_ADMIN, null);
 
-    @BeforeEach void setup() { AuthUserContext.setAuthUser(admin); }
+    @BeforeEach void setup() {
+        AuthUserContext.setAuthUser(admin);
+        when(ctx.status(any(io.javalin.http.HttpStatus.class))).thenReturn(ctx);
+    }
     @AfterEach void cleanup() { AuthUserContext.clear(); }
 
     @Test void apiRetornaContratoPadronizado() throws Exception {
@@ -29,7 +34,7 @@ class EscolaPaginacaoControllerTest {
         when(ctx.queryParam("size")).thenReturn("10");
         when(service.listarPaginadas("Kutuar", EscolaStatus.ATIVA, 2, 10, admin))
                 .thenReturn(new PageResponse<>(2, 10, 21, List.of()));
-        controller.listarEscolas(ctx);
+        controller.listarEscolasAdmin(ctx);
         ArgumentCaptor<Object> response = ArgumentCaptor.forClass(Object.class);
         verify(ctx).json(response.capture());
         var json = new com.fasterxml.jackson.databind.ObjectMapper().valueToTree(response.getValue());
@@ -39,6 +44,80 @@ class EscolaPaginacaoControllerTest {
         assertEquals(2, json.get("page").asInt());
         assertEquals(3L, json.get("totalPages").asLong());
         assertEquals(5, json.size());
+    }
+
+    @Test void apiVaziaRetornaHttp200EItemsVazio() {
+        when(service.listarPaginadas(null, null, null, null, admin))
+                .thenReturn(new PageResponse<>(1, 20, 0, List.of()));
+
+        controller.listarEscolasAdmin(ctx);
+
+        verify(ctx).status(io.javalin.http.HttpStatus.OK);
+        ArgumentCaptor<Object> response = ArgumentCaptor.forClass(Object.class);
+        verify(ctx).json(response.capture());
+        PageResponse<?> pagina = (PageResponse<?>) response.getValue();
+        assertEquals(0, pagina.totalItems());
+        assertEquals(0, pagina.totalPages());
+        assertEquals(List.of(), pagina.items());
+    }
+
+    @Test void apiRejeitaPageNaoInteiro() {
+        when(ctx.queryParam("page")).thenReturn("abc");
+        controller.listarEscolasAdmin(ctx);
+        assertBadRequest("Parâmetro 'page' inválido. Use um número inteiro.");
+        verifyNoInteractions(service);
+    }
+
+    @Test void apiRejeitaSizeNaoInteiro() {
+        when(ctx.queryParam("size")).thenReturn("1.5");
+        controller.listarEscolasAdmin(ctx);
+        assertBadRequest("Parâmetro 'size' inválido. Use um número inteiro.");
+        verifyNoInteractions(service);
+    }
+
+    @Test void apiRejeitaStatusInexistente() {
+        when(ctx.queryParam("status")).thenReturn("EXCLUIDA");
+        controller.listarEscolasAdmin(ctx);
+        assertBadRequest("Status inválido. Use um dos valores permitidos: ATIVA ou INATIVA.");
+        verifyNoInteractions(service);
+    }
+
+    @Test void apiEncaminhaTodosOsParametrosConvertidos() {
+        when(ctx.queryParam("search")).thenReturn("  hora  ");
+        when(ctx.queryParam("status")).thenReturn("ATIVA");
+        when(ctx.queryParam("page")).thenReturn("3");
+        when(ctx.queryParam("size")).thenReturn("25");
+        when(service.listarPaginadas("  hora  ", EscolaStatus.ATIVA, 3, 25, admin))
+                .thenReturn(new PageResponse<>(3, 25, 0, List.of()));
+
+        controller.listarEscolasAdmin(ctx);
+
+        verify(service).listarPaginadas("  hora  ", EscolaStatus.ATIVA, 3, 25, admin);
+        verify(ctx).status(io.javalin.http.HttpStatus.OK);
+    }
+
+    @Test void middlewareRecusaAusenteEPerfilNaoSuperAdmin() throws Exception {
+        RoleBasedMiddleware middleware = new RoleBasedMiddleware(Perfil.SUPER_ADMIN);
+        when(ctx.path()).thenReturn("/api/admin/escolas");
+        AuthUserContext.clear();
+        AuthorizationException ausente = assertThrows(AuthorizationException.class, () -> middleware.handle(ctx));
+        assertEquals(io.javalin.http.HttpStatus.FORBIDDEN, ausente.getStatus());
+
+        AuthUser gestor = new AuthUser(null, null, null, Perfil.GESTOR, "00000000000");
+        AuthUserContext.setAuthUser(gestor);
+        AuthorizationException proibido = assertThrows(AuthorizationException.class, () -> middleware.handle(ctx));
+        assertEquals(io.javalin.http.HttpStatus.FORBIDDEN, proibido.getStatus());
+
+        AuthUserContext.setAuthUser(admin);
+        assertDoesNotThrow(() -> middleware.handle(ctx));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void assertBadRequest(String message) {
+        verify(ctx).status(io.javalin.http.HttpStatus.BAD_REQUEST);
+        ArgumentCaptor<Object> response = ArgumentCaptor.forClass(Object.class);
+        verify(ctx).json(response.capture());
+        assertEquals(Map.of("error", message), response.getValue());
     }
 
     @Test void telaPreservaFiltrosETrataParametrosInvalidos() {

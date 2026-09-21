@@ -327,6 +327,42 @@ public class EscolaController {
         }
     }
 
+    private static Integer optionalIntegerParam(String value, String name) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            throw new ValidationException("Parâmetro '" + name + "' inválido. Use um número inteiro.");
+        }
+    }
+
+    private static EscolaStatus optionalStatusParam(String value) {
+        if (value == null || value.isBlank()) return null;
+        EscolaStatus status = EscolaStatus.fromFilter(value);
+        if (status == null) {
+            throw new ValidationException("Status inválido. Use um dos valores permitidos: ATIVA ou INATIVA.");
+        }
+        return status;
+    }
+
+    /** GET /api/admin/escolas - Listagem administrativa paginada. */
+    public void listarEscolasAdmin(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            PageResponse<EscolaResumoDTO> pagina = escolaService.listarPaginadas(
+                    ctx.queryParam("search"),
+                    optionalStatusParam(ctx.queryParam("status")),
+                    optionalIntegerParam(ctx.queryParam("page"), "page"),
+                    optionalIntegerParam(ctx.queryParam("size"), "size"),
+                    currentUser);
+            ctx.status(HttpStatus.OK).json(pagina);
+        } catch (ValidationException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of("error", e.getMessage()));
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus()).json(Map.of("message", e.getMessage()));
+        }
+    }
+
     public void listarEscolas(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();

@@ -31,6 +31,9 @@ import java.util.UUID;
 public class EscolaService {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaService.class);
+    public static final int DEFAULT_PAGE = 1;
+    public static final int DEFAULT_PAGE_SIZE = 20;
+    public static final int MAX_PAGE_SIZE = 100;
     private final EscolaRepository escolaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordService passwordService;
@@ -391,10 +394,12 @@ public class EscolaService {
     /**
      * Lista todas as escolas.
      */
-    public PageResponse<EscolaResumoDTO> listarPaginadas(String search, EscolaStatus status, int page, int size,
+    public PageResponse<EscolaResumoDTO> listarPaginadas(String search, EscolaStatus status, Integer page, Integer size,
                                             AuthUser authUser) {
         verificarPermissaoMaster(authUser);
-        size = Math.max(1, Math.min(size, 100));
+        page = page == null ? DEFAULT_PAGE : page;
+        size = size == null ? DEFAULT_PAGE_SIZE : size;
+        size = Math.max(1, Math.min(size, MAX_PAGE_SIZE));
         // Limita a página ao maior offset representável pelo contrato JDBC do repository.
         page = (int) Math.min(Math.max(1L, page), Integer.MAX_VALUE / (long) size + 1);
         int offset = (int) ((page - 1L) * size);
