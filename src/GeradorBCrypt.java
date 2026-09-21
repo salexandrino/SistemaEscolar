@@ -1,4 +1,4 @@
-package br.com.kutuar.seguranca.utils;
+package br.com.kutuar.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 import java.io.Console;

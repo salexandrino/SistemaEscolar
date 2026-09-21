@@ -285,18 +285,18 @@
             </div>
 
 
-            <div class="table-responsive">
+            <div class="table-responsive recent-schools-table-wrap">
 
-                <table class="dashboard-table k-dashboard-table">
+                <table class="dashboard-table k-dashboard-table recent-schools-table">
 
                     <thead>
 
                     <tr>
-                        <th>Escola</th>
-                        <th>Cidade</th>
-                        <th>Status</th>
-                        <th>Cadastro</th>
-                        <th></th>
+                        <th scope="col">Escola</th>
+                        <th scope="col">Cidade</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Cadastro</th>
+                        <th scope="col" class="recent-schools-action-column">Ação</th>
                     </tr>
 
                     </thead>
@@ -311,7 +311,7 @@
                         <td>
 
                             <span class="table-entity-icon">
-                                <i class="bi bi-building"></i>
+                                <i class="bi bi-building" aria-hidden="true"></i>
                             </span>
 
                             <strong
@@ -363,9 +363,9 @@
                             <a
                                 class="icon-link"
                                 th:href="${'/dashboard/escolas/visualizar/' + escola.id}"
-                                aria-label="Visualizar escola">
+                                th:attr="aria-label=${'Visualizar escola ' + escola.nome}">
 
-                                <i class="bi bi-arrow-up-right"></i>
+                                <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
 
                             </a>
 
@@ -429,29 +429,39 @@
                         ? ' alert-warning'
                         : ' alert-success'">
 
-                    <i class="bi bi-person-exclamation"></i>
+                    <i
+                        class="alert-icon bi"
+                        th:classappend="${dashboard.usuariosPendentes > 0}
+                            ? ' bi-person-exclamation'
+                            : ' bi-check-circle'"
+                        aria-hidden="true"></i>
 
 
                     <span>
 
                         <strong
                             th:text="${dashboard.usuariosPendentes > 0
-                                ? dashboard.usuariosPendentes
-                                    + ' usuário(s) aguardando aprovação'
+                                ? dashboard.usuariosPendentes +
+                                    (dashboard.usuariosPendentes == 1
+                                        ? ' usuário aguardando aprovação'
+                                        : ' usuários aguardando aprovação')
                                 : 'Nenhum usuário pendente'}">
 
                             Usuários pendentes
 
                         </strong>
 
-                        <small>
+                        <small
+                            th:text="${dashboard.usuariosPendentes > 0
+                                ? 'Consulte os novos cadastros.'
+                                : 'Não há cadastros aguardando análise.'}">
                             Consulte os novos cadastros.
                         </small>
 
                     </span>
 
 
-                    <i class="bi bi-chevron-right"></i>
+                    <i class="alert-chevron bi bi-chevron-right" aria-hidden="true"></i>
 
                 </a>
 
@@ -464,15 +474,22 @@
                         ? ' alert-danger'
                         : ' alert-success'">
 
-                    <i class="bi bi-building-exclamation"></i>
+                    <i
+                        class="alert-icon bi"
+                        th:classappend="${dashboard.escolasInativas > 0}
+                            ? ' bi-building-exclamation'
+                            : ' bi-check-circle'"
+                        aria-hidden="true"></i>
 
 
                     <span>
 
                         <strong
                             th:text="${dashboard.escolasInativas > 0
-                                ? dashboard.escolasInativas
-                                    + ' escola(s) inativa(s)'
+                                ? dashboard.escolasInativas +
+                                    (dashboard.escolasInativas == 1
+                                        ? ' escola inativa'
+                                        : ' escolas inativas')
                                 : 'Todas as escolas estão ativas'}">
 
                             Status das escolas
@@ -480,14 +497,17 @@
                         </strong>
 
 
-                        <small>
+                        <small
+                            th:text="${dashboard.escolasInativas > 0
+                                ? 'Consulte a situação das unidades.'
+                                : 'Nenhuma unidade requer atenção.'}">
                             Consulte a situação das unidades.
                         </small>
 
                     </span>
 
 
-                    <i class="bi bi-chevron-right"></i>
+                    <i class="alert-chevron bi bi-chevron-right" aria-hidden="true"></i>
 
                 </a>
 
@@ -521,7 +541,7 @@
 
                 <a href="/dashboard/usuarios?status=todos">
 
-                    Ver todas
+                    Ver todos os usuários
 
                     <i class="bi bi-arrow-right"></i>
 
@@ -537,12 +557,12 @@
                     th:each="usuario : ${dashboard.usuariosRecentes}">
 
 
-                    <span class="activity-dot">
+                    <span class="activity-dot activity-icon" aria-hidden="true">
                         <i class="bi bi-person-plus"></i>
                     </span>
 
 
-                    <div>
+                    <div class="activity-content">
 
                         <strong
                             th:text="${'Usuário &quot;'
@@ -565,6 +585,7 @@
 
 
                     <time
+                        th:attr="datetime=${usuario.criadoEm}"
                         th:text="${#temporals.format(
                             usuario.criadoEm,
                             'dd/MM, HH:mm'
@@ -625,7 +646,7 @@
                     class="quick-action primary k-quick-action"
                     href="/dashboard/escolas/nova">
 
-                    <i class="bi bi-plus-lg"></i>
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
 
                     <span>
 
@@ -646,7 +667,7 @@
                     class="quick-action k-quick-action"
                     href="/dashboard/usuarios">
 
-                    <i class="bi bi-people"></i>
+                    <i class="bi bi-people" aria-hidden="true"></i>
 
                     <span>
 
@@ -667,12 +688,20 @@
                     class="quick-action k-quick-action"
                     href="/dashboard/usuarios?status=pendente">
 
-                    <i class="bi bi-person-check"></i>
+                    <i class="bi bi-person-check" aria-hidden="true"></i>
 
                     <span>
 
                         <strong>
                             Aprovar Usuários
+
+                            <span
+                                class="quick-action-badge"
+                                th:if="${dashboard.usuariosPendentes > 0}"
+                                th:text="${dashboard.usuariosPendentes}"
+                                th:attr="aria-label=${dashboard.usuariosPendentes + ' usuários pendentes'}">
+                                0
+                            </span>
                         </strong>
 
                         <small>
@@ -688,7 +717,7 @@
                     class="quick-action k-quick-action"
                     href="#atividades-recentes">
 
-                    <i class="bi bi-journal-text"></i>
+                    <i class="bi bi-journal-text" aria-hidden="true"></i>
 
                     <span>
 
@@ -961,11 +990,17 @@
 
                             cutout: '66%',
 
+                            onResize: (chart, size) => {
+                                chart.options.plugins.legend.position =
+                                    size.width < 400 ? 'bottom' : 'right';
+                            },
+
                             plugins: {
 
                                 legend: {
 
-                                    position: 'right',
+                                    position: perfisCanvas.parentElement.clientWidth < 400
+                                        ? 'bottom' : 'right',
 
                                     labels: {
 

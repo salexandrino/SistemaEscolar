@@ -49,6 +49,7 @@ import br.com.kutuar.academico.services.SerieService;
 import br.com.kutuar.academico.services.TurmaService;
 import br.com.kutuar.academico.services.media.CalculoMediaAritmetica;
 import br.com.kutuar.administrativo.controllers.DashboardController;
+import br.com.kutuar.administrativo.controllers.SuperAdminDashboardApiController;
 import br.com.kutuar.administrativo.repositories.DashboardRepository;
 import br.com.kutuar.administrativo.services.DashboardService;
 import br.com.kutuar.config.DatabaseConfig;
@@ -178,6 +179,7 @@ public class KutuarApp {
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(escolaService);
         DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, templateEngine);
+        SuperAdminDashboardApiController superAdminDashboardApiController = new SuperAdminDashboardApiController(dashboardService);
         // Acadêmico
         DisciplinaController disciplinaController = new DisciplinaController(disciplinaService);
         AnoLetivoController anoLetivoController = new AnoLetivoController(anoLetivoService);
@@ -657,6 +659,13 @@ public class KutuarApp {
         // SISTEMA DE ALERTAS
         app.before("/api/alertas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
         app.get("/api/alertas", alertaController::obterAlertas);
+
+        app.before("/api/admin/dashboard", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
+        app.before("/api/admin/dashboard/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
+        app.get("/api/admin/dashboard", superAdminDashboardApiController::dashboard);
+        app.get("/api/admin/dashboard/alertas", superAdminDashboardApiController::alertas);
+        app.get("/api/admin/dashboard/atividades", superAdminDashboardApiController::atividades);
+        app.get("/api/admin/dashboard/ultimos-acessos", superAdminDashboardApiController::ultimosAcessos);
 
 
         // TRATAMENTO DE EXCEÇÕES

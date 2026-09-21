@@ -322,6 +322,12 @@ public class EscolaController {
             }
 
             List<Escola> escolas = escolaService.listarTodas(currentUser);
+            String status = ctx.queryParam("status");
+            if ("ativa".equals(status)) {
+                escolas = escolas.stream().filter(escola -> "ATIVA".equals(escola.getStatus())).toList();
+            } else if ("inativa".equals(status)) {
+                escolas = escolas.stream().filter(escola -> "INATIVA".equals(escola.getStatus())).toList();
+            }
 
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("total", escolas.size());
@@ -605,9 +611,16 @@ public class EscolaController {
             }
 
             List<Escola> escolas = escolaService.listarTodas(currentUser);
+            String status = ctx.queryParam("status");
+            if ("ativa".equals(status)) {
+                escolas = escolas.stream().filter(escola -> "ATIVA".equals(escola.getStatus())).toList();
+            } else if ("inativa".equals(status)) {
+                escolas = escolas.stream().filter(escola -> "INATIVA".equals(escola.getStatus())).toList();
+            }
 
             Map<String, Object> model = new java.util.HashMap<>();
             model.put("escolas", escolas);
+            model.put("filtroStatus", status);
 
             String gestorEmail = ctx.sessionAttribute("gestorEmailGerado");
             String gestorCpf = ctx.sessionAttribute("gestorCpfGerado");

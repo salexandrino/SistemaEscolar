@@ -16,6 +16,8 @@ import org.thymeleaf.TemplateEngine;
 import java.util.Map;
 import java.util.UUID;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 public class DashboardController {
 
@@ -38,7 +40,7 @@ public class DashboardController {
 
     // 1. Tela Inicial Principal do Dashboard
     public void dashboard(Context ctx) {
-        DashboardDTO dashboard = dashboardService.buscarDashboard();
+        DashboardDTO dashboard = dashboardService.buscarDashboardSuperAdmin();
         org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
         thymeleaf.setVariable("dashboard", dashboard);
         thymeleaf.setVariable("content", "dashboard/index");
@@ -96,30 +98,32 @@ public class DashboardController {
         // Puxa todos os usuários do banco (seja criado na tela ou no cadastro geral)
         List<Usuario> listaUsuarios = usuarioRepository.findAll();
 
-        // Suporta filtro via query param: ?status=pendente|inativos|todos
+        // Os filtros usam os mesmos criterios das contagens dos alertas.
         String status = ctx.queryParam("status");
+        String acesso = ctx.queryParam("acesso");
+        String seguranca = ctx.queryParam("seguranca");
         List<Usuario> listaFiltrada;
-        if (status != null) {
-            switch (status) {
-                case "pendente":
-                    listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAprovado()).collect(java.util.stream.Collectors.toList());
-                    break;
-                case "inativos":
-                    listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAtivo()).collect(java.util.stream.Collectors.toList());
-                    break;
-                case "todos":
-                    listaFiltrada = listaUsuarios;
-                    break;
-                default:
-                    listaFiltrada = listaUsuarios.stream().filter(Usuario::isAtivo).collect(java.util.stream.Collectors.toList());
-            }
-        } else {
-            // padrão: mostrar somente usuários ativos
-            listaFiltrada = listaUsuarios.stream().filter(Usuario::isAtivo).collect(java.util.stream.Collectors.toList());
+        switch (status == null ? "ativos" : status) {
+            case "pendente" -> listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAprovado()).collect(Collectors.toList());
+            case "inativos", "inativa" -> listaFiltrada = listaUsuarios.stream().filter(u -> !u.isAtivo()).collect(Collectors.toList());
+            case "bloqueado" -> listaFiltrada = listaUsuarios.stream().filter(Usuario::isBloqueado).collect(Collectors.toList());
+            case "todos" -> listaFiltrada = listaUsuarios;
+            default -> listaFiltrada = listaUsuarios.stream().filter(Usuario::isAtivo).collect(Collectors.toList());
+        }
+        if ("sem-acesso-recente".equals(acesso)) {
+            LocalDateTime limite = LocalDateTime.now().minusDays(30);
+            listaFiltrada = listaFiltrada.stream()
+                    .filter(u -> u.isAtivo() && (u.getUltimoLogin() == null || u.getUltimoLogin().isBefore(limite)))
+                    .collect(Collectors.toList());
+        }
+        if ("tentativas-login".equals(seguranca)) {
+            listaFiltrada = listaFiltrada.stream().filter(u -> u.getTentativasLogin() >= 3).collect(Collectors.toList());
         }
 
         thymeleafContext.setVariable("usuarios", listaFiltrada);
         thymeleafContext.setVariable("filtroStatus", status);
+        thymeleafContext.setVariable("filtroAcesso", acesso);
+        thymeleafContext.setVariable("filtroSeguranca", seguranca);
 
         thymeleafContext.setVariable("content", "dashboard/usuarios/index");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleafContext));
