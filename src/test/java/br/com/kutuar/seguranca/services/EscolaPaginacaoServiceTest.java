@@ -1,6 +1,7 @@
 package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.enums.*;
+import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.models.*;
 import br.com.kutuar.seguranca.repositories.*;
@@ -19,8 +20,8 @@ class EscolaPaginacaoServiceTest {
         when(repository.countFiltered("Kutuar", EscolaStatus.ATIVA)).thenReturn(41L);
         when(repository.findAllPaginated("Kutuar", EscolaStatus.ATIVA, 20, 20)).thenReturn(List.of(escola));
         var pagina = service.listarPaginadas("  Kutuar  ", EscolaStatus.ATIVA, 2, 20, admin);
-        assertEquals(List.of(escola), pagina.itens());
-        assertEquals(41, pagina.total());
+        assertEquals(List.of(EscolaResumoDTO.from(escola)), pagina.items());
+        assertEquals(41, pagina.totalItems());
         assertEquals(3, pagina.totalPages());
         assertEquals(2, pagina.page());
         assertTrue(pagina.hasNext());

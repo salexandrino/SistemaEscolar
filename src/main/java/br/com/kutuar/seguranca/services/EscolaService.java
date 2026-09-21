@@ -1,7 +1,8 @@
 package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
-import br.com.kutuar.seguranca.dtos.PaginaEscolasDTO;
+import br.com.kutuar.seguranca.dtos.PageResponse;
+import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
 import br.com.kutuar.seguranca.dtos.CriarEscolaDTO;
 import br.com.kutuar.seguranca.dtos.CriarEscolaResponseDTO;
@@ -390,7 +391,7 @@ public class EscolaService {
     /**
      * Lista todas as escolas.
      */
-    public PaginaEscolasDTO listarPaginadas(String search, EscolaStatus status, int page, int size,
+    public PageResponse<EscolaResumoDTO> listarPaginadas(String search, EscolaStatus status, int page, int size,
                                             AuthUser authUser) {
         verificarPermissaoMaster(authUser);
         size = Math.max(1, Math.min(size, 100));
@@ -399,10 +400,8 @@ public class EscolaService {
         int offset = (int) ((page - 1L) * size);
         String filtro = search == null || search.isBlank() ? null : search.trim();
         long total = escolaRepository.countFiltered(filtro, status);
-        long totalPages = total / size + (total % size == 0 ? 0 : 1);
         List<Escola> itens = escolaRepository.findAllPaginated(filtro, status, size, offset);
-        return new PaginaEscolasDTO(itens, page, size, total, totalPages,
-                page > 1, page < totalPages);
+        return new PageResponse<>(page, size, total, itens.stream().map(EscolaResumoDTO::from).toList());
     }
 
     public List<Escola> listarTodas(AuthUser authUser) {

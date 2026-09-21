@@ -12,7 +12,8 @@ import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
-import br.com.kutuar.seguranca.dtos.PaginaEscolasDTO;
+import br.com.kutuar.seguranca.dtos.PageResponse;
+import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
@@ -319,7 +320,7 @@ public class EscolaController {
     private static int paginationParam(String value, int fallback) {
         if (value == null || value.isBlank()) return fallback;
         try {
-            return new java.math.BigInteger(value.trim()).max(java.math.BigInteger.ONE)
+            return new java.math.BigInteger(value.trim()).max(java.math.BigInteger.valueOf(Integer.MIN_VALUE))
                     .min(java.math.BigInteger.valueOf(Integer.MAX_VALUE)).intValue();
         } catch (NumberFormatException e) {
             return fallback;
@@ -335,22 +336,11 @@ public class EscolaController {
 
             EscolaStatus status = EscolaStatus.fromFilter(ctx.queryParam("status"));
             String search = ctx.queryParam("search");
-            PaginaEscolasDTO pagina = escolaService.listarPaginadas(search, status,
+            PageResponse<EscolaResumoDTO> pagina = escolaService.listarPaginadas(search, status,
                     paginationParam(ctx.queryParam("page"), 1),
                     paginationParam(ctx.queryParam("size"), 20), currentUser);
-            List<Escola> escolas = pagina.itens();
-
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("total", pagina.total());
-            response.put("page", pagina.page());
-            response.put("size", pagina.size());
-            response.put("totalPages", pagina.totalPages());
-            response.put("hasPrevious", pagina.hasPrevious());
-            response.put("hasNext", pagina.hasNext());
-            response.put("escolas", escolas.stream().map(this::escolaToMapSummarized).toList());
-
             ctx.status(HttpStatus.OK);
-            ctx.json(response);
+            ctx.json(pagina);
 
         } catch (AuthenticationException | AuthorizationException e) {
             ctx.status(e.getStatus());
@@ -628,10 +618,10 @@ public class EscolaController {
 
             EscolaStatus status = EscolaStatus.fromFilter(ctx.queryParam("status"));
             String search = ctx.queryParam("search");
-            PaginaEscolasDTO pagina = escolaService.listarPaginadas(search, status,
+            PageResponse<EscolaResumoDTO> pagina = escolaService.listarPaginadas(search, status,
                     paginationParam(ctx.queryParam("page"), 1),
                     paginationParam(ctx.queryParam("size"), 20), currentUser);
-            List<Escola> escolas = pagina.itens();
+            List<EscolaResumoDTO> escolas = pagina.items();
 
             Map<String, Object> model = new java.util.HashMap<>();
             model.put("escolas", escolas);
@@ -640,7 +630,7 @@ public class EscolaController {
             model.put("search", search == null ? "" : search.trim());
             model.put("page", pagina.page());
             model.put("size", pagina.size());
-            model.put("total", pagina.total());
+            model.put("total", pagina.totalItems());
             model.put("totalPages", pagina.totalPages());
             model.put("hasPrevious", pagina.hasPrevious());
             model.put("hasNext", pagina.hasNext());
