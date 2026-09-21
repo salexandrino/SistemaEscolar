@@ -26,7 +26,7 @@ class DashboardPostgresTest {
         connection = DriverManager.getConnection(env.get("DB_URL"), env.get("DB_USER"), env.get("DB_PASSWORD"));
         connection.setAutoCommit(false);
         executar("CREATE TEMP TABLE escola (id uuid DEFAULT gen_random_uuid(), nome text, cidade text, status text, criado_em timestamp)");
-        executar("CREATE TEMP TABLE usuario (id uuid DEFAULT gen_random_uuid(), nome_completo text, perfil text, ativo boolean, criado_em timestamp)");
+        executar("CREATE TEMP TABLE usuario (id uuid DEFAULT gen_random_uuid(), nome_completo text, perfil text, ativo boolean, bloqueado boolean DEFAULT false, criado_em timestamp)");
         // Repository fecha cada emprestimo; a conexao de teste permanece ate o rollback.
         Connection emprestimo = (Connection) Proxy.newProxyInstance(getClass().getClassLoader(),
                 new Class<?>[]{Connection.class}, (proxy, method, args) -> {

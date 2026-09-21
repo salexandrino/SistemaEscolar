@@ -2,6 +2,7 @@ package br.com.kutuar.administrativo.repositories;
 
 import br.com.kutuar.administrativo.dto.AtividadeRecenteDTO;
 import br.com.kutuar.administrativo.dto.UltimoAcessoDTO;
+import br.com.kutuar.administrativo.dto.UsuarioRecenteDTO;
 import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import br.com.kutuar.seguranca.enums.Perfil;
 import br.com.kutuar.seguranca.models.Escola;
@@ -105,16 +106,17 @@ public class DashboardRepository extends BaseDAO {
         }
     }
 
-    public List<Usuario> findUltimosUsuarios() {
+    public List<UsuarioRecenteDTO> findUltimosUsuarios() {
 
         String sql = """
-                SELECT id, COALESCE(nome_completo, 'Não informado') AS nome_completo, perfil, criado_em
+                  SELECT id, COALESCE(nome_completo, 'Não informado') AS nome_completo,
+                      perfil, ativo, bloqueado, criado_em
                 FROM usuario
                 ORDER BY criado_em DESC NULLS LAST, id DESC
                 LIMIT 5
                 """;
 
-        List<Usuario> usuarios = new ArrayList<>();
+        List<UsuarioRecenteDTO> usuarios = new ArrayList<>();
 
         try (
                 Connection connection = getConnection();
@@ -124,12 +126,14 @@ public class DashboardRepository extends BaseDAO {
 
             while (rs.next()) {
 
-                Usuario usuario = new Usuario();
+                UsuarioRecenteDTO usuario = new UsuarioRecenteDTO();
 
                 usuario.setId(UUID.fromString(rs.getString("id")));
                 usuario.setNomeCompleto(rs.getString("nome_completo"));
                 String perfil = rs.getString("perfil");
-                if (perfil != null) usuario.setPerfil(Perfil.valueOf(perfil));
+                usuario.setPerfil(perfil);
+                usuario.setAtivo(rs.getBoolean("ativo"));
+                usuario.setBloqueado(rs.getBoolean("bloqueado"));
                 Timestamp criadoEm = rs.getTimestamp("criado_em");
                 usuario.setCriadoEm(criadoEm == null ? null : criadoEm.toLocalDateTime());
 

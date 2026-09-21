@@ -1,7 +1,6 @@
 package br.com.kutuar.administrativo.dto;
 
 import br.com.kutuar.seguranca.models.Escola;
-import br.com.kutuar.seguranca.models.Usuario;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class DashboardDTO {
     private Map<String, Long> usuariosPorPerfil = Map.of();
 
     private List<Escola> escolasRecentes = List.of();
-    private List<Usuario> usuariosRecentes = List.of();
+    private List<UsuarioRecenteDTO> usuariosRecentes = List.of();
 
     public long getTotalEscolas() {
         return totalEscolas;
@@ -69,11 +68,11 @@ public class DashboardDTO {
         this.escolasRecentes = escolasRecentes == null ? List.of() : escolasRecentes;
     }
 
-    public List<Usuario> getUsuariosRecentes() {
+    public List<UsuarioRecenteDTO> getUsuariosRecentes() {
         return usuariosRecentes;
     }
 
-    public void setUsuariosRecentes(List<Usuario> usuariosRecentes) {
+    public void setUsuariosRecentes(List<UsuarioRecenteDTO> usuariosRecentes) {
         this.usuariosRecentes = usuariosRecentes == null ? List.of() : usuariosRecentes;
     }
 

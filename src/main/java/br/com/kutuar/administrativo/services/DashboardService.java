@@ -71,62 +71,40 @@ public class DashboardService {
     }
 
     public List<AlertaSistemaDTO> buscarAlertasSistema() {
-        List<AlertaSistemaDTO> alertas = new ArrayList<>();
-
         DashboardRepository.ContagemEscolas escolas = dashboardRepository.countEscolas();
-        adicionarAlerta(alertas, "ESCOLAS_INATIVAS", escolas.inativas(),
-                "Existem " + escolas.inativas() + " escola(s) inativa(s) no sistema.",
-                "/dashboard/escolas?status=inativa");
-
         long usuariosPendentes = dashboardRepository.countUsuariosPendentes();
-        adicionarAlerta(alertas, "USUARIOS_PENDENTES", usuariosPendentes,
-                "Existem " + usuariosPendentes + " usuário(s) pendente(s) de aprovação.",
-                "/dashboard/usuarios?status=pendente");
-
-        long usuariosBloqueados = dashboardRepository.countUsuariosBloqueados();
-        adicionarAlerta(alertas, "USUARIOS_BLOQUEADOS", usuariosBloqueados,
-                "Existem " + usuariosBloqueados + " usuário(s) bloqueado(s).",
-                "/dashboard/usuarios?status=bloqueado");
-
-        long semAcessoRecente = dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE);
-        adicionarAlerta(alertas, "USUARIOS_SEM_ACESSO_RECENTE", semAcessoRecente,
-                "Existem " + semAcessoRecente + " usuário(s) ativo(s) sem acesso nos últimos " + DIAS_SEM_ACESSO_RECENTE + " dias.",
-                "/dashboard/usuarios?acesso=sem-acesso-recente");
-
-        long tentativasSuspeitas = dashboardRepository.countTentativasLoginSuspeitas();
-        adicionarAlerta(alertas, "TENTATIVAS_LOGIN_SUSPEITAS", tentativasSuspeitas,
-                "Existem " + tentativasSuspeitas + " usuário(s) com tentativas de login suspeitas.",
-                "/dashboard/usuarios?seguranca=tentativas-login");
-
-        return alertas;
+        return comporAlertas(escolas.inativas(), usuariosPendentes,
+                dashboardRepository.countUsuariosBloqueados(),
+                dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE),
+                dashboardRepository.countTentativasLoginSuspeitas());
     }
 
     private List<AlertaSistemaDTO> buscarAlertasSistema(DashboardDTO base) {
+        return comporAlertas(base.getEscolasInativas(), base.getUsuariosPendentes(),
+                dashboardRepository.countUsuariosBloqueados(),
+                dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE),
+                dashboardRepository.countTentativasLoginSuspeitas());
+    }
+
+    private List<AlertaSistemaDTO> comporAlertas(long escolasInativas, long usuariosPendentes,
+                                                  long usuariosBloqueados, long semAcessoRecente,
+                                                  long tentativasSuspeitas) {
         List<AlertaSistemaDTO> alertas = new ArrayList<>();
-
-        adicionarAlerta(alertas, "ESCOLAS_INATIVAS", base.getEscolasInativas(),
-                "Existem " + base.getEscolasInativas() + " escola(s) inativa(s) no sistema.",
+        adicionarAlerta(alertas, "ESCOLAS_INATIVAS", escolasInativas,
+                "Existem " + escolasInativas + " escola(s) inativa(s) no sistema.",
                 "/dashboard/escolas?status=inativa");
-
-        adicionarAlerta(alertas, "USUARIOS_PENDENTES", base.getUsuariosPendentes(),
-                "Existem " + base.getUsuariosPendentes() + " usuário(s) pendente(s) de aprovação.",
+        adicionarAlerta(alertas, "USUARIOS_PENDENTES", usuariosPendentes,
+                "Existem " + usuariosPendentes + " usuário(s) pendente(s) de aprovação.",
                 "/dashboard/usuarios?status=pendente");
-
-        long usuariosBloqueados = dashboardRepository.countUsuariosBloqueados();
         adicionarAlerta(alertas, "USUARIOS_BLOQUEADOS", usuariosBloqueados,
                 "Existem " + usuariosBloqueados + " usuário(s) bloqueado(s).",
                 "/dashboard/usuarios?status=bloqueado");
-
-        long semAcessoRecente = dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE);
         adicionarAlerta(alertas, "USUARIOS_SEM_ACESSO_RECENTE", semAcessoRecente,
-                "Existem " + semAcessoRecente + " usuário(s) ativo(s) sem acesso nos últimos " + DIAS_SEM_ACESSO_RECENTE + " dias.",
+                "Existem " + semAcessoRecente + " usuário(s) ativo(s) sem acesso registrado ou há mais de " + DIAS_SEM_ACESSO_RECENTE + " dias.",
                 "/dashboard/usuarios?acesso=sem-acesso-recente");
-
-        long tentativasSuspeitas = dashboardRepository.countTentativasLoginSuspeitas();
         adicionarAlerta(alertas, "TENTATIVAS_LOGIN_SUSPEITAS", tentativasSuspeitas,
-                "Existem " + tentativasSuspeitas + " usuário(s) com tentativas de login suspeitas.",
+                "Existem " + tentativasSuspeitas + " usuário(s) com 3 ou mais tentativas de login no estado atual.",
                 "/dashboard/usuarios?seguranca=tentativas-login");
-
         return alertas;
     }
 

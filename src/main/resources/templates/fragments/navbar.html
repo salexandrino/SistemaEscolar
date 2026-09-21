@@ -44,7 +44,7 @@
             <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span th:text="${#authentication.name} ?: 'Usuário'">Usuário</span> (<span th:text="${#authentication.principal.authorities[0].authority} ?: 'Função'">Função</span>)
+                        <span th:text="${#authentication.name != null ? #authentication.name : 'Usuário'}">Usuário</span> (<span th:text="${#authentication.principal.authorities[0].authority != null ? #authentication.principal.authorities[0].authority : 'Função'}">Função</span>)
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="#">Perfil</a>
@@ -91,8 +91,8 @@
                     <span th:text="${currentUser != null and currentUser.nomeCompleto != null ? #strings.substring(currentUser.nomeCompleto, 0, 1) : 'U'}">U</span>
                 </div>
                 <div class="d-none d-md-block" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                    <div class="fw-bold text-white m-0" style="font-size: 13px;" th:text="${currentUser?.getNomeCompleto() ?: 'Usuário'}">Usuário</div>
-                    <div class="text-white m-0" style="font-size: 11px; opacity: 0.8;" th:text="${currentUser?.getPerfil()?.name() ?: 'Perfil'}">Perfil</div>
+                    <div class="fw-bold text-white m-0" style="font-size: 13px;" th:text="${currentUser == null or currentUser.getNomeCompleto() == null ? 'Usuário' : currentUser.getNomeCompleto()}">Usuário</div>
+                    <div class="text-white m-0" style="font-size: 11px; opacity: 0.8;" th:text="${currentUser == null or currentUser.getPerfil() == null ? 'Perfil' : currentUser.getPerfil().name()}">Perfil</div>
                 </div>
                 <i class="bi bi-chevron-down text-white ms-1"></i>
 

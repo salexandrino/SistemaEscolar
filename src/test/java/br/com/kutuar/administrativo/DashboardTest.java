@@ -5,6 +5,7 @@ import br.com.kutuar.administrativo.dto.AtividadeRecenteDTO;
 import br.com.kutuar.administrativo.dto.DashboardDTO;
 import br.com.kutuar.administrativo.dto.SuperAdminDashboardResponseDTO;
 import br.com.kutuar.administrativo.dto.UltimoAcessoDTO;
+import br.com.kutuar.administrativo.dto.UsuarioRecenteDTO;
 import br.com.kutuar.administrativo.repositories.DashboardRepository;
 import br.com.kutuar.administrativo.services.DashboardService;
 import org.junit.jupiter.api.Test;
@@ -130,6 +131,36 @@ class DashboardTest {
         assertEquals(2, dto.getAlertas().size());
         assertEquals("ESCOLAS_INATIVAS", dto.getAlertas().get(0).getTipo());
         assertEquals("USUARIOS_PENDENTES", dto.getAlertas().get(1).getTipo());
+    }
+
+    @Test
+    void usuarioRecentePublicaSomenteDadosDoContrato() throws Exception {
+        UsuarioRecenteDTO usuario = new UsuarioRecenteDTO();
+        usuario.setId(UUID.randomUUID());
+        usuario.setNomeCompleto("Usuário <teste>");
+        usuario.setPerfil("GESTOR");
+        usuario.setAtivo(true);
+        usuario.setCriadoEm(LocalDateTime.of(2026, 9, 20, 12, 0));
+
+        String json = new com.fasterxml.jackson.databind.ObjectMapper()
+                .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
+                .writeValueAsString(usuario);
+
+        assertTrue(json.contains("\"status\":\"APROVADO\""));
+        assertFalse(json.contains("senha"));
+        assertFalse(json.contains("token"));
+        assertFalse(json.contains("cpf"));
+    }
+
+    @Test
+    void catalogoDeComponentesRenderizaComOGNLValido() {
+        var resolver = new org.thymeleaf.templateresolver.ClassLoaderTemplateResolver();
+        resolver.setPrefix("templates/");
+        resolver.setSuffix(".html");
+        resolver.setCharacterEncoding("UTF-8");
+        var engine = new org.thymeleaf.TemplateEngine();
+        engine.setTemplateResolver(resolver);
+        assertDoesNotThrow(() -> engine.process("dev/components", new org.thymeleaf.context.Context()));
     }
 
     private String severidade(List<AlertaSistemaDTO> alertas, String tipo) {
