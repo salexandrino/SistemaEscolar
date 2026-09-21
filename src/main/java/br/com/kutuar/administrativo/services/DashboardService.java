@@ -1,13 +1,22 @@
 package br.com.kutuar.administrativo.services;
 
 
+import br.com.kutuar.administrativo.dto.AlertaSistemaDTO;
+import br.com.kutuar.administrativo.dto.AtividadeRecenteDTO;
 import br.com.kutuar.administrativo.dto.DashboardDTO;
+import br.com.kutuar.administrativo.dto.SuperAdminDashboardResponseDTO;
+import br.com.kutuar.administrativo.dto.UltimoAcessoDTO;
 import br.com.kutuar.administrativo.repositories.DashboardRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class DashboardService {
+
+    private static final int LIMITE_ULTIMOS_ACESSOS = 10;
+    private static final int LIMITE_ATIVIDADES = 15;
+    private static final int DIAS_SEM_ACESSO_RECENTE = 30;
 
     private final DashboardRepository dashboardRepository;
 
@@ -41,5 +50,108 @@ public class DashboardService {
 
 
         return dto;
+    }
+
+    public SuperAdminDashboardResponseDTO buscarDashboardSuperAdmin() {
+        DashboardDTO base = buscarDashboard();
+        SuperAdminDashboardResponseDTO dto = new SuperAdminDashboardResponseDTO();
+        copiarBase(base, dto);
+        dto.setUltimosAcessos(buscarUltimosAcessos());
+        dto.setAlertas(buscarAlertasSistema(base));
+        dto.setAtividades(buscarAtividadesRecentes());
+        return dto;
+    }
+
+    public List<UltimoAcessoDTO> buscarUltimosAcessos() {
+        return dashboardRepository.findUltimosAcessos(LIMITE_ULTIMOS_ACESSOS);
+    }
+
+    public List<AtividadeRecenteDTO> buscarAtividadesRecentes() {
+        return dashboardRepository.findAtividadesRecentes(LIMITE_ATIVIDADES);
+    }
+
+    public List<AlertaSistemaDTO> buscarAlertasSistema() {
+        List<AlertaSistemaDTO> alertas = new ArrayList<>();
+
+        DashboardRepository.ContagemEscolas escolas = dashboardRepository.countEscolas();
+        adicionarAlerta(alertas, "ESCOLAS_INATIVAS", escolas.inativas(),
+                "Existem " + escolas.inativas() + " escola(s) inativa(s) no sistema.",
+                "/dashboard/escolas?status=inativa");
+
+        long usuariosPendentes = dashboardRepository.countUsuariosPendentes();
+        adicionarAlerta(alertas, "USUARIOS_PENDENTES", usuariosPendentes,
+                "Existem " + usuariosPendentes + " usuário(s) pendente(s) de aprovação.",
+                "/dashboard/usuarios?status=pendente");
+
+        long usuariosBloqueados = dashboardRepository.countUsuariosBloqueados();
+        adicionarAlerta(alertas, "USUARIOS_BLOQUEADOS", usuariosBloqueados,
+                "Existem " + usuariosBloqueados + " usuário(s) bloqueado(s).",
+                "/dashboard/usuarios?status=bloqueado");
+
+        long semAcessoRecente = dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE);
+        adicionarAlerta(alertas, "USUARIOS_SEM_ACESSO_RECENTE", semAcessoRecente,
+                "Existem " + semAcessoRecente + " usuário(s) ativo(s) sem acesso nos últimos " + DIAS_SEM_ACESSO_RECENTE + " dias.",
+                "/dashboard/usuarios?acesso=sem-acesso-recente");
+
+        long tentativasSuspeitas = dashboardRepository.countTentativasLoginSuspeitas();
+        adicionarAlerta(alertas, "TENTATIVAS_LOGIN_SUSPEITAS", tentativasSuspeitas,
+                "Existem " + tentativasSuspeitas + " usuário(s) com tentativas de login suspeitas.",
+                "/dashboard/usuarios?seguranca=tentativas-login");
+
+        return alertas;
+    }
+
+    private List<AlertaSistemaDTO> buscarAlertasSistema(DashboardDTO base) {
+        List<AlertaSistemaDTO> alertas = new ArrayList<>();
+
+        adicionarAlerta(alertas, "ESCOLAS_INATIVAS", base.getEscolasInativas(),
+                "Existem " + base.getEscolasInativas() + " escola(s) inativa(s) no sistema.",
+                "/dashboard/escolas?status=inativa");
+
+        adicionarAlerta(alertas, "USUARIOS_PENDENTES", base.getUsuariosPendentes(),
+                "Existem " + base.getUsuariosPendentes() + " usuário(s) pendente(s) de aprovação.",
+                "/dashboard/usuarios?status=pendente");
+
+        long usuariosBloqueados = dashboardRepository.countUsuariosBloqueados();
+        adicionarAlerta(alertas, "USUARIOS_BLOQUEADOS", usuariosBloqueados,
+                "Existem " + usuariosBloqueados + " usuário(s) bloqueado(s).",
+                "/dashboard/usuarios?status=bloqueado");
+
+        long semAcessoRecente = dashboardRepository.countUsuariosSemAcessoRecente(DIAS_SEM_ACESSO_RECENTE);
+        adicionarAlerta(alertas, "USUARIOS_SEM_ACESSO_RECENTE", semAcessoRecente,
+                "Existem " + semAcessoRecente + " usuário(s) ativo(s) sem acesso nos últimos " + DIAS_SEM_ACESSO_RECENTE + " dias.",
+                "/dashboard/usuarios?acesso=sem-acesso-recente");
+
+        long tentativasSuspeitas = dashboardRepository.countTentativasLoginSuspeitas();
+        adicionarAlerta(alertas, "TENTATIVAS_LOGIN_SUSPEITAS", tentativasSuspeitas,
+                "Existem " + tentativasSuspeitas + " usuário(s) com tentativas de login suspeitas.",
+                "/dashboard/usuarios?seguranca=tentativas-login");
+
+        return alertas;
+    }
+
+    private void adicionarAlerta(List<AlertaSistemaDTO> alertas, String tipo, long quantidade, String mensagem, String link) {
+        if (quantidade <= 0) return;
+        AlertaSistemaDTO alerta = new AlertaSistemaDTO();
+        alerta.setTipo(tipo);
+        alerta.setSeveridade(quantidade > 10 ? "CRITICO" : "ATENCAO");
+        alerta.setMensagem(mensagem);
+        alerta.setQuantidade(quantidade);
+        alerta.setLink(link);
+        alertas.add(alerta);
+    }
+
+    private void copiarBase(DashboardDTO origem, SuperAdminDashboardResponseDTO destino) {
+        destino.setTotalEscolas(origem.getTotalEscolas());
+        destino.setEscolasAtivas(origem.getEscolasAtivas());
+        destino.setEscolasInativas(origem.getEscolasInativas());
+        destino.setTotalUsuarios(origem.getTotalUsuarios());
+        destino.setUsuariosPendentes(origem.getUsuariosPendentes());
+        destino.setMeses(origem.getMeses());
+        destino.setCrescimentoEscolas(origem.getCrescimentoEscolas());
+        destino.setCrescimentoUsuarios(origem.getCrescimentoUsuarios());
+        destino.setUsuariosPorPerfil(origem.getUsuariosPorPerfil());
+        destino.setEscolasRecentes(origem.getEscolasRecentes());
+        destino.setUsuariosRecentes(origem.getUsuariosRecentes());
     }
 }
