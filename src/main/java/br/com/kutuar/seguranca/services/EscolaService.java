@@ -1,6 +1,8 @@
 package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
+import br.com.kutuar.seguranca.dtos.PaginaEscolasDTO;
+import br.com.kutuar.seguranca.enums.EscolaStatus;
 import br.com.kutuar.seguranca.dtos.CriarEscolaDTO;
 import br.com.kutuar.seguranca.dtos.CriarEscolaResponseDTO;
 import br.com.kutuar.seguranca.enums.Perfil;
@@ -388,6 +390,21 @@ public class EscolaService {
     /**
      * Lista todas as escolas.
      */
+    public PaginaEscolasDTO listarPaginadas(String search, EscolaStatus status, int page, int size,
+                                            AuthUser authUser) {
+        verificarPermissaoMaster(authUser);
+        size = Math.max(1, Math.min(size, 100));
+        // Limita a página ao maior offset representável pelo contrato JDBC do repository.
+        page = (int) Math.min(Math.max(1L, page), Integer.MAX_VALUE / (long) size + 1);
+        int offset = (int) ((page - 1L) * size);
+        String filtro = search == null || search.isBlank() ? null : search.trim();
+        long total = escolaRepository.countFiltered(filtro, status);
+        long totalPages = total / size + (total % size == 0 ? 0 : 1);
+        List<Escola> itens = escolaRepository.findAllPaginated(filtro, status, size, offset);
+        return new PaginaEscolasDTO(itens, page, size, total, totalPages,
+                page > 1, page < totalPages);
+    }
+
     public List<Escola> listarTodas(AuthUser authUser) {
         verificarPermissaoMaster(authUser);
 

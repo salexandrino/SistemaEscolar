@@ -51,6 +51,26 @@
         </div>
     </div>
 
+    <form method="get" action="/dashboard/escolas" class="row g-3 align-items-end mb-4">
+        <div class="col-md-5">
+            <label for="search" class="form-label">Nome ou CNPJ</label>
+            <input id="search" name="search" type="search" class="form-control" th:value="${search}">
+        </div>
+        <div class="col-md-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">Todos</option>
+                <option value="ATIVA" th:selected="${filtroStatus == 'ATIVA'}">Ativas</option>
+                <option value="INATIVA" th:selected="${filtroStatus == 'INATIVA'}">Inativas</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="size" class="form-label">Por página</label>
+            <input id="size" name="size" type="number" min="1" max="100" class="form-control" th:value="${size}">
+        </div>
+        <div class="col-md-2"><button class="btn btn-success" type="submit">Filtrar</button></div>
+    </form>
+
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
             <h5 class="mb-0">Instituições Cadastradas</h5>
@@ -137,6 +157,16 @@
             </div>
         </div>
     </div>
+
+    <nav aria-label="Paginação de escolas" class="d-flex align-items-center justify-content-between my-3 gap-3">
+        <span th:text="${total + ' resultado(s) — Página ' + page + ' de ' + (totalPages == 0 ? 1 : totalPages)}"></span>
+        <div class="d-flex gap-2">
+            <a th:if="${hasPrevious}" class="btn btn-outline-secondary"
+               th:href="@{escolas(search=${search},status=${filtroStatus},page=${page - 1},size=${size})}">Anterior</a>
+            <a th:if="${hasNext}" class="btn btn-outline-secondary"
+               th:href="@{escolas(search=${search},status=${filtroStatus},page=${page + 1},size=${size})}">Próxima</a>
+        </div>
+    </nav>
 
     <!-- Modal de confirmação de exclusão definitiva -->
     <div class="modal fade" id="modalExcluirEscola" tabindex="-1" aria-hidden="true">

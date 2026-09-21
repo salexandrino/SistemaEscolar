@@ -3,6 +3,7 @@ package br.com.kutuar.seguranca.repositories;
 import br.com.kutuar.seguranca.repositories.base.BaseDAO;
 import br.com.kutuar.seguranca.repositories.base.DAO;
 import br.com.kutuar.seguranca.models.Escola;
+import br.com.kutuar.seguranca.enums.EscolaStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,65 @@ import java.util.UUID;
 public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     private static final Logger logger = LoggerFactory.getLogger(EscolaRepository.class);
+
+    // A mesma definição e vinculação de filtros é usada pela página e pela contagem.
+    private record Filtro(String sql, List<String> valores) {
+        int bind(PreparedStatement stmt) throws SQLException {
+            int index = 1;
+            for (String valor : valores) stmt.setString(index++, valor);
+            return index;
+        }
+    }
+
+    private Filtro filtro(String search, EscolaStatus status) {
+        StringBuilder sql = new StringBuilder(" WHERE 1 = 1");
+        List<String> valores = new ArrayList<>();
+        if (search != null && !search.isBlank()) {
+            sql.append(" AND (nome ILIKE ? ESCAPE '!' OR cnpj ILIKE ? ESCAPE '!')");
+            String pattern = "%" + search.trim().replace("!", "!!")
+                    .replace("%", "!%").replace("_", "!_") + "%";
+            valores.add(pattern);
+            valores.add(pattern);
+        }
+        if (status != null) {
+            sql.append(" AND status = ?");
+            valores.add(status.name());
+        }
+        return new Filtro(sql.toString(), valores);
+    }
+
+    public List<Escola> findAllPaginated(String search, EscolaStatus status, int limit, int offset) {
+        Filtro filtro = filtro(search, status);
+        String sql = "SELECT * FROM escola" + filtro.sql() + " ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?";
+        List<Escola> escolas = new ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            int index = filtro.bind(stmt);
+            stmt.setInt(index++, limit);
+            stmt.setInt(index, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) escolas.add(mapResultSetToEscola(rs));
+            }
+            return escolas;
+        } catch (SQLException e) {
+            logger.error("Erro ao listar escolas paginadas", e);
+            throw new RuntimeException("Erro ao listar escolas no banco de dados.", e);
+        }
+    }
+
+    public long countFiltered(String search, EscolaStatus status) {
+        Filtro filtro = filtro(search, status);
+        String sql = "SELECT COUNT(*) FROM escola" + filtro.sql();
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            filtro.bind(stmt);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao contar escolas filtradas", e);
+            throw new RuntimeException("Erro ao contar escolas no banco de dados.", e);
+        }
+    }
 
     @Override
     public List<Escola> findAll() {
