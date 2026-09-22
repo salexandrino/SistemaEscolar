@@ -68,4 +68,32 @@ class EscolaPaginacaoServiceTest {
         assertNull(EscolaStatus.fromFilter("desconhecido"));
         assertNull(EscolaStatus.fromFilter(null));
     }
+
+    @Test void buscaStatusEPaginacaoEncaminhamOsParametrosCorretos() {
+        Escola primeira = new Escola();
+        Escola segunda = new Escola();
+        when(repository.countFiltered("Escola", EscolaStatus.INATIVA)).thenReturn(3L);
+        when(repository.findAllPaginated("Escola", EscolaStatus.INATIVA, 1, 0)).thenReturn(List.of(primeira));
+        when(repository.findAllPaginated("Escola", EscolaStatus.INATIVA, 1, 1)).thenReturn(List.of(segunda));
+
+        var primeiraPagina = service.listarPaginadas(" Escola ", EscolaStatus.INATIVA, 1, 1, admin);
+        var segundaPagina = service.listarPaginadas(" Escola ", EscolaStatus.INATIVA, 2, 1, admin);
+
+        assertEquals(1, primeiraPagina.items().size());
+        assertEquals(2, segundaPagina.page());
+        assertTrue(segundaPagina.hasPrevious());
+        assertTrue(segundaPagina.hasNext());
+        verify(repository).findAllPaginated("Escola", EscolaStatus.INATIVA, 1, 0);
+        verify(repository).findAllPaginated("Escola", EscolaStatus.INATIVA, 1, 1);
+    }
+
+    @Test void contadoresPodemSerObtidosDasListasDeCadaStatus() {
+        when(repository.findAll()).thenReturn(List.of(new Escola(), new Escola(), new Escola()));
+        when(repository.findAllAtivas()).thenReturn(List.of(new Escola(), new Escola()));
+        when(repository.findAllInativas()).thenReturn(List.of(new Escola()));
+
+        assertEquals(3, service.listarTodas(admin).size());
+        assertEquals(2, service.listarAtivas(admin).size());
+        assertEquals(1, service.listarInativas(admin).size());
+    }
 }

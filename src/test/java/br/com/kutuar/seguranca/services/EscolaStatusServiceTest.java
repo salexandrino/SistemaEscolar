@@ -26,6 +26,8 @@ class EscolaStatusServiceTest {
 
     @Test void ativaEscolaInativaEAtualizaDataSemUpdateCompleto() {
         Escola escola = escola("INATIVA");
+        LocalDateTime dataAnterior = LocalDateTime.now().minusDays(1);
+        escola.setAtualizadoEm(dataAnterior);
         when(repository.findById(escola.getId())).thenReturn(Optional.of(escola));
         when(repository.updateStatus(eq(escola.getId()), eq(br.com.kutuar.seguranca.enums.EscolaStatus.INATIVA),
                 eq(br.com.kutuar.seguranca.enums.EscolaStatus.ATIVA), any(LocalDateTime.class))).thenReturn(true);
@@ -33,7 +35,7 @@ class EscolaStatusServiceTest {
         Escola resultado = service.ativarEscola(escola.getId(), admin);
 
         assertEquals("ATIVA", resultado.getStatus());
-        assertNotNull(resultado.getAtualizadoEm());
+        assertTrue(resultado.getAtualizadoEm().isAfter(dataAnterior));
         verify(repository).updateStatus(eq(escola.getId()), eq(br.com.kutuar.seguranca.enums.EscolaStatus.INATIVA),
                 eq(br.com.kutuar.seguranca.enums.EscolaStatus.ATIVA), any(LocalDateTime.class));
         verify(repository, never()).update(any());
@@ -53,9 +55,12 @@ class EscolaStatusServiceTest {
 
     @Test void inativaEscolaAtivaERejeitaEscolaInativa() {
         Escola ativa = escola("ATIVA");
+        ativa.setAtualizadoEm(LocalDateTime.now().minusDays(1));
         when(repository.findById(ativa.getId())).thenReturn(Optional.of(ativa));
         when(repository.updateStatus(eq(ativa.getId()), any(), any(), any())).thenReturn(true);
-        assertEquals("INATIVA", service.inativarEscola(ativa.getId(), admin).getStatus());
+        Escola resultado = service.inativarEscola(ativa.getId(), admin);
+        assertEquals("INATIVA", resultado.getStatus());
+        assertTrue(resultado.getAtualizadoEm().isAfter(LocalDateTime.now().minusDays(1)));
 
         Escola inativa = escola("INATIVA");
         when(repository.findById(inativa.getId())).thenReturn(Optional.of(inativa));

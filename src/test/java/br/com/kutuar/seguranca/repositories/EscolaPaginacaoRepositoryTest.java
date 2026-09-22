@@ -11,6 +11,27 @@ import static org.mockito.Mockito.*;
 
 class EscolaPaginacaoRepositoryTest {
     @Test
+    void paginaSemResultadosRetornaListaVaziaComOrdenacaoDeterministica() throws Exception {
+        Connection conn = mock(Connection.class);
+        PreparedStatement stmt = mock(PreparedStatement.class);
+        ResultSet rs = mock(ResultSet.class);
+        when(conn.prepareStatement(anyString())).thenReturn(stmt);
+        when(stmt.executeQuery()).thenReturn(rs);
+        when(rs.next()).thenReturn(false);
+        EscolaRepository repository = new EscolaRepository() {
+            @Override protected Connection getConnection() { return conn; }
+        };
+
+        assertEquals(List.of(), repository.findAllPaginated("inexistente", EscolaStatus.ATIVA, 20, 40));
+        verify(conn).prepareStatement("SELECT * FROM escola WHERE 1 = 1 AND (nome ILIKE ? ESCAPE '!' OR cnpj ILIKE ? ESCAPE '!') AND status = ? ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?");
+        verify(stmt).setString(1, "%inexistente%");
+        verify(stmt).setString(2, "%inexistente%");
+        verify(stmt).setString(3, "ATIVA");
+        verify(stmt).setInt(4, 20);
+        verify(stmt).setInt(5, 40);
+    }
+
+    @Test
     void todasAsCombinacoesUsamOsMesmosFiltrosNaPaginaEContagem() throws Exception {
         for (String search : new String[]{null, "   ", "  Kutuar  ", "12.345", "x%' OR 1=1 --"}) {
             for (EscolaStatus status : new EscolaStatus[]{null, EscolaStatus.ATIVA, EscolaStatus.INATIVA}) {

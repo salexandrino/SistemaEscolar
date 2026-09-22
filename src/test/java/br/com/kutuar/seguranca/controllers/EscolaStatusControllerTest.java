@@ -3,6 +3,7 @@ package br.com.kutuar.seguranca.controllers;
 import br.com.kutuar.seguranca.exceptions.BusinessException;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
@@ -40,6 +41,23 @@ class EscolaStatusControllerTest {
 
         verify(ctx).status(HttpStatus.BAD_REQUEST);
         verify(ctx).json(Map.of("error", "A escola já está ativa."));
+    }
+
+    @Test void superAdminRecebeSucessoAoAtivarEInativar() {
+        UUID ativarId = UUID.randomUUID();
+        UUID inativarId = UUID.randomUUID();
+        Escola ativa = new Escola(); ativa.setId(ativarId); ativa.setStatus("ATIVA");
+        Escola inativa = new Escola(); inativa.setId(inativarId); inativa.setStatus("INATIVA");
+        when(ctx.pathParam("id")).thenReturn(ativarId.toString(), inativarId.toString());
+        when(service.ativarEscola(eq(ativarId), any())).thenReturn(ativa);
+        when(service.inativarEscola(eq(inativarId), any())).thenReturn(inativa);
+
+        controller.ativarEscola(ctx);
+        controller.inativarEscola(ctx);
+
+        verify(ctx, times(2)).status(HttpStatus.OK);
+        verify(service).ativarEscola(eq(ativarId), any());
+        verify(service).inativarEscola(eq(inativarId), any());
     }
 
     @Test void retorna404ComCampoErrorQuandoEscolaNaoExiste() {
