@@ -569,9 +569,11 @@ public class KutuarApp {
         app.get("/escolas/{id}", escolaController::obterEscola);
         app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
 
+        app.before("/escolas/{id}/ativar", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
         app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
         app.post("/escolas/{id}/ativar", escolaController::ativarEscola);
 
+        app.before("/escolas/{id}/inativar", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
         app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
         app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
         app.delete("/escolas/{id}/excluir", escolaController::excluirEscola);

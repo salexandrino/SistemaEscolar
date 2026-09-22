@@ -511,7 +511,7 @@ public class EscolaController {
             logger.warn("Falha na ativação de escola: {}", e.getMessage());
         } catch (NotFoundException | BusinessException e) {
             ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
+            ctx.json(Map.of("error", e.getMessage()));
             logger.warn("Erro na ativação de escola: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             ctx.status(HttpStatus.BAD_REQUEST);
@@ -556,7 +556,7 @@ public class EscolaController {
             logger.warn("Falha na inativação de escola: {}", e.getMessage());
         } catch (NotFoundException | BusinessException e) {
             ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
+            ctx.json(Map.of("error", e.getMessage()));
             logger.warn("Erro na inativação de escola: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             ctx.status(HttpStatus.BAD_REQUEST);

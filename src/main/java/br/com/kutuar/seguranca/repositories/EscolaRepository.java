@@ -331,6 +331,29 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     }
 
     /**
+     * Atualiza somente o status de uma escola quando ela ainda estiver no
+     * estado esperado. O predicado evita sobrescrever uma transição concorrente
+     * e impede que uma solicitação idempotente atualize atualizado_em.
+     */
+    public boolean updateStatus(UUID id, EscolaStatus statusAtual, EscolaStatus novoStatus,
+                                LocalDateTime atualizadoEm) {
+        String sql = "UPDATE escola SET status = ?, atualizado_em = ? " +
+                "WHERE id = ? AND status = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, novoStatus.name());
+            stmt.setObject(2, atualizadoEm);
+            stmt.setObject(3, id);
+            stmt.setString(4, statusAtual.name());
+            return stmt.executeUpdate() == 1;
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar status da escola {}: {}", id, e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar status da escola.", e);
+        }
+    }
+
+    /**
      * Verifica se a escola tem dados acadêmicos/financeiros reais (aluno,
      * turma, mensalidade) antes de permitir exclusão definitiva. Consulta
      * direta via SQL para não criar dependência de seguranca -> academico/financeiro.

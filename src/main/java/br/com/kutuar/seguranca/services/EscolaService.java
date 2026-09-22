@@ -21,6 +21,7 @@ import br.com.kutuar.seguranca.services.observers.EscolaCadastradaObserver;
 import br.com.kutuar.seguranca.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.javalin.http.HttpStatus;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -447,40 +448,45 @@ public class EscolaService {
      * Ativa uma escola.
      */
     public Escola ativarEscola(UUID id, AuthUser authUser) {
-        verificarPermissaoMaster(authUser);
-
-        Escola escola = escolaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
-
-        if ("ATIVA".equals(escola.getStatus())) {
-            throw new BusinessException("Essa escola já está ativa.");
-        }
-
-        escola.setStatus("ATIVA");
-        escolaRepository.update(escola);
-
-        logger.info("Escola ativada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
-
-        return escola;
+        return alterarStatus(id, EscolaStatus.INATIVA, EscolaStatus.ATIVA, authUser,
+                "A escola já está ativa.");
     }
 
     /**
      * Inativa uma escola.
      */
     public Escola inativarEscola(UUID id, AuthUser authUser) {
+        return alterarStatus(id, EscolaStatus.ATIVA, EscolaStatus.INATIVA, authUser,
+                "A escola já está inativa.");
+    }
+
+    private Escola alterarStatus(UUID id, EscolaStatus statusAtual, EscolaStatus novoStatus,
+                                 AuthUser authUser, String mensagemEstadoJaDesejado) {
         verificarPermissaoMaster(authUser);
 
         Escola escola = escolaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
 
-        if ("INATIVA".equals(escola.getStatus())) {
-            throw new BusinessException("Essa escola já está inativa.");
+        if (novoStatus.name().equalsIgnoreCase(escola.getStatus())) {
+            logger.warn("Tentativa de alterar escola {} para o status já vigente {}", id, novoStatus);
+            throw new BusinessException(mensagemEstadoJaDesejado, HttpStatus.BAD_REQUEST);
         }
 
-        escola.setStatus("INATIVA");
-        escolaRepository.update(escola);
+        LocalDateTime atualizadoEm = LocalDateTime.now();
+        if (!escolaRepository.updateStatus(id, statusAtual, novoStatus, atualizadoEm)) {
+            // A linha pode ter sido removida ou alterada entre a leitura e o UPDATE.
+            Escola estadoAtual = escolaRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
+            if (novoStatus.name().equalsIgnoreCase(estadoAtual.getStatus())) {
+                logger.warn("Tentativa concorrente de alterar escola {} para o status já vigente {}", id, novoStatus);
+                throw new BusinessException(mensagemEstadoJaDesejado, HttpStatus.BAD_REQUEST);
+            }
+            throw new BusinessException("Não foi possível alterar o status da escola. Tente novamente.", HttpStatus.BAD_REQUEST);
+        }
 
-        logger.info("Escola inativada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
+        escola.setStatus(novoStatus.name());
+        escola.setAtualizadoEm(atualizadoEm);
+        logger.info("Status da escola alterado com sucesso: escolaId={}, status={}", escola.getId(), novoStatus);
 
         return escola;
     }

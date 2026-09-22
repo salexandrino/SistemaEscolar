@@ -1,0 +1,55 @@
+package br.com.kutuar.seguranca.controllers;
+
+import br.com.kutuar.seguranca.exceptions.BusinessException;
+import br.com.kutuar.seguranca.exceptions.NotFoundException;
+import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.EscolaService;
+import br.com.kutuar.seguranca.utils.AuthUserContext;
+import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class EscolaStatusControllerTest {
+    private final EscolaService service = mock(EscolaService.class);
+    private final EscolaController controller = new EscolaController(service);
+    private final Context ctx = mock(Context.class);
+
+    @BeforeEach void setup() {
+        AuthUserContext.setAuthUser(mock(AuthUser.class));
+        when(ctx.status(any(HttpStatus.class))).thenReturn(ctx);
+    }
+
+    @AfterEach void cleanup() { AuthUserContext.clear(); }
+
+    @Test void retorna400ComCampoErrorParaTransicaoInvalida() {
+        UUID id = UUID.randomUUID();
+        when(ctx.pathParam("id")).thenReturn(id.toString());
+        doThrow(new BusinessException("A escola já está ativa.", HttpStatus.BAD_REQUEST))
+                .when(service).ativarEscola(eq(id), any());
+
+        controller.ativarEscola(ctx);
+
+        verify(ctx).status(HttpStatus.BAD_REQUEST);
+        verify(ctx).json(Map.of("error", "A escola já está ativa."));
+    }
+
+    @Test void retorna404ComCampoErrorQuandoEscolaNaoExiste() {
+        UUID id = UUID.randomUUID();
+        when(ctx.pathParam("id")).thenReturn(id.toString());
+        doThrow(new NotFoundException("Escola não encontrada.")).when(service).inativarEscola(eq(id), any());
+
+        controller.inativarEscola(ctx);
+
+        verify(ctx).status(HttpStatus.NOT_FOUND);
+        verify(ctx).json(Map.of("error", "Escola não encontrada."));
+    }
+}
