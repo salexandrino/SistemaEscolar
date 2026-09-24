@@ -117,7 +117,7 @@ class EscolaPaginacaoControllerTest {
         verify(ctx).status(io.javalin.http.HttpStatus.BAD_REQUEST);
         ArgumentCaptor<Object> response = ArgumentCaptor.forClass(Object.class);
         verify(ctx).json(response.capture());
-        assertEquals(Map.of("error", message), response.getValue());
+        assertEquals(Map.of("message", message), response.getValue());
     }
 
     @Test void telaPreservaFiltrosETrataParametrosInvalidos() {

@@ -10,6 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class EscolaPaginacaoRepositoryTest {
+    private static final String ESCOLA_COLUMNS = "id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
+            "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+            "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada";
+
     @Test
     void paginaSemResultadosRetornaListaVaziaComOrdenacaoDeterministica() throws Exception {
         Connection conn = mock(Connection.class);
@@ -23,7 +27,7 @@ class EscolaPaginacaoRepositoryTest {
         };
 
         assertEquals(List.of(), repository.findAllPaginated("inexistente", EscolaStatus.ATIVA, 20, 40));
-        verify(conn).prepareStatement("SELECT * FROM escola WHERE 1 = 1 AND (nome ILIKE ? ESCAPE '!' OR cnpj ILIKE ? ESCAPE '!') AND status = ? ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?");
+        verify(conn).prepareStatement("SELECT " + ESCOLA_COLUMNS + " FROM escola WHERE 1 = 1 AND (nome ILIKE ? ESCAPE '!' OR cnpj ILIKE ? ESCAPE '!') AND status = ? ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?");
         verify(stmt).setString(1, "%inexistente%");
         verify(stmt).setString(2, "%inexistente%");
         verify(stmt).setString(3, "ATIVA");
@@ -70,7 +74,7 @@ class EscolaPaginacaoRepositoryTest {
                     where += " AND status = ?";
                     verify(stmt, times(2)).setString(index++, status.name());
                 }
-                assertEquals("SELECT * FROM escola" + where + " ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?", sql.get(0));
+                assertEquals("SELECT " + ESCOLA_COLUMNS + " FROM escola" + where + " ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?", sql.get(0));
                 assertEquals("SELECT COUNT(*) FROM escola" + where, sql.get(1));
                 verify(stmt).setInt(index++, 20);
                 verify(stmt).setInt(index, 40);

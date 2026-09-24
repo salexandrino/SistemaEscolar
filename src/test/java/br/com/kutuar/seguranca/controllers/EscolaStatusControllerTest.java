@@ -31,7 +31,7 @@ class EscolaStatusControllerTest {
 
     @AfterEach void cleanup() { AuthUserContext.clear(); }
 
-    @Test void retorna400ComCampoErrorParaTransicaoInvalida() {
+    @Test void retorna400ComCampoMessageParaTransicaoInvalida() {
         UUID id = UUID.randomUUID();
         when(ctx.pathParam("id")).thenReturn(id.toString());
         doThrow(new BusinessException("A escola já está ativa.", HttpStatus.BAD_REQUEST))
@@ -40,7 +40,7 @@ class EscolaStatusControllerTest {
         controller.ativarEscola(ctx);
 
         verify(ctx).status(HttpStatus.BAD_REQUEST);
-        verify(ctx).json(Map.of("error", "A escola já está ativa."));
+        verify(ctx).json(Map.of("message", "A escola já está ativa."));
     }
 
     @Test void superAdminRecebeSucessoAoAtivarEInativar() {
@@ -60,7 +60,7 @@ class EscolaStatusControllerTest {
         verify(service).inativarEscola(eq(inativarId), any());
     }
 
-    @Test void retorna404ComCampoErrorQuandoEscolaNaoExiste() {
+    @Test void retorna404ComCampoMessageQuandoEscolaNaoExiste() {
         UUID id = UUID.randomUUID();
         when(ctx.pathParam("id")).thenReturn(id.toString());
         doThrow(new NotFoundException("Escola não encontrada.")).when(service).inativarEscola(eq(id), any());
@@ -68,6 +68,6 @@ class EscolaStatusControllerTest {
         controller.inativarEscola(ctx);
 
         verify(ctx).status(HttpStatus.NOT_FOUND);
-        verify(ctx).json(Map.of("error", "Escola não encontrada."));
+        verify(ctx).json(Map.of("message", "Escola não encontrada."));
     }
 }

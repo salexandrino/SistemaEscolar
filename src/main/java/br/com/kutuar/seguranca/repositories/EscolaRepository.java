@@ -49,7 +49,10 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     public List<Escola> findAllPaginated(String search, EscolaStatus status, int limit, int offset) {
         Filtro filtro = filtro(search, status);
-        String sql = "SELECT * FROM escola" + filtro.sql() + " ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, numero, " +
+                "complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
+                "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada FROM escola" +
+                filtro.sql() + " ORDER BY nome ASC, id ASC LIMIT ? OFFSET ?";
         List<Escola> escolas = new ArrayList<>();
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             int index = filtro.bind(stmt);
