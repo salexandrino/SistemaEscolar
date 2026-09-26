@@ -34,7 +34,8 @@
     function initFromUrl() {
         const params = new URLSearchParams(window.location.search);
         state.search = params.get('search') || '';
-        state.status = ['ATIVA', 'INATIVA'].includes(params.get('status')) ? params.get('status') : '';
+        const statusParam = (params.get('status') || '').toUpperCase();
+        state.status = ['ATIVA', 'INATIVA'].includes(statusParam) ? statusParam : '';
         state.page = Math.max(parseInt(params.get('page') || '1', 10), 1);
         state.size = Math.min(Math.max(parseInt(params.get('size') || '20', 10), 1), 100);
     }
