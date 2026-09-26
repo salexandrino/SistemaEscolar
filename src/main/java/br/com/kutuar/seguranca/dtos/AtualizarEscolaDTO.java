@@ -124,8 +124,8 @@ public class AtualizarEscolaDTO {
     private String infraEnergia;
     private String infraEsgoto;
     private String infraLixo;
-    private int qtdComputadores;
-    private boolean temInternet;
+    private Integer qtdComputadores;
+    private Boolean temInternet;
     private String tipoBandaLarga;
     private String linguaMinistrada;
 
@@ -191,10 +191,10 @@ public class AtualizarEscolaDTO {
     public void setInfraEsgoto(String infraEsgoto) { this.infraEsgoto = infraEsgoto; }
     public String getInfraLixo() { return infraLixo; }
     public void setInfraLixo(String infraLixo) { this.infraLixo = infraLixo; }
-    public int getQtdComputadores() { return qtdComputadores; }
-    public void setQtdComputadores(int qtdComputadores) { this.qtdComputadores = qtdComputadores; }
-    public boolean isTemInternet() { return temInternet; }
-    public void setTemInternet(boolean temInternet) { this.temInternet = temInternet; }
+    public Integer getQtdComputadores() { return qtdComputadores; }
+    public void setQtdComputadores(Integer qtdComputadores) { this.qtdComputadores = qtdComputadores; }
+    public Boolean getTemInternet() { return temInternet; }
+    public void setTemInternet(Boolean temInternet) { this.temInternet = temInternet; }
     public String getTipoBandaLarga() { return tipoBandaLarga; }
     public void setTipoBandaLarga(String tipoBandaLarga) { this.tipoBandaLarga = tipoBandaLarga; }
     public String getLinguaMinistrada() { return linguaMinistrada; }

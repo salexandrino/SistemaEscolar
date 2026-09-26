@@ -87,8 +87,8 @@ public class EscolaService {
      * Valida os dados obrigatórios da atualização de escola.
      */
     private void validarDadosObrigatoriosAtualizacao(AtualizarEscolaDTO dto) {
-        if (dto.getNome() != null && dto.getNome().isBlank()) {
-            throw new ValidationException("Nome da escola não pode estar vazio.");
+        if (dto.getNome() != null) {
+            ValidationUtil.validateTamanho(dto.getNome(), 3, 150, "Nome da escola");
         }
 
         if (dto.getCnpj() != null && dto.getCnpj().isBlank()) {
@@ -98,28 +98,31 @@ public class EscolaService {
             ValidationUtil.validarCnpjComStrategy(CnpjUtil.normalizar(dto.getCnpj()));
         }
 
-        if (dto.getEmailInstitucional() != null && dto.getEmailInstitucional().isBlank()) {
-            throw new ValidationException("E-mail institucional não pode estar vazio.");
+        if (dto.getEmailInstitucional() != null) {
+            ValidationUtil.validateEmail(dto.getEmailInstitucional());
         }
 
         if (dto.getTelefone() != null && dto.getTelefone().isBlank()) {
             throw new ValidationException("Telefone não pode estar vazio.");
         }
 
-        if (dto.getCidade() != null && dto.getCidade().isBlank()) {
-            throw new ValidationException("Cidade não pode estar vazia.");
+        if (dto.getEndereco() != null) {
+            ValidationUtil.validateTamanho(dto.getEndereco(), 5, 200, "Endereço");
         }
-
-        if (dto.getEstado() != null && dto.getEstado().isBlank()) {
-            throw new ValidationException("Estado não pode estar vazio.");
+        if (dto.getBairro() != null) {
+            ValidationUtil.validateTamanho(dto.getBairro(), 2, 100, "Bairro");
         }
-
-        if (dto.getCep() != null && dto.getCep().isBlank()) {
-            throw new ValidationException("CEP não pode estar vazio.");
+        if (dto.getCidade() != null) {
+            ValidationUtil.validateTamanho(dto.getCidade(), 2, 100, "Cidade");
         }
-
-        if (dto.getNomeResponsavel() != null && dto.getNomeResponsavel().isBlank()) {
-            throw new ValidationException("Nome do responsável não pode estar vazio.");
+        if (dto.getEstado() != null) {
+            ValidationUtil.validateUf(dto.getEstado());
+        }
+        if (dto.getCep() != null) {
+            ValidationUtil.validateCep(dto.getCep());
+        }
+        if (dto.getNomeResponsavel() != null) {
+            ValidationUtil.validateTamanho(dto.getNomeResponsavel(), 5, 150, "Nome do responsável");
         }
 
         if (dto.getStatus() != null && !dto.getStatus().isBlank() &&
@@ -403,8 +406,8 @@ public class EscolaService {
         if (dto.getInfraEnergia() != null) escola.setInfraEnergia(dto.getInfraEnergia());
         if (dto.getInfraEsgoto() != null) escola.setInfraEsgoto(dto.getInfraEsgoto());
         if (dto.getInfraLixo() != null) escola.setInfraLixo(dto.getInfraLixo());
-        if (dto.getQtdComputadores() >= 0) escola.setQtdComputadores(dto.getQtdComputadores());
-        escola.setTemInternet(dto.isTemInternet());
+        if (dto.getQtdComputadores() != null) escola.setQtdComputadores(dto.getQtdComputadores());
+        if (dto.getTemInternet() != null) escola.setTemInternet(dto.getTemInternet());
         if (dto.getTipoBandaLarga() != null) escola.setTipoBandaLarga(dto.getTipoBandaLarga());
         if (dto.getLinguaMinistrada() != null) escola.setLinguaMinistrada(dto.getLinguaMinistrada());
 

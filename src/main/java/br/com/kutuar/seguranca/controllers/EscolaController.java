@@ -232,7 +232,9 @@ public class EscolaController {
                 dto.setInfraEsgoto(obterCampoForm(ctx, "infraEsgoto"));
                 dto.setInfraLixo(obterCampoForm(ctx, "infraLixo"));
                 if (obterCampoForm(ctx, "qtdComputadores") != null) dto.setQtdComputadores(Integer.parseInt(obterCampoForm(ctx, "qtdComputadores")));
-                dto.setTemInternet("on".equals(ctx.formParam("temInternet")) || "true".equals(ctx.formParam("temInternet")));
+                if (ctx.formParam("temInternet") != null) {
+                    dto.setTemInternet("on".equals(ctx.formParam("temInternet")) || "true".equals(ctx.formParam("temInternet")));
+                }
                 dto.setTipoBandaLarga(obterCampoForm(ctx, "tipoBandaLarga"));
                 dto.setLinguaMinistrada(obterCampoForm(ctx, "linguaMinistrada"));
 
