@@ -135,7 +135,7 @@ class EscolaPaginacaoControllerTest {
         assertEquals(1, model.getValue().get("size"));
     }
 
-    @Test void templateRenderizaLinksComFiltrosCodificados() {
+    @Test void templateRenderizaEstruturaDaTelaSpaDeEscolas() {
         var resolver = new org.thymeleaf.templateresolver.ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/");
         resolver.setSuffix(".html");
@@ -148,10 +148,15 @@ class EscolaPaginacaoControllerTest {
                 "hasPrevious", true, "hasNext", true));
         context.setVariable("content", "dashboard/escolas/lista");
         String html = engine.process("dashboard/escolas/lista", context);
-        assertTrue(html.contains("escolas?search=A%26B&amp;status=ATIVA&amp;page=1&amp;size=10"));
-        assertTrue(html.contains("escolas?search=A%26B&amp;status=ATIVA&amp;page=3&amp;size=10"));
-        assertTrue(html.contains("Recife"));
-        assertTrue(html.contains("Escola X"));
-        assertTrue(html.contains("value=\"ATIVA\" selected=\"selected\""));
+        assertTrue(html.contains("data-page=\"gestao-escolas\""));
+        assertTrue(html.contains("id=\"schoolSearch\""));
+        assertTrue(html.contains("id=\"schoolStatus\""));
+        assertTrue(html.contains("data-schools-table-body"));
+        assertTrue(html.contains("id=\"school-row-template\""));
+        assertTrue(html.contains("data-page-action=\"previous\""));
+        assertTrue(html.contains("data-page-action=\"next\""));
+        assertFalse(html.contains("escolas?search=A%26B&amp;status=ATIVA&amp;page=1&amp;size=10"));
+        assertFalse(html.contains("Recife"));
+        assertFalse(html.contains("Escola X"));
     }
 }

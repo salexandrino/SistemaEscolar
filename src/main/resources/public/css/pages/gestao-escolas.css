@@ -1,0 +1,149 @@
+.gestao-escolas-page {
+    color: var(--kutuar-text);
+}
+
+.gestao-escolas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--kutuar-space-4);
+    margin-bottom: var(--kutuar-space-5);
+}
+
+.gestao-escolas-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gestao-escolas-toolbar {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) minmax(12rem, 16rem);
+    gap: var(--kutuar-space-4);
+    align-items: end;
+    margin-bottom: var(--kutuar-space-4);
+}
+
+.gestao-escolas-panel {
+    padding: var(--kutuar-space-4);
+}
+
+.gestao-escolas-panel-heading {
+    margin-bottom: var(--kutuar-space-4);
+}
+
+.gestao-escolas-table-wrap {
+    border: 1px solid var(--kutuar-border);
+    border-radius: var(--kutuar-radius-md);
+}
+
+.gestao-escolas-table td,
+.gestao-escolas-table th {
+    vertical-align: middle;
+}
+
+.gestao-escolas-table strong {
+    color: var(--kutuar-text);
+}
+
+.gestao-escolas-table .col-acoes {
+    width: 7rem;
+    text-align: right;
+}
+
+.gestao-escolas-table .status-badge {
+    justify-content: center;
+    min-width: 4.5rem;
+}
+
+.gestao-escolas-loading {
+    display: grid;
+    gap: var(--kutuar-space-2);
+}
+
+.gestao-escolas-skeleton {
+    min-height: 3.4rem;
+    border-radius: var(--kutuar-radius-md);
+    background: linear-gradient(90deg, var(--kutuar-background), var(--kutuar-border), var(--kutuar-background));
+    background-size: 200% 100%;
+    animation: gestao-escolas-skeleton 1.1s ease-in-out infinite;
+}
+
+.metric-card.is-loading .metric-value,
+.metric-card.is-loading .metric-description {
+    color: var(--kutuar-border);
+    border-radius: var(--kutuar-radius-sm);
+    background: var(--kutuar-border);
+}
+
+.gestao-escolas-state {
+    display: grid;
+    justify-items: center;
+    gap: var(--kutuar-space-2);
+    padding: var(--kutuar-space-6);
+    text-align: center;
+    color: var(--kutuar-muted);
+}
+
+.gestao-escolas-state i {
+    color: var(--kutuar-accent);
+    font-size: 2.75rem;
+}
+
+.gestao-escolas-state h3 {
+    margin: 0;
+    color: var(--kutuar-text);
+    font-size: var(--kutuar-font-lg);
+}
+
+.gestao-escolas-state p {
+    margin: 0 0 var(--kutuar-space-3);
+}
+
+.gestao-escolas-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--kutuar-space-3);
+    margin-top: var(--kutuar-space-4);
+    color: var(--kutuar-muted);
+    font-size: var(--kutuar-font-sm);
+}
+
+.gestao-escolas-pagination nav,
+.gestao-escolas-pages {
+    display: flex;
+    align-items: center;
+    gap: var(--kutuar-space-2);
+}
+
+.gestao-escolas-page-button.is-current {
+    background: var(--kutuar-primary);
+    color: var(--kutuar-white);
+    border-color: var(--kutuar-primary);
+}
+
+@keyframes gestao-escolas-skeleton {
+    from {
+        background-position: 200% 0;
+    }
+
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 760px) {
+    .gestao-escolas-header,
+    .gestao-escolas-pagination {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .gestao-escolas-metrics,
+    .gestao-escolas-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .gestao-escolas-table .col-cidade {
+        display: none;
+    }
+}
