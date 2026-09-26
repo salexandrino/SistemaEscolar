@@ -164,9 +164,16 @@ public class EscolaController {
             ctx.status(201);
             ctx.redirect("/dashboard/escolas");
 
-        } catch (Exception e) {
-            ctx.status(400);
+        } catch (ConflictException e) {
+            ctx.status(e.getStatus());
             ctx.json(Map.of("error", e.getMessage()));
+        } catch (ValidationException e) {
+            ctx.status(e.getStatus());
+            ctx.json(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Erro ao cadastrar escola", e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            ctx.json(Map.of("error", "Erro interno ao cadastrar escola."));
         }
     }
 
@@ -255,7 +262,7 @@ public class EscolaController {
             logger.warn("Falha na atualização de escola: {}", e.getMessage());
         } catch (ValidationException | NotFoundException | ConflictException e) {
             ctx.status(e.getStatus());
-            ctx.json(Map.of("message", e.getMessage()));
+            ctx.json(Map.of("error", e.getMessage()));
             logger.warn("Erro na atualização de escola: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             ctx.status(HttpStatus.BAD_REQUEST);

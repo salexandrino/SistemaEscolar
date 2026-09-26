@@ -19,6 +19,7 @@ import br.com.kutuar.seguranca.repositories.EscolaRepository;
 import br.com.kutuar.seguranca.repositories.UsuarioRepository;
 import br.com.kutuar.seguranca.services.observers.EscolaCadastradaObserver;
 import br.com.kutuar.seguranca.utils.ValidationUtil;
+import br.com.kutuar.seguranca.utils.CnpjUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.javalin.http.HttpStatus;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.sql.SQLException;
 
 public class EscolaService {
 
@@ -79,7 +81,7 @@ public class EscolaService {
             throw new ValidationException("CNPJ não pode estar vazio.");
         }
         if (dto.getCnpj() != null && !dto.getCnpj().isBlank()) {
-            ValidationUtil.validarCnpjComStrategy(dto.getCnpj());
+            ValidationUtil.validarCnpjComStrategy(CnpjUtil.normalizar(dto.getCnpj()));
         }
 
         if (dto.getEmailInstitucional() != null && dto.getEmailInstitucional().isBlank()) {
@@ -171,8 +173,9 @@ public class EscolaService {
         }
         ValidationUtil.validarCpfComStrategy(dto.getCpfResponsavel());
 
-        if (escolaRepository.findByCnpj(dto.getCnpj()).isPresent()) {
-            throw new ConflictException("CNPJ já cadastrado.");
+        String cnpjNormalizado = CnpjUtil.normalizar(dto.getCnpj());
+        if (escolaRepository.existsByCnpj(cnpjNormalizado)) {
+            throw cnpjEmUso();
         }
         if (usuarioRepository.existsByEmail(dto.getEmailResponsavel())) {
             throw new ConflictException("Já existe um usuário cadastrado com o e-mail do responsável.");
@@ -180,7 +183,7 @@ public class EscolaService {
 
         Escola escola = new Escola();
         escola.setNome(dto.getNome());
-        escola.setCnpj(dto.getCnpj());
+        escola.setCnpj(cnpjNormalizado);
         escola.setEmailInstitucional(dto.getEmailInstitucional());
         escola.setTelefone(dto.getTelefone());
         escola.setEndereco(dto.getEndereco());
@@ -215,7 +218,12 @@ public class EscolaService {
         escola.setLinguaMinistrada(dto.getLinguaMinistrada());
 
 
-        Escola escolaSalva = escolaRepository.save(escola);
+        Escola escolaSalva;
+        try {
+            escolaSalva = escolaRepository.save(escola);
+        } catch (RuntimeException e) {
+            throw converterViolacaoCnpj(e);
+        }
 
         // Cria o primeiro Gestor da escola já ativo — é o Super Admin quem está
         // autorizando isso ao criar a escola, então não passa pelo fluxo de
@@ -301,12 +309,10 @@ public class EscolaService {
                 .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
 
         // Se CNPJ foi alterado, verifica se já existe outro com o mesmo CNPJ
-        if (dto.getCnpj() != null && !dto.getCnpj().equals(escola.getCnpj())) {
-            Optional<Escola> escolaComMesmoCnpj = escolaRepository.findByCnpj(dto.getCnpj());
-            if (escolaComMesmoCnpj.isPresent()) {
-                logger.warn("Tentativa de atualizar CNPJ duplicado. Novo CNPJ: {}", dto.getCnpj());
-                throw new ConflictException("Já existe uma escola cadastrada com este CNPJ.");
-            }
+        String cnpjNormalizado = dto.getCnpj() == null ? null : CnpjUtil.normalizar(dto.getCnpj());
+        if (cnpjNormalizado != null && escolaRepository.existsByCnpjAndIdNot(cnpjNormalizado, escolaId)) {
+            logger.warn("Tentativa de atualizar CNPJ duplicado. Novo CNPJ: {}", cnpjNormalizado);
+            throw cnpjEmUso();
         }
 
         // Atualiza apenas os campos fornecidos
@@ -314,7 +320,7 @@ public class EscolaService {
             escola.setNome(dto.getNome());
         }
         if (dto.getCnpj() != null && !dto.getCnpj().isBlank()) {
-            escola.setCnpj(dto.getCnpj());
+            escola.setCnpj(cnpjNormalizado);
         }
         if (dto.getEmailInstitucional() != null && !dto.getEmailInstitucional().isBlank()) {
             escola.setEmailInstitucional(dto.getEmailInstitucional());
@@ -376,7 +382,11 @@ public class EscolaService {
         if (dto.getLinguaMinistrada() != null) escola.setLinguaMinistrada(dto.getLinguaMinistrada());
 
 
-        escolaRepository.update(escola);
+        try {
+            escolaRepository.update(escola);
+        } catch (RuntimeException e) {
+            throw converterViolacaoCnpj(e);
+        }
 
         logger.info("Escola atualizada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
 
@@ -440,7 +450,7 @@ public class EscolaService {
     public Escola buscarEscolaPorCnpj(String cnpj, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
 
-        return escolaRepository.findByCnpj(cnpj)
+        return escolaRepository.findByCnpj(CnpjUtil.normalizar(cnpj))
                 .orElseThrow(() -> new NotFoundException("Escola não encontrada com o CNPJ informado."));
     }
 
@@ -550,6 +560,22 @@ public class EscolaService {
         logger.info("Escola excluída: {} (ID: {}) por {}", escola.getNome(), id, authUser.getCpf());
     }
 
+    private ConflictException cnpjEmUso() {
+        return new ConflictException("Já existe uma escola cadastrada com este CNPJ.");
+    }
+
+    /** A constraint é a garantia final quando duas requisições passam pela pré-validação. */
+    private RuntimeException converterViolacaoCnpj(RuntimeException exception) {
+        for (Throwable causa = exception; causa != null; causa = causa.getCause()) {
+            if (causa instanceof SQLException sqlException
+                    && "23505".equals(sqlException.getSQLState())
+                    && (sqlException.getMessage() == null || sqlException.getMessage().contains("uk_escola_cnpj"))) {
+                return cnpjEmUso();
+            }
+        }
+        return exception;
+    }
+
     private void validarDados(CriarEscolaDTO dto) {
 
         ValidationUtil.validateTamanho(dto.getNome(), 3, 150, "Nome da escola");
@@ -557,7 +583,7 @@ public class EscolaService {
         if (dto.getCnpj() == null || dto.getCnpj().isBlank()) {
             throw new ValidationException("CNPJ é obrigatório.");
         }
-        ValidationUtil.validarCnpjComStrategy(dto.getCnpj());
+        ValidationUtil.validarCnpjComStrategy(CnpjUtil.normalizar(dto.getCnpj()));
 
         ValidationUtil.validateEmail(dto.getEmailInstitucional());
 

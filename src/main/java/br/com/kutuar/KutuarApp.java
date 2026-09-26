@@ -704,7 +704,7 @@ public class KutuarApp {
 
         app.exception(ConflictException.class, (e, ctx) -> {
             ctx.status(409);
-            ctx.json(Map.of("message", e.getMessage()));
+            ctx.json(Map.of("error", e.getMessage()));
         });
 
         app.exception(Exception.class, (e, ctx) -> {

@@ -201,6 +201,35 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
         return Optional.empty();
     }
 
+    public boolean existsByCnpj(String cnpj) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM escola WHERE cnpj = ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cnpj);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar CNPJ de escola", e);
+            throw new RuntimeException("Erro ao verificar CNPJ de escola.", e);
+        }
+    }
+
+    public boolean existsByCnpjAndIdNot(String cnpj, UUID escolaId) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM escola WHERE cnpj = ? AND id <> ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, cnpj);
+            stmt.setObject(2, escolaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
+                return rs.getBoolean(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar CNPJ de escola", e);
+            throw new RuntimeException("Erro ao verificar CNPJ de escola.", e);
+        }
+    }
+
     @Override
     public Escola save(Escola escola) {
         String sql = "INSERT INTO escola (id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, " +
