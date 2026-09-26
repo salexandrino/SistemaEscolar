@@ -237,7 +237,7 @@ public class EscolaService {
         gestor.setTelefone(dto.getTelefoneResponsavel());
         gestor.setSenhaHash(passwordService.hash(senhaGerada));
         gestor.setPerfil(Perfil.GESTOR);
-        gestor.setTenantId(escolaSalva.getId());
+        gestor.setTenantId(escolaSalva.getTenantId());
         gestor.setEscolaId(escolaSalva.getId());
         gestor.setAtivo(true);
         gestor.setBloqueado(false);
@@ -245,7 +245,7 @@ public class EscolaService {
         gestor.setCriadoEm(LocalDateTime.now());
         gestor.setAtualizadoEm(LocalDateTime.now());
 
-        usuarioRepository.save(gestor, escolaSalva.getId());
+        usuarioRepository.save(gestor, escolaSalva.getTenantId());
 
         logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
                 escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
@@ -507,7 +507,7 @@ public class EscolaService {
      * 1) só permite excluir se a escola já estiver INATIVA;
      * 2) bloqueia se houver aluno/turma/mensalidade vinculados, para não
      *    apagar silenciosamente dados acadêmicos/financeiros reais.
-     * Remove primeiro os usuários do tenant (FK usuario.tenant_id -> escola.id)
+     * Remove primeiro os usuários do tenant e só então a escola.
      * e só então a escola.
      */
     public void excluirEscola(UUID id, AuthUser authUser) {
