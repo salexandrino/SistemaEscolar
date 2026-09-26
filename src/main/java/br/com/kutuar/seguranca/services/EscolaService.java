@@ -1,5 +1,6 @@
 package br.com.kutuar.seguranca.services;
 
+import br.com.kutuar.config.DatabaseConfig;
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.sql.SQLException;
+import java.sql.Connection;
 
 public class EscolaService {
 
@@ -40,13 +42,25 @@ public class EscolaService {
     private final EscolaRepository escolaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordService passwordService;
+    private final ConnectionProvider connectionProvider;
     private final List<EscolaCadastradaObserver> observers = new java.util.ArrayList<>();
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository, PasswordService passwordService) {
+        this(escolaRepository, usuarioRepository, passwordService, DatabaseConfig::getConnection);
+    }
+
+    EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository,
+                  PasswordService passwordService, ConnectionProvider connectionProvider) {
         this.escolaRepository = escolaRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordService = passwordService;
+        this.connectionProvider = connectionProvider;
+    }
+
+    @FunctionalInterface
+    interface ConnectionProvider {
+        Connection get() throws SQLException;
     }
 
     /**
@@ -174,12 +188,6 @@ public class EscolaService {
         ValidationUtil.validarCpfComStrategy(dto.getCpfResponsavel());
 
         String cnpjNormalizado = CnpjUtil.normalizar(dto.getCnpj());
-        if (escolaRepository.existsByCnpj(cnpjNormalizado)) {
-            throw cnpjEmUso();
-        }
-        if (usuarioRepository.existsByEmail(dto.getEmailResponsavel())) {
-            throw new ConflictException("Já existe um usuário cadastrado com o e-mail do responsável.");
-        }
 
         Escola escola = new Escola();
         escola.setNome(dto.getNome());
@@ -218,18 +226,7 @@ public class EscolaService {
         escola.setLinguaMinistrada(dto.getLinguaMinistrada());
 
 
-        Escola escolaSalva;
-        try {
-            escolaSalva = escolaRepository.save(escola);
-        } catch (RuntimeException e) {
-            throw converterViolacaoCnpj(e);
-        }
-
-        // Cria o primeiro Gestor da escola já ativo — é o Super Admin quem está
-        // autorizando isso ao criar a escola, então não passa pelo fluxo de
-        // auto-cadastro público (que nunca oferece o perfil GESTOR).
         String senhaGerada = gerarSenhaTemporaria();
-
         Usuario gestor = new Usuario();
         gestor.setNomeCompleto(dto.getNomeResponsavel());
         gestor.setCpf(dto.getCpfResponsavel());
@@ -237,15 +234,45 @@ public class EscolaService {
         gestor.setTelefone(dto.getTelefoneResponsavel());
         gestor.setSenhaHash(passwordService.hash(senhaGerada));
         gestor.setPerfil(Perfil.GESTOR);
-        gestor.setTenantId(escolaSalva.getTenantId());
-        gestor.setEscolaId(escolaSalva.getId());
         gestor.setAtivo(true);
         gestor.setBloqueado(false);
         gestor.setTentativasLogin(0);
         gestor.setCriadoEm(LocalDateTime.now());
         gestor.setAtualizadoEm(LocalDateTime.now());
 
-        usuarioRepository.save(gestor, escolaSalva.getTenantId());
+        Escola escolaSalva;
+        try (Connection conn = connectionProvider.get()) {
+            boolean autoCommitOriginal = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try {
+                if (escolaRepository.existsByCnpj(conn, cnpjNormalizado)) {
+                    throw cnpjEmUso();
+                }
+                if (usuarioRepository.existsByEmail(conn, gestor.getEmail())) {
+                    throw new ConflictException("Já existe um usuário cadastrado com o e-mail do responsável.");
+                }
+
+                escolaSalva = escolaRepository.save(conn, escola);
+                gestor.setTenantId(escolaSalva.getTenantId());
+                gestor.setEscolaId(escolaSalva.getId());
+                usuarioRepository.save(conn, gestor, escolaSalva.getTenantId());
+                conn.commit();
+            } catch (Exception e) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackError) {
+                    logger.error("Falha ao desfazer cadastro de escola", rollbackError);
+                }
+                if (e instanceof RuntimeException runtimeException) {
+                    throw converterViolacaoCnpj(runtimeException);
+                }
+                throw new RuntimeException("Erro ao cadastrar escola.", e);
+            } finally {
+                conn.setAutoCommit(autoCommitOriginal);
+            }
+        } catch (SQLException e) {
+            throw converterViolacaoCnpj(new RuntimeException("Erro ao cadastrar escola.", e));
+        }
 
         logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
                 escolaSalva.getNome(), gestor.getEmail(), gestor.getId());

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,25 +65,31 @@ class EscolaCnpjServiceTest {
     }
 
     @Test
-    void gestorRecebeOTenantDaEscolaEReferenciaAEscola() {
+    void gestorRecebeOTenantDaEscolaEReferenciaAEscola() throws Exception {
         UUID tenantId = UUID.randomUUID();
+        Connection connection = mock(Connection.class);
         doAnswer(invocation -> {
-            Escola escola = invocation.getArgument(0);
+            Escola escola = invocation.getArgument(1);
             escola.setId(escolaId);
             escola.setTenantId(tenantId);
             return escola;
-        }).when(escolaRepository).save(any(Escola.class));
-        when(escolaRepository.existsByCnpj("04252011000110")).thenReturn(false);
+        }).when(escolaRepository).save(eq(connection), any(Escola.class));
         UsuarioRepository usuarios = mock(UsuarioRepository.class);
-        when(usuarios.existsByEmail(any())).thenReturn(false);
+        try {
+            when(connection.getAutoCommit()).thenReturn(true);
+            when(escolaRepository.existsByCnpj(eq(connection), eq("04252011000110"))).thenReturn(false);
+            when(usuarios.existsByEmail(eq(connection), any())).thenReturn(false);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
         PasswordService senha = mock(PasswordService.class);
         when(senha.hash(any())).thenReturn("hash");
-        EscolaService cadastro = new EscolaService(escolaRepository, usuarios, senha);
+        EscolaService cadastro = new EscolaService(escolaRepository, usuarios, senha, () -> connection);
 
         cadastro.cadastrarEscola(dtoValido(), superAdmin);
 
         var gestor = org.mockito.ArgumentCaptor.forClass(Usuario.class);
-        verify(usuarios).save(gestor.capture(), eq(tenantId));
+        verify(usuarios).save(eq(connection), gestor.capture(), eq(tenantId));
         assertEquals(tenantId, gestor.getValue().getTenantId());
         assertEquals(escolaId, gestor.getValue().getEscolaId());
     }

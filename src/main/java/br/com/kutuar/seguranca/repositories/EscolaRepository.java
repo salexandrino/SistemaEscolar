@@ -202,16 +202,22 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
     }
 
     public boolean existsByCnpj(String cnpj) {
+        try (Connection conn = getConnection()) {
+            return existsByCnpj(conn, cnpj);
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar CNPJ de escola", e);
+            throw new RuntimeException("Erro ao verificar CNPJ de escola.", e);
+        }
+    }
+
+    public boolean existsByCnpj(Connection conn, String cnpj) throws SQLException {
         String sql = "SELECT EXISTS (SELECT 1 FROM escola WHERE cnpj = ?)";
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cnpj);
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();
                 return rs.getBoolean(1);
             }
-        } catch (SQLException e) {
-            logger.error("Erro ao verificar CNPJ de escola", e);
-            throw new RuntimeException("Erro ao verificar CNPJ de escola.", e);
         }
     }
 
@@ -232,13 +238,24 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
     @Override
     public Escola save(Escola escola) {
+        try (Connection conn = getConnection()) {
+            Escola salva = save(conn, escola);
+            logger.info("Escola salva: {} (ID: {}, Tenant: {})", salva.getNome(), salva.getId(), salva.getTenantId());
+            return salva;
+        } catch (SQLException e) {
+            logger.error("Erro ao salvar escola {}: {}", escola.getNome(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao salvar escola.", e);
+        }
+    }
+
+    /** Insere na conexão fornecida; a transação é responsabilidade do Service. */
+    public Escola save(Connection conn, Escola escola) throws SQLException {
         String sql = "INSERT INTO escola (id, tenant_id, nome, cnpj, email_institucional, telefone, endereco, " +
                 "numero, complemento, bairro, cidade, estado, cep, nome_responsavel, telefone_responsavel, " +
                 "email_responsavel, status, criado_em, atualizado_em, codigo_inep, situacao_funcionamento, data_inicio_ano_letivo, data_termino_ano_letivo, latitude, longitude, zona, localizacao_diferenciada, dependencia_administrativa, regulamentacao_numero, regulamentacao_data, infra_agua, infra_energia, infra_esgoto, infra_lixo, qtd_computadores, tem_internet, tipo_banda_larga, lingua_ministrada) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             escola.setId(UUID.randomUUID());
             escola.setTenantId(UUID.randomUUID());
@@ -291,12 +308,6 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
 
             stmt.executeUpdate();
-
-            logger.info("Escola salva: {} (ID: {}, Tenant: {})", escola.getNome(), escola.getId(), escola.getTenantId());
-
-        } catch (SQLException e) {
-            logger.error("Erro ao salvar escola {}: {}", escola.getNome(), e.getMessage(), e);
-            throw new RuntimeException("Erro ao salvar escola.", e);
         }
         return escola;
     }

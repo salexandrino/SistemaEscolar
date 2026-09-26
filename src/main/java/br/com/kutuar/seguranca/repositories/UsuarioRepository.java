@@ -183,20 +183,22 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
     }
 
     public boolean existsByEmail(String email) {
-        String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, email);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
+        try (Connection conn = getConnection()) {
+            return existsByEmail(conn, email);
         } catch (SQLException e) {
             logger.error("Erro ao buscar usuário por email.", e);
             throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
-        return false;
+    }
+
+    public boolean existsByEmail(Connection conn, String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
     }
 
     // Tenant-aware overload
@@ -226,9 +228,19 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
     // Tenant-aware save (preferred)
     public void save(Usuario usuario, UUID tenantId) {
+        try (Connection conn = getConnection()) {
+            save(conn, usuario, tenantId);
+            logger.info("Usuário salvo: {}", usuario.getId());
+        } catch (SQLException e) {
+            logger.error("Erro ao salvar usuário {}: {}", usuario.getCpfMascarado(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao salvar usuário no banco de dados.", e);
+        }
+    }
+
+    /** Insere na conexão fornecida; não fecha nem controla a transação dela. */
+    public void save(Connection conn, Usuario usuario, UUID tenantId) throws SQLException {
         String sql = "INSERT INTO usuario (id, tenant_id, escola_id, nome_completo, email, cpf, telefone, senha_hash, perfil, ativo, bloqueado, tentativas_login, ultimo_login, criado_em, atualizado_em, reset_password_token, reset_password_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             usuario.setId(UUID.randomUUID());
             usuario.setCriadoEm(LocalDateTime.now());
             usuario.setAtualizadoEm(LocalDateTime.now());
@@ -260,10 +272,6 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             stmt.setString(16, usuario.getResetPasswordToken());
             stmt.setObject(17, usuario.getResetPasswordExpiresAt(), Types.TIMESTAMP);
             stmt.executeUpdate();
-            logger.info("Usuário salvo: {}", usuario.getId());
-        } catch (SQLException e) {
-            logger.error("Erro ao salvar usuário {}: {}", usuario.getCpfMascarado(), e.getMessage(), e);
-            throw new RuntimeException("Erro ao salvar usuário no banco de dados.", e);
         }
     }
 
