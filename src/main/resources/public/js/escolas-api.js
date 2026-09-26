@@ -31,11 +31,16 @@
         });
     }
 
+    function analisarImpactoExclusao(id) {
+        return window.kutuarApi.apiFetch(`/api/admin/escolas/${id}/exclusao/impacto`);
+    }
+
     window.escolasApi = {
         listarEscolas,
         buscarDashboard,
         ativarEscola,
-        inativarEscola
+        inativarEscola,
+        analisarImpactoExclusao
     };
 })();
 
