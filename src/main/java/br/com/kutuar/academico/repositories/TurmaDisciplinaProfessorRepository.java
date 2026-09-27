@@ -64,7 +64,7 @@ public class TurmaDisciplinaProfessorRepository extends BaseDAO {
                 SELECT COALESCE(SUM(sd.carga_horaria_anual), 0) AS total
                 FROM turma_disciplina_professor tdp
                 JOIN turma t ON t.id = tdp.id_turma AND t.tenant_id = tdp.tenant_id
-                JOIN serie_disciplina sd ON sd.id_serie = t.id_serie AND sd.id_disciplina = tdp.id_disciplina
+                JOIN serie_disciplina sd ON sd.tenant_id = tdp.tenant_id AND sd.id_serie = t.id_serie AND sd.id_disciplina = tdp.id_disciplina
                 WHERE tdp.tenant_id = ? AND tdp.id_professor = ?
                 """;
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -88,7 +88,7 @@ public class TurmaDisciplinaProfessorRepository extends BaseDAO {
                 JOIN turma t ON t.id = tdp.id_turma AND t.tenant_id = tdp.tenant_id
                 JOIN serie s ON s.id = t.id_serie AND s.tenant_id = t.tenant_id
                 JOIN disciplina d ON d.id = tdp.id_disciplina AND d.tenant_id = tdp.tenant_id
-                JOIN serie_disciplina sd ON sd.id_serie = t.id_serie AND sd.id_disciplina = tdp.id_disciplina
+                JOIN serie_disciplina sd ON sd.tenant_id = tdp.tenant_id AND sd.id_serie = t.id_serie AND sd.id_disciplina = tdp.id_disciplina
                 WHERE tdp.tenant_id = ? AND tdp.id_professor = ?
                 ORDER BY s.nome, t.nome, d.nome
                 """;

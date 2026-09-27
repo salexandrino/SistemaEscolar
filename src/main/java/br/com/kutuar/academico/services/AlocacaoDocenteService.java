@@ -50,7 +50,7 @@ public class AlocacaoDocenteService {
                 .orElseThrow(() -> new NotFoundException("Turma não encontrada."));
 
         // validar que disciplina pertence à matriz da série da turma
-        boolean disciplinaNaMatriz = serieDisciplinaRepository.existeNaMatriz(turma.getIdSerie(), dto.getIdDisciplina());
+        boolean disciplinaNaMatriz = serieDisciplinaRepository.existeNaMatriz(tenantId, turma.getIdSerie(), dto.getIdDisciplina());
         if (!disciplinaNaMatriz) {
             throw new ValidationException("Disciplina não pertence à matriz da série da turma.");
         }
@@ -62,7 +62,7 @@ public class AlocacaoDocenteService {
 
         // validar carga horária contratual (tudo em unidade ANUAL)
         int atual = tdpRepository.somatorioCargaHorariaProfessor(tenantId, dto.getIdProfessor());
-        int cargaDisciplina = serieDisciplinaRepository.obterCargaHorariaAnual(turma.getIdSerie(), dto.getIdDisciplina())
+        int cargaDisciplina = serieDisciplinaRepository.obterCargaHorariaAnual(tenantId, turma.getIdSerie(), dto.getIdDisciplina())
                 .orElseThrow(() -> new ValidationException("Carga horária não definida para a disciplina na série."));
         int contratualSemanal = professorRepository.getCargaHorariaContratual(tenantId, dto.getIdProfessor())
                 .orElseThrow(() -> new ValidationException("Carga horária contratual não definida para o professor."));

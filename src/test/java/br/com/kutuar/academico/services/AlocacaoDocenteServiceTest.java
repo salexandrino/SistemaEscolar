@@ -65,10 +65,10 @@ public class AlocacaoDocenteServiceTest {
     void permitirAtribuicaoDentroDoLimite() {
         UUID idSerie = UUID.randomUUID();
         when(turmaRepository.buscarPorId(tenantId, idTurma)).thenReturn(Optional.of(mockTurma(idSerie)));
-        when(serieDisciplinaRepository.existeNaMatriz(idSerie, idDisciplina)).thenReturn(true);
+        when(serieDisciplinaRepository.existeNaMatriz(tenantId, idSerie, idDisciplina)).thenReturn(true);
         when(professorRepository.existsById(tenantId, idProfessor)).thenReturn(true);
         when(tdpRepository.somatorioCargaHorariaProfessor(tenantId, idProfessor)).thenReturn(0);
-        when(serieDisciplinaRepository.obterCargaHorariaAnual(idSerie, idDisciplina)).thenReturn(Optional.of(160));
+        when(serieDisciplinaRepository.obterCargaHorariaAnual(tenantId, idSerie, idDisciplina)).thenReturn(Optional.of(160));
         when(professorRepository.getCargaHorariaContratual(tenantId, idProfessor)).thenReturn(Optional.of(20)); // semanal
 
         AtribuirDocenteDTO dto = new AtribuirDocenteDTO();
@@ -77,6 +77,8 @@ public class AlocacaoDocenteServiceTest {
 
         assertDoesNotThrow(() -> service.atribuir(idTurma, dto));
         verify(tdpRepository, times(1)).atribuir(tenantId, idTurma, idDisciplina, idProfessor);
+        verify(serieDisciplinaRepository).existeNaMatriz(tenantId, idSerie, idDisciplina);
+        verify(serieDisciplinaRepository).obterCargaHorariaAnual(tenantId, idSerie, idDisciplina);
     }
 
     @Test
@@ -84,10 +86,10 @@ public class AlocacaoDocenteServiceTest {
     void bloquearQuandoUltrapassaLimiteAnual() {
         UUID idSerie = UUID.randomUUID();
         when(turmaRepository.buscarPorId(tenantId, idTurma)).thenReturn(Optional.of(mockTurma(idSerie)));
-        when(serieDisciplinaRepository.existeNaMatriz(idSerie, idDisciplina)).thenReturn(true);
+        when(serieDisciplinaRepository.existeNaMatriz(tenantId, idSerie, idDisciplina)).thenReturn(true);
         when(professorRepository.existsById(tenantId, idProfessor)).thenReturn(true);
         when(tdpRepository.somatorioCargaHorariaProfessor(tenantId, idProfessor)).thenReturn(700); // já tem 700h
-        when(serieDisciplinaRepository.obterCargaHorariaAnual(idSerie, idDisciplina)).thenReturn(Optional.of(160));
+        when(serieDisciplinaRepository.obterCargaHorariaAnual(tenantId, idSerie, idDisciplina)).thenReturn(Optional.of(160));
         when(professorRepository.getCargaHorariaContratual(tenantId, idProfessor)).thenReturn(Optional.of(20)); // semanal (800h/ano)
 
         AtribuirDocenteDTO dto = new AtribuirDocenteDTO();
@@ -95,6 +97,23 @@ public class AlocacaoDocenteServiceTest {
         dto.setIdProfessor(idProfessor);
 
         assertThrows(ValidationException.class, () -> service.atribuir(idTurma, dto));
+        verify(tdpRepository, never()).atribuir(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Não deve validar matriz de outro tenant ao atribuir docente")
+    void bloquearAtribuicaoQuandoRelacaoExisteApenasEmOutroTenant() {
+        UUID idSerie = UUID.randomUUID();
+        when(turmaRepository.buscarPorId(tenantId, idTurma)).thenReturn(Optional.of(mockTurma(idSerie)));
+        when(serieDisciplinaRepository.existeNaMatriz(tenantId, idSerie, idDisciplina)).thenReturn(false);
+
+        AtribuirDocenteDTO dto = new AtribuirDocenteDTO();
+        dto.setIdDisciplina(idDisciplina);
+        dto.setIdProfessor(idProfessor);
+
+        assertThrows(ValidationException.class, () -> service.atribuir(idTurma, dto));
+        verify(serieDisciplinaRepository).existeNaMatriz(tenantId, idSerie, idDisciplina);
+        verify(serieDisciplinaRepository, never()).obterCargaHorariaAnual(any(), any(), any());
         verify(tdpRepository, never()).atribuir(any(), any(), any(), any());
     }
 }

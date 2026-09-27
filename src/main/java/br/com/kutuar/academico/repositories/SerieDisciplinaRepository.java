@@ -9,6 +9,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -112,12 +113,14 @@ public class SerieDisciplinaRepository extends BaseDAO {
         }
     }
 
-    // Utilitários sem tenantId (id_serie já é do tenant correto nas chamadas que partem da turma)
-    public boolean existeNaMatriz(UUID idSerie, UUID idDisciplina) {
-        String sql = "SELECT 1 FROM serie_disciplina WHERE id_serie = ? AND id_disciplina = ? LIMIT 1";
+    // Consultas de validação também são isoladas pelo tenant autenticado.
+    public boolean existeNaMatriz(UUID tenantId, UUID idSerie, UUID idDisciplina) {
+        Objects.requireNonNull(tenantId, "tenantId é obrigatório.");
+        String sql = "SELECT 1 FROM serie_disciplina WHERE tenant_id = ? AND id_serie = ? AND id_disciplina = ? LIMIT 1";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, idSerie);
-            ps.setObject(2, idDisciplina);
+            ps.setObject(1, tenantId);
+            ps.setObject(2, idSerie);
+            ps.setObject(3, idDisciplina);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
@@ -127,11 +130,13 @@ public class SerieDisciplinaRepository extends BaseDAO {
         }
     }
 
-    public Optional<Integer> obterCargaHorariaAnual(UUID idSerie, UUID idDisciplina) {
-        String sql = "SELECT carga_horaria_anual FROM serie_disciplina WHERE id_serie = ? AND id_disciplina = ?";
+    public Optional<Integer> obterCargaHorariaAnual(UUID tenantId, UUID idSerie, UUID idDisciplina) {
+        Objects.requireNonNull(tenantId, "tenantId é obrigatório.");
+        String sql = "SELECT carga_horaria_anual FROM serie_disciplina WHERE tenant_id = ? AND id_serie = ? AND id_disciplina = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, idSerie);
-            ps.setObject(2, idDisciplina);
+            ps.setObject(1, tenantId);
+            ps.setObject(2, idSerie);
+            ps.setObject(3, idDisciplina);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return Optional.of(rs.getInt(1));
             }
