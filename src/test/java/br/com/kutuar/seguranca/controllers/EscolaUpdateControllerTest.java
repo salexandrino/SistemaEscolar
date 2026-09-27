@@ -2,6 +2,8 @@ package br.com.kutuar.seguranca.controllers;
 
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.exceptions.ConflictException;
+import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.services.EscolaService;
@@ -37,7 +39,7 @@ class EscolaUpdateControllerTest {
     }
 
     @Test
-    void patchOuPutGenericoComStatusRetorna400() {
+    void atualizacaoComErroDeValidacaoRetornaMessage() {
         UUID escolaId = UUID.randomUUID();
         AtualizarEscolaDTO dto = new AtualizarEscolaDTO();
         dto.setStatus("INATIVA");
@@ -50,6 +52,40 @@ class EscolaUpdateControllerTest {
         controller.atualizarEscola(ctx);
 
         verify(ctx).status(HttpStatus.BAD_REQUEST);
-        verify(ctx).json(Map.of("error", mensagem));
+        verify(ctx).json(Map.of("message", mensagem));
+    }
+
+    @Test
+    void atualizacaoDeEscolaInexistenteRetornaMessage() {
+        UUID escolaId = UUID.randomUUID();
+        AtualizarEscolaDTO dto = new AtualizarEscolaDTO();
+        String mensagem = "Escola não encontrada.";
+        prepararAtualizacaoJson(escolaId, dto);
+        doThrow(new NotFoundException(mensagem)).when(service).atualizarEscola(eq(escolaId), eq(dto), eq(admin));
+
+        controller.atualizarEscola(ctx);
+
+        verify(ctx).status(HttpStatus.NOT_FOUND);
+        verify(ctx).json(Map.of("message", mensagem));
+    }
+
+    @Test
+    void atualizacaoComConflitoRetornaMessage() {
+        UUID escolaId = UUID.randomUUID();
+        AtualizarEscolaDTO dto = new AtualizarEscolaDTO();
+        String mensagem = "Já existe uma escola com este CNPJ.";
+        prepararAtualizacaoJson(escolaId, dto);
+        doThrow(new ConflictException(mensagem)).when(service).atualizarEscola(eq(escolaId), eq(dto), eq(admin));
+
+        controller.atualizarEscola(ctx);
+
+        verify(ctx).status(HttpStatus.CONFLICT);
+        verify(ctx).json(Map.of("message", mensagem));
+    }
+
+    private void prepararAtualizacaoJson(UUID escolaId, AtualizarEscolaDTO dto) {
+        when(ctx.pathParam("id")).thenReturn(escolaId.toString());
+        when(ctx.formParamMap()).thenReturn(Map.of());
+        when(ctx.bodyAsClass(AtualizarEscolaDTO.class)).thenReturn(dto);
     }
 }

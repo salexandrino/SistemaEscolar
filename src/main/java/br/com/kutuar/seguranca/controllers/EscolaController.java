@@ -265,7 +265,7 @@ public class EscolaController {
             logger.warn("Falha na atualização de escola: {}", e.getMessage());
         } catch (ValidationException | NotFoundException | ConflictException e) {
             ctx.status(e.getStatus());
-            ctx.json(Map.of("error", e.getMessage()));
+            ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Erro na atualização de escola: {}", e.getMessage());
         } catch (IllegalArgumentException e) {
             ctx.status(HttpStatus.BAD_REQUEST);
