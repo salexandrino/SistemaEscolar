@@ -14,6 +14,7 @@ import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
 import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
+import br.com.kutuar.seguranca.dtos.EscolaExclusaoImpactoDTO;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
@@ -612,10 +613,30 @@ public class EscolaController {
         }
     }
 
-    /**
-     * POST /dashboard/escolas/{id}/deletar - Exclui uma escola (soft delete)
-     * Usa POST pois formulários HTML não suportam DELETE nativamente.
-     */
+    /** GET /api/admin/escolas/{id}/exclusao/impacto - análise somente leitura. */
+    public void analisarImpactoExclusao(Context ctx) {
+        try {
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            if (currentUser == null) {
+                throw new AuthenticationException("Usuário não autenticado.");
+            }
+            UUID escolaId = UUID.fromString(ctx.pathParam("id"));
+            EscolaExclusaoImpactoDTO impacto = escolaService.analisarImpactoExclusao(escolaId, currentUser);
+            ctx.status(HttpStatus.OK).json(impacto);
+        } catch (AuthenticationException | AuthorizationException e) {
+            ctx.status(e.getStatus()).json(Map.of("message", e.getMessage()));
+            logger.warn("Falha ao analisar impacto de exclusão: {}", e.getMessage());
+        } catch (NotFoundException e) {
+            ctx.status(e.getStatus()).json(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of("message", "ID de escola inválido."));
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao analisar impacto de exclusão", e);
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of("message", "Não foi possível analisar a exclusão."));
+        }
+    }
+
+    /** POST legado mantido somente para devolver bloqueio de exclusão definitiva. */
     public void deletarEscola(Context ctx) {
         try {
             AuthUser currentUser = AuthUserContext.getAuthUser();
@@ -715,7 +736,7 @@ public class EscolaController {
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
 
-            Map<String, Object> model = Map.of("escola", escola);
+            Map<String, Object> model = Map.of("escola", escola, "content", "dashboard/escolas/visualizar");
             ctx.render("dashboard/escolas/visualizar.html", model);
 
         } catch (Exception e) {

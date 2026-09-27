@@ -85,6 +85,8 @@ public class AuthService {
             throw new AuthenticationException("CPF ou senha inválidos.");
         }
 
+        validarEscolaAtiva(usuario);
+
         resetarTentativasLogin(usuario);
         usuario.setUltimoLogin(LocalDateTime.now()); // Atualiza último login
         usuarioRepository.update(usuario); // Persiste a atualização do último login
@@ -96,6 +98,25 @@ public class AuthService {
                 usuario.getPerfil(),
                 usuario.getCpf()
         );
+    }
+
+    private void validarEscolaAtiva(Usuario usuario) {
+        if (usuario.getPerfil() == Perfil.SUPER_ADMIN) {
+            return;
+        }
+
+        if (usuario.getEscolaId() == null) {
+            logger.warn("Tentativa de login de usuário sem escola vinculada: {}", usuario.getId());
+            throw new AuthenticationException("Não foi possível autenticar sua conta.");
+        }
+
+        Escola escola = escolaRepository.findById(usuario.getEscolaId())
+                .orElseThrow(() -> new AuthenticationException("Não foi possível autenticar sua conta."));
+        if (!"ATIVA".equals(escola.getStatus())) {
+            logger.warn("Tentativa de login em escola inativa: usuarioId={}, escolaId={}",
+                    usuario.getId(), escola.getId());
+            throw new AuthenticationException("O acesso desta escola está temporariamente indisponível.");
+        }
     }
 
     private void registrarTentativaLoginFalha(Usuario usuario) {

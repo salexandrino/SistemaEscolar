@@ -4,6 +4,7 @@ import br.com.kutuar.config.DatabaseConfig;
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
+import br.com.kutuar.seguranca.dtos.EscolaExclusaoImpactoDTO;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
 import br.com.kutuar.seguranca.dtos.CriarEscolaDTO;
 import br.com.kutuar.seguranca.dtos.CriarEscolaResponseDTO;
@@ -28,6 +29,7 @@ import io.javalin.http.HttpStatus;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.sql.SQLException;
@@ -531,63 +533,38 @@ public class EscolaService {
         return escola;
     }
 
-    /**
-     * Exclui de fato a escola (hard delete) — diferente de inativarEscola(),
-     * que só marca status = INATIVA. Trava de segurança dupla:
-     * 1) só permite excluir se a escola já estiver INATIVA;
-     * 2) bloqueia se houver aluno/turma/mensalidade vinculados, para não
-     *    apagar silenciosamente dados acadêmicos/financeiros reais.
-     * Remove primeiro os usuários do tenant e só então a escola.
-     * e só então a escola.
-     */
+    /** Endpoint legado mantido apenas para responder bloqueio seguro até haver política de retenção. */
     public void excluirEscola(UUID id, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
-
-        Escola escola = escolaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
-
-        if (!"INATIVA".equals(escola.getStatus())) {
-            throw new BusinessException("Só é possível excluir definitivamente uma escola que já esteja inativa. Inative-a primeiro.");
-        }
-
-        if (escolaRepository.possuiDadosVinculados(escola.getId())) {
-            throw new BusinessException("Não é possível excluir: existem alunos, turmas ou mensalidades vinculados a esta escola. " +
-                    "Excluir apagaria esses dados de forma definitiva e irreversível.");
-        }
-
-        usuarioRepository.deleteAllByTenant(escola.getId());
-        escolaRepository.delete(escola.getId());
-
-        logger.warn("Escola excluida DEFINITIVAMENTE: {} (ID: {}) por {}", escola.getNome(), escola.getId(), authUser.getCpf());
+        logger.warn("Tentativa bloqueada de exclusão definitiva da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
+        throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
     }
-    /**
-     * Exclui uma escola (soft delete: status → EXCLUIDA).
-     * Apenas SUPER_ADMIN pode executar esta operação.
-     */
+    /** Rota legada do dashboard, também bloqueada para impedir exclusão física acidental. */
     public void deletarEscola(UUID id, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
+        logger.warn("Tentativa bloqueada de exclusão via dashboard da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
+        throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
+    }
 
+    public EscolaExclusaoImpactoDTO analisarImpactoExclusao(UUID id, AuthUser authUser) {
+        verificarPermissaoMaster(authUser);
         Escola escola = escolaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Escola não encontrada."));
 
-        if ("EXCLUIDA".equals(escola.getStatus())) {
-            throw new BusinessException("Esta escola já foi excluída.");
+        // O cadastro e todas as áreas do produto usam escola.id como tenant_id.
+        Map<String, Long> dependencias = escolaRepository.contarDependenciasPorTenant(escola.getId());
+        List<String> motivos = new java.util.ArrayList<>();
+        if (!escola.isInativa()) {
+            motivos.add("A escola precisa estar inativa antes da exclusão definitiva.");
         }
-
-        // Inativa todos os usuários vinculados antes de excluir a escola
-        List<Usuario> usuarios = usuarioRepository.findAll()
-                .stream()
-                .filter(u -> id.equals(u.getEscolaId()))
-                .toList();
-
-        for (Usuario u : usuarios) {
-            if (u.isAtivo()) {
-                usuarioRepository.inactivate(u.getId(), u.getTenantId());
-            }
+        if (dependencias.values().stream().anyMatch(total -> total > 0)) {
+            motivos.add("Existem dados vinculados à escola; a política de retenção ainda não foi definida.");
         }
+        motivos.add("A exclusão definitiva está bloqueada até a definição da política de retenção de dados.");
 
-        escolaRepository.delete(id);
-        logger.info("Escola excluída: {} (ID: {}) por {}", escola.getNome(), id, authUser.getCpf());
+        logger.info("Impacto de exclusão analisado: escolaId={}, status={}, dependências={}", id, escola.getStatus(), dependencias);
+        return new EscolaExclusaoImpactoDTO(escola.getId(), escola.getNome(), escola.getStatus(), false,
+                List.copyOf(motivos), Map.copyOf(dependencias));
     }
 
     private ConflictException cnpjEmUso() {

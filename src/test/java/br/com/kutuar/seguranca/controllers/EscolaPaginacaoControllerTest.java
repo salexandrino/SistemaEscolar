@@ -1,7 +1,6 @@
 package br.com.kutuar.seguranca.controllers;
 
 import br.com.kutuar.seguranca.dtos.PageResponse;
-import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.enums.*;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
@@ -135,7 +134,7 @@ class EscolaPaginacaoControllerTest {
         assertEquals(1, model.getValue().get("size"));
     }
 
-    @Test void templateRenderizaLinksComFiltrosCodificados() {
+    @Test void templateDisponibilizaHooksDaGestaoClientSide() {
         var resolver = new org.thymeleaf.templateresolver.ClassLoaderTemplateResolver();
         resolver.setPrefix("templates/");
         resolver.setSuffix(".html");
@@ -143,15 +142,14 @@ class EscolaPaginacaoControllerTest {
         var engine = new org.thymeleaf.TemplateEngine();
         engine.setTemplateResolver(resolver);
         var context = new org.thymeleaf.context.Context();
-        context.setVariables(Map.of("escolas", List.of(new EscolaResumoDTO(UUID.randomUUID(), "Escola X", "123", "ATIVA", "Recife")), "search", "A&B", "filtroStatus", "ATIVA",
-                "page", 2, "size", 10, "total", 30L, "totalPages", 3L,
-                "hasPrevious", true, "hasNext", true));
         context.setVariable("content", "dashboard/escolas/lista");
         String html = engine.process("dashboard/escolas/lista", context);
-        assertTrue(html.contains("escolas?search=A%26B&amp;status=ATIVA&amp;page=1&amp;size=10"));
-        assertTrue(html.contains("escolas?search=A%26B&amp;status=ATIVA&amp;page=3&amp;size=10"));
-        assertTrue(html.contains("Recife"));
-        assertTrue(html.contains("Escola X"));
-        assertTrue(html.contains("value=\"ATIVA\" selected=\"selected\""));
+        assertTrue(html.contains("data-page=\"gestao-escolas\""));
+        assertTrue(html.contains("id=\"schoolSearch\""));
+        assertTrue(html.contains("id=\"schoolStatus\""));
+        assertTrue(html.contains("data-page-numbers"));
+        assertTrue(html.contains("data-page-action=\"previous\""));
+        assertTrue(html.contains("data-page-action=\"next\""));
+        assertTrue(html.contains("school-row-template"));
     }
 }

@@ -9,7 +9,7 @@
 
 <body>
 
-<div th:fragment="content">
+<div th:fragment="content" class="gestao-escolas-page" data-page="gestao-escolas">
 
     <div th:if="${gestorSenhaGerada}" class="alert alert-success border-0 shadow-sm mb-4">
         <div class="d-flex align-items-start">
@@ -17,11 +17,11 @@
             <div>
                 <h6 class="mb-1">Escola cadastrada! Gestor criado com acesso imediato.</h6>
                 <p class="mb-1 small">
-                    Copie esta senha agora — ela <strong>não</strong> ficará visível novamente.
+                    Copie esta senha agora. Ela <strong>não</strong> ficará visível novamente.
                     Repasse ao Gestor e peça que troque no primeiro acesso.
-                    <strong>O login é feito com o CPF, não com o e-mail</strong> — repasse os dois.
+                    <strong>O login é feito com o CPF, não com o e-mail</strong>.
                 </p>
-                <div class="d-flex align-items-center gap-2 mt-2">
+                <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
                     <span class="badge bg-light text-dark border">CPF (login): <span th:text="${gestorCpfGerado}"></span></span>
                     <span class="badge bg-light text-dark border">E-mail: <span th:text="${gestorEmailGerado}"></span></span>
                     <span class="badge bg-light text-dark border">Senha temporária: <code th:text="${gestorSenhaGerada}"></code></span>
@@ -30,225 +30,138 @@
         </div>
     </div>
 
-    <nav class="breadcrumb-admin mb-4">
+    <nav class="breadcrumb-admin mb-4" aria-label="Breadcrumb">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
         <span class="text-muted">Escolas</span>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="gestao-escolas-header">
         <div>
             <h2 class="page-title mb-0">
                 <i class="bi bi-building me-2"></i>
                 Gerenciamento de Escolas
             </h2>
         </div>
-        <div>
-            <a href="/dashboard/escolas/nova" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i>
-                Nova Escola
-            </a>
-        </div>
-    </div>
+        <div th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
+    </header>
 
-    <form method="get" action="/dashboard/escolas" class="row g-3 align-items-end mb-4">
-        <div class="col-md-5">
-            <label for="search" class="form-label">Nome ou CNPJ</label>
-            <input id="search" name="search" type="search" class="form-control" th:value="${search}">
-        </div>
-        <div class="col-md-3">
-            <label for="status" class="form-label">Status</label>
-            <select id="status" name="status" class="form-select">
-                <option value="">Todos</option>
-                <option value="ATIVA" th:selected="${filtroStatus == 'ATIVA'}">Ativas</option>
-                <option value="INATIVA" th:selected="${filtroStatus == 'INATIVA'}">Inativas</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="size" class="form-label">Por página</label>
-            <input id="size" name="size" type="number" min="1" max="100" class="form-control" th:value="${size}">
-        </div>
-        <div class="col-md-2"><button class="btn btn-success" type="submit">Filtrar</button></div>
-    </form>
+    <section class="metrics-grid gestao-escolas-metrics" aria-label="Indicadores de escolas">
+        <article class="metric-card" data-kpi-card>
+            <span class="metric-icon" aria-hidden="true"><i class="bi bi-building"></i></span>
+            <span class="metric-label">Total de escolas</span>
+            <strong class="metric-value" data-kpi="totalEscolas">--</strong>
+            <small class="metric-description">cadastradas na plataforma</small>
+        </article>
+        <article class="metric-card metric-success" data-kpi-card>
+            <span class="metric-icon" aria-hidden="true"><i class="bi bi-check-circle"></i></span>
+            <span class="metric-label">Ativas</span>
+            <strong class="metric-value" data-kpi="escolasAtivas">--</strong>
+            <small class="metric-description">em operação</small>
+        </article>
+        <article class="metric-card metric-danger" data-kpi-card>
+            <span class="metric-icon" aria-hidden="true"><i class="bi bi-x-circle"></i></span>
+            <span class="metric-label">Inativas</span>
+            <strong class="metric-value" data-kpi="escolasInativas">--</strong>
+            <small class="metric-description">sem acesso ao sistema</small>
+        </article>
+    </section>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Instituições Cadastradas</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th class="ps-4 fw-bold text-secondary" style="width: 35%;">Nome</th>
-                        <th class="fw-bold text-secondary" style="width: 20%;">CNPJ</th>
-                        <th class="fw-bold text-secondary" style="width: 20%;">Localização</th>
-                        <th class="fw-bold text-secondary" style="width: 13%;">Status</th>
-                        <th class="text-end pe-4 fw-bold text-secondary" style="width: 12%;">Ações</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+    <section class="gestao-escolas-toolbar" aria-label="Filtros de escolas">
+        <div th:replace="~{components/input :: input(null, 'search', 'schoolSearch', 'search', '', 'Buscar por nome ou CNPJ...', false, false, false, null, null, 'bi-search', null)}"></div>
+        <div th:replace="~{components/dropdown :: select('Status', 'status', 'schoolStatus', ${ {'Todos', 'Ativas', 'Inativas'} }, 'Todos', false, false, null)}"></div>
+    </section>
 
-                    <tr th:if="${#lists.isEmpty(escolas)}">
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-                            Nenhum registro de escola encontrado no sistema.
-                        </td>
-                    </tr>
-
-                    <tr th:unless="${#lists.isEmpty(escolas)}" th:each="escola : ${escolas}">
-
-                        <td class="ps-4 fw-bold text-dark" th:text="${escola.nome}">Colégio Kutuar Educação</td>
-                        <td class="text-muted" th:text="${escola.cnpj}">12.345.678/0001-90</td>
-                        <td class="text-muted" th:text="${escola.cidade}">São Paulo</td>
-
-                        <td>
-                            <span th:text="${escola.status}"
-                                  th:classappend="${escola.status == 'ATIVA'} ? 'badge bg-success fs-6' : 'badge bg-danger fs-6'">
-                                ATIVA
-                            </span>
-                        </td>
-
-                        <td class="text-end pe-4">
-                            <div class="d-flex justify-content-end gap-1">
-
-                                <!-- Visualizar -->
-                                <a th:href="'/dashboard/escolas/visualizar/' + ${escola.id}"
-                                   class="btn btn-sm btn-outline-secondary" title="Visualizar Detalhes">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-
-                                <!-- Editar -->
-                                <a th:href="'/dashboard/escolas/editar/' + ${escola.id}"
-                                   class="btn btn-sm btn-warning text-dark" title="Editar Cadastro">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-
-                                <!-- Inativar (só se ATIVA) -->
-                                <button th:if="${escola.status == 'ATIVA'}" type="button"
-                                        class="btn btn-sm btn-outline-danger" title="Inativar Escola"
-                                        th:attr="data-escola-id=${escola.id}"
-                                        onclick="confirmarEExecutarEscola(this.dataset.escolaId, 'inativar', 'Tem certeza que deseja inativar esta escola?')">
-                                    <i class="bi bi-slash-circle"></i>
-                                </button>
-
-                                <!-- Reativar (só se INATIVA) -->
-                                <button th:if="${escola.status != 'ATIVA'}" type="button"
-                                        class="btn btn-sm btn-outline-success" title="Reativar Escola"
-                                        th:attr="data-escola-id=${escola.id}"
-                                        onclick="confirmarEExecutarEscola(this.dataset.escolaId, 'ativar', 'Tem certeza que deseja reativar esta escola?')">
-                                    <i class="bi bi-check-circle"></i>
-                                </button>
-
-                                <!-- Excluir definitivamente — SEMPRE visível para o Super Admin -->
-                                <button type="button"
-                                        class="btn btn-sm btn-danger" title="Excluir Definitivamente"
-                                        th:attr="data-escola-id=${escola.id}, data-escola-nome=${escola.nome}"
-                                        onclick="confirmarExclusaoEscola(this.dataset.escolaId, this.dataset.escolaNome)">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
-
-                            </div>
-                        </td>
-
-                    </tr>
-                    </tbody>
-                </table>
+    <section class="dashboard-panel gestao-escolas-panel" aria-labelledby="gestaoEscolasTabelaTitulo">
+        <div class="panel-heading gestao-escolas-panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-buildings"></i></span>
+                <h2 id="gestaoEscolasTabelaTitulo">Instituições cadastradas</h2>
+                <p data-results-summary>Carregando escolas...</p>
             </div>
         </div>
-    </div>
 
-    <nav aria-label="Paginação de escolas" class="d-flex align-items-center justify-content-between my-3 gap-3">
-        <span th:text="${total + ' resultado(s) — Página ' + page + ' de ' + (totalPages == 0 ? 1 : totalPages)}"></span>
-        <div class="d-flex gap-2">
-            <a th:if="${hasPrevious}" class="btn btn-outline-secondary"
-               th:href="@{escolas(search=${search},status=${filtroStatus},page=${page - 1},size=${size})}">Anterior</a>
-            <a th:if="${hasNext}" class="btn btn-outline-secondary"
-               th:href="@{escolas(search=${search},status=${filtroStatus},page=${page + 1},size=${size})}">Próxima</a>
+        <div class="gestao-escolas-loading" data-state="loading" aria-live="polite">
+            <div class="gestao-escolas-skeleton"></div>
+            <div class="gestao-escolas-skeleton"></div>
+            <div class="gestao-escolas-skeleton"></div>
         </div>
-    </nav>
 
-    <!-- Modal de confirmação de exclusão definitiva -->
-    <div class="modal fade" id="modalExcluirEscola" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Exclusão Definitiva
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-2">Você está prestes a excluir <strong>permanentemente</strong> a escola:</p>
-                    <p class="fw-bold fs-5 text-danger" id="nomeEscolaExcluir">—</p>
-                    <div class="alert alert-warning py-2 mb-3">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        Esta ação <strong>não pode ser desfeita</strong>. Todos os dados vinculados (usuários, turmas, alunos, financeiro) serão removidos permanentemente.
-                    </div>
-                    <label class="form-label fw-semibold">Digite <code>EXCLUIR</code> para confirmar:</label>
-                    <input type="text" id="inputConfirmacaoExcluir" class="form-control" placeholder="EXCLUIR" autocomplete="off">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btnConfirmarExclusao" class="btn btn-danger" disabled
-                            onclick="executarExclusaoEscola()">
-                        <i class="bi bi-trash3 me-1"></i> Excluir Definitivamente
-                    </button>
-                </div>
-            </div>
+        <div class="table-responsive gestao-escolas-table-wrap" data-state="table" hidden>
+            <table class="dashboard-table k-dashboard-table gestao-escolas-table">
+                <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">CNPJ</th>
+                    <th scope="col" class="col-cidade">Cidade</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="col-acoes">Ações</th>
+                </tr>
+                </thead>
+                <tbody data-schools-table-body></tbody>
+            </table>
         </div>
-    </div>
 
-    <script>
-        let _idEscolaParaExcluir = null;
+        <div class="gestao-escolas-state" data-state="empty" hidden>
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <h3>Nenhuma escola cadastrada ainda.</h3>
+            <p>Cadastre a primeira instituição para começar a operação.</p>
+            <div th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
+        </div>
 
-        // Inativar / Ativar escola
-        async function confirmarEExecutarEscola(id, acao, mensagem) {
-            if (!window.confirm(mensagem)) return;
-            try {
-                const response = await fetch('/escolas/' + id + '/' + acao, { method: 'POST' });
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    const data = await response.json().catch(() => ({}));
-                    alert(data.message || 'Não foi possível concluir a ação.');
-                }
-            } catch (e) {
-                alert('Erro de conexão ao tentar executar a ação.');
-            }
-        }
+        <div class="gestao-escolas-state" data-state="no-results" hidden>
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <h3>Nenhuma escola encontrada com esses filtros.</h3>
+            <p>Limpe a busca ou altere o status para ampliar os resultados.</p>
+        </div>
 
-        // Abrir modal de exclusão definitiva
-        function confirmarExclusaoEscola(id, nome) {
-            _idEscolaParaExcluir = id;
-            document.getElementById('nomeEscolaExcluir').textContent = nome;
-            document.getElementById('inputConfirmacaoExcluir').value = '';
-            document.getElementById('btnConfirmarExclusao').disabled = true;
-            new bootstrap.Modal(document.getElementById('modalExcluirEscola')).show();
-        }
+        <div class="gestao-escolas-state" data-state="error" hidden>
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            <h3>Não foi possível carregar as escolas.</h3>
+            <p>Confira sua conexão e tente novamente.</p>
+            <button class="k-button k-button--outline k-button--md" type="button" data-action="retry">
+                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                <span>Tentar novamente</span>
+            </button>
+        </div>
 
-        // Habilita o botão só quando o usuário digitar EXCLUIR corretamente
-        document.getElementById('inputConfirmacaoExcluir').addEventListener('input', function () {
-            document.getElementById('btnConfirmarExclusao').disabled = (this.value !== 'EXCLUIR');
-        });
+        <footer class="gestao-escolas-pagination" data-pagination hidden>
+            <span data-pagination-summary></span>
+            <nav aria-label="Paginação de escolas">
+                <button class="k-button k-button--outline k-button--sm" type="button" data-page-action="previous">← Anterior</button>
+                <div class="gestao-escolas-pages" data-page-numbers></div>
+                <button class="k-button k-button--outline k-button--sm" type="button" data-page-action="next">Próxima →</button>
+            </nav>
+        </footer>
+    </section>
 
-        // Executar o DELETE no backend
-        async function executarExclusaoEscola() {
-            if (!_idEscolaParaExcluir) return;
-            try {
-                const response = await fetch('/escolas/' + _idEscolaParaExcluir + '/excluir', { method: 'DELETE' });
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    const data = await response.json().catch(() => ({}));
-                    alert(data.message || 'Não foi possível excluir a escola. Verifique se há dados vinculados.');
-                    bootstrap.Modal.getInstance(document.getElementById('modalExcluirEscola')).hide();
-                }
-            } catch (e) {
-                alert('Erro de conexão ao tentar excluir a escola.');
-            }
-        }
-    </script>
+    <template id="school-row-template">
+        <tr>
+            <td>
+                <span class="table-entity-icon"><i class="bi bi-building" aria-hidden="true"></i></span>
+                <strong data-school-field="nome"></strong>
+            </td>
+            <td data-school-field="cnpj"></td>
+            <td class="col-cidade" data-school-field="cidade"></td>
+            <td><span class="status-badge" data-school-field="status"></span></td>
+            <td class="col-acoes">
+                <div th:replace="~{components/dropdown :: actions('Ações', 'bi-three-dots-vertical')}">
+                    <th:block th:fragment="items">
+                        <a class="dropdown-item" data-school-action="details" href="#">
+                            <i class="bi bi-eye me-2" aria-hidden="true"></i>
+                            Ver detalhes
+                        </a>
+                        <a class="dropdown-item" data-school-action="edit" href="#">
+                            <i class="bi bi-pencil me-2" aria-hidden="true"></i>
+                            Editar
+                        </a>
+                        <hr class="dropdown-divider">
+                        <button class="dropdown-item text-danger" type="button" data-school-action="toggle"></button>
+                    </th:block>
+                </div>
+            </td>
+        </tr>
+    </template>
 
 </div>
 

@@ -231,7 +231,7 @@ public class KutuarApp {
             });
         });
 
-        app.before(new AuthMiddleware(jwtService));
+        app.before(new AuthMiddleware(jwtService, usuarioRepository, escolaRepository));
 
         // Rota Ping
         app.get("/ping", ctx -> {
@@ -666,6 +666,8 @@ public class KutuarApp {
         app.before("/api/admin/dashboard/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
         app.before("/api/admin/escolas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
         app.get("/api/admin/escolas", escolaController::listarEscolasAdmin);
+        app.before("/api/admin/escolas/{id}/exclusao/impacto", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
+        app.get("/api/admin/escolas/{id}/exclusao/impacto", escolaController::analisarImpactoExclusao);
         app.get("/api/admin/dashboard", superAdminDashboardApiController::dashboard);
         app.get("/api/admin/dashboard/alertas", superAdminDashboardApiController::alertas);
         app.get("/api/admin/dashboard/atividades", superAdminDashboardApiController::atividades);

@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -417,6 +419,36 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
             logger.error("Erro ao verificar dados vinculados da escola {}: {}", tenantId, e.getMessage(), e);
             // Falha ao verificar: por segurança, assume que HÁ dados vinculados e bloqueia a exclusão.
             return true;
+        }
+    }
+
+    /**
+     * Conta, sem modificar dados, todas as tabelas atualmente isoladas por tenant_id.
+     * O identificador de tenant em uso nas tabelas do produto é escola.id.
+     */
+    public Map<String, Long> contarDependenciasPorTenant(UUID tenantId) {
+        Map<String, Long> dependencias = new LinkedHashMap<>();
+        String[] tabelas = {
+                "aluno", "ano_letivo", "avaliacao", "desconto", "disciplina", "documento_aluno",
+                "frequencia", "historico_situacao_aluno", "matricula", "mensalidade", "nota",
+                "pagamento", "parcela", "professor", "serie", "serie_disciplina", "turma",
+                "turma_disciplina_professor", "usuario"
+        };
+
+        try (Connection conn = getConnection()) {
+            for (String tabela : tabelas) {
+                try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(1) FROM " + tabela + " WHERE tenant_id = ?")) {
+                    stmt.setObject(1, tenantId);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        rs.next();
+                        dependencias.put(tabela, rs.getLong(1));
+                    }
+                }
+            }
+            return dependencias;
+        } catch (SQLException e) {
+            logger.error("Erro ao analisar dependências da escola {}: {}", tenantId, e.getMessage(), e);
+            throw new RuntimeException("Não foi possível analisar as dependências da escola.", e);
         }
     }
 

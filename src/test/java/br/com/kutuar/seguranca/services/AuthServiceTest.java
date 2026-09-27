@@ -5,7 +5,9 @@ import br.com.kutuar.seguranca.enums.Perfil;
 import br.com.kutuar.seguranca.exceptions.AuthenticationException;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
+import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario;
+import br.com.kutuar.seguranca.repositories.EscolaRepository;
 import br.com.kutuar.seguranca.repositories.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,9 @@ public class AuthServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private EscolaRepository escolaRepository;
 
     @Mock
     private PasswordService passwordService;
@@ -91,6 +96,62 @@ public class AuthServiceTest {
 
         // Garante que o gerador de token NUNCA foi chamado
         verify(jwtService, never()).gerarToken(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Gestor de escola inativa não consegue logar")
+    void gestorDeEscolaInativaNaoConsegueLogar() {
+        Usuario gestor = usuarioDaEscola(Perfil.GESTOR);
+        when(usuarioRepository.findByCpf(gestor.getCpf())).thenReturn(Optional.of(gestor));
+        when(escolaRepository.findById(gestor.getEscolaId())).thenReturn(Optional.of(escola("INATIVA", gestor.getEscolaId())));
+        when(passwordService.verificar("Senha@123", gestor.getSenhaHash())).thenReturn(true);
+
+        assertThrows(AuthenticationException.class, () -> authService.autenticar(gestor.getCpf(), "Senha@123"));
+        verify(jwtService, never()).gerarToken(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Usuário comum de escola inativa não consegue logar")
+    void usuarioComumDeEscolaInativaNaoConsegueLogar() {
+        Usuario usuario = usuarioDaEscola(Perfil.PROFESSOR);
+        when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
+        when(escolaRepository.findById(usuario.getEscolaId())).thenReturn(Optional.of(escola("INATIVA", usuario.getEscolaId())));
+        when(passwordService.verificar("Senha@123", usuario.getSenhaHash())).thenReturn(true);
+
+        assertThrows(AuthenticationException.class, () -> authService.autenticar(usuario.getCpf(), "Senha@123"));
+        verify(jwtService, never()).gerarToken(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Usuário volta a logar após reativação da escola")
+    void usuarioVoltaALogarAposReativacaoDaEscola() {
+        Usuario usuario = usuarioDaEscola(Perfil.PROFESSOR);
+        when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
+        when(escolaRepository.findById(usuario.getEscolaId())).thenReturn(Optional.of(escola("ATIVA", usuario.getEscolaId())));
+        when(passwordService.verificar("Senha@123", usuario.getSenhaHash())).thenReturn(true);
+        when(jwtService.gerarToken(any(), any(), any(), any(), any())).thenReturn("jwt-ativo");
+
+        assertEquals("jwt-ativo", authService.autenticar(usuario.getCpf(), "Senha@123"));
+    }
+
+    private Usuario usuarioDaEscola(Perfil perfil) {
+        Usuario usuario = new Usuario();
+        usuario.setId(UUID.randomUUID());
+        usuario.setCpf("529.982.247-25");
+        usuario.setSenhaHash("hash");
+        usuario.setPerfil(perfil);
+        usuario.setEscolaId(UUID.randomUUID());
+        usuario.setTenantId(UUID.randomUUID());
+        usuario.setAtivo(true);
+        usuario.setBloqueado(false);
+        return usuario;
+    }
+
+    private Escola escola(String status, UUID escolaId) {
+        Escola escola = new Escola();
+        escola.setId(escolaId);
+        escola.setStatus(status);
+        return escola;
     }
 
     @Test
