@@ -127,9 +127,8 @@ public class EscolaService {
             ValidationUtil.validateTamanho(dto.getNomeResponsavel(), 5, 150, "Nome do responsável");
         }
 
-        if (dto.getStatus() != null && !dto.getStatus().isBlank() &&
-                !dto.getStatus().equals("ATIVA") && !dto.getStatus().equals("INATIVA")) {
-            throw new ValidationException("Status deve ser ATIVA ou INATIVA.");
+        if (dto.getStatus() != null) {
+            throw new ValidationException("O status da escola só pode ser alterado pelos fluxos de ativação ou inativação.");
         }
 
         if (dto.getCodigoInep() != null && !dto.getCodigoInep().isBlank() && dto.getCodigoInep().length() != 8) {
@@ -389,9 +388,6 @@ public class EscolaService {
         }
         if (dto.getEmailResponsavel() != null) {
             escola.setEmailResponsavel(dto.getEmailResponsavel());
-        }
-        if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
-            escola.setStatus(dto.getStatus());
         }
         if (dto.getCodigoInep() != null) escola.setCodigoInep(dto.getCodigoInep());
         if (dto.getSituacaoFuncionamento() != null) escola.setSituacaoFuncionamento(dto.getSituacaoFuncionamento());

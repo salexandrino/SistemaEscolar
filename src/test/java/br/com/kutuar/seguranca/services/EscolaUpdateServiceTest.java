@@ -2,6 +2,7 @@ package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.dtos.AtualizarEscolaDTO;
 import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.repositories.EscolaRepository;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class EscolaUpdateServiceTest {
@@ -54,6 +56,21 @@ class EscolaUpdateServiceTest {
         dto.setTemInternet(false);
         service.atualizarEscola(escola.getId(), dto, admin);
         assertEquals(false, escola.isTemInternet());
+    }
+
+    @Test
+    void atualizacaoGenericaComStatusEhRejeitadaSemAlterarEscola() {
+        Escola escola = escolaCompleta();
+        AtualizarEscolaDTO dto = new AtualizarEscolaDTO();
+        dto.setStatus("INATIVA");
+
+        ValidationException erro = assertThrows(ValidationException.class,
+                () -> service.atualizarEscola(escola.getId(), dto, admin));
+
+        assertEquals("O status da escola só pode ser alterado pelos fluxos de ativação ou inativação.",
+                erro.getMessage());
+        assertEquals("ATIVA", escola.getStatus());
+        verifyNoInteractions(repository);
     }
 
     private Escola escolaCompleta() {
