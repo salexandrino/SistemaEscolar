@@ -1,23 +1,90 @@
 package br.com.kutuar.seguranca.enums;
 
-public enum Perfil {
-    SUPER_ADMIN,
-    GESTOR,
-    SECRETARIA,
-    PROFESSOR,
-    FINANCEIRO;
+import java.util.EnumSet;
+import java.util.Set;
 
-    // Método para verificar se o perfil tem acesso a um determinado recurso/permissão
+public enum Perfil {
+    SUPER_ADMIN(EnumSet.allOf(Permissao.class)),
+
+    GESTOR(EnumSet.of(
+            Permissao.ESCOLA_VISUALIZAR,
+            Permissao.ESCOLA_EDITAR,
+            Permissao.USUARIO_VISUALIZAR,
+            Permissao.USUARIO_CRIAR,
+            Permissao.USUARIO_EDITAR,
+            Permissao.USUARIO_BLOQUEAR,
+            Permissao.USUARIO_APROVAR,
+            Permissao.ALUNO_VISUALIZAR,
+            Permissao.ALUNO_CRIAR,
+            Permissao.ALUNO_EDITAR,
+            Permissao.MATRICULA_VISUALIZAR,
+            Permissao.MATRICULA_CRIAR,
+            Permissao.MATRICULA_EDITAR,
+            Permissao.TURMA_VISUALIZAR,
+            Permissao.TURMA_GERENCIAR,
+            Permissao.NOTA_VISUALIZAR,
+            Permissao.NOTA_LANCAR,
+            Permissao.FREQUENCIA_VISUALIZAR,
+            Permissao.FREQUENCIA_LANCAR,
+            Permissao.FINANCEIRO_VISUALIZAR,
+            Permissao.FINANCEIRO_GERENCIAR,
+            Permissao.AUDITORIA_VISUALIZAR
+    )),
+
+    SECRETARIA(EnumSet.of(
+            Permissao.ESCOLA_VISUALIZAR,
+            Permissao.USUARIO_VISUALIZAR,
+            Permissao.ALUNO_VISUALIZAR,
+            Permissao.ALUNO_CRIAR,
+            Permissao.ALUNO_EDITAR,
+            Permissao.MATRICULA_VISUALIZAR,
+            Permissao.MATRICULA_CRIAR,
+            Permissao.MATRICULA_EDITAR,
+            Permissao.TURMA_VISUALIZAR
+    )),
+
+    PROFESSOR(EnumSet.of(
+            Permissao.ALUNO_VISUALIZAR,
+            Permissao.MATRICULA_VISUALIZAR,
+            Permissao.TURMA_VISUALIZAR,
+            Permissao.NOTA_VISUALIZAR,
+            Permissao.NOTA_LANCAR,
+            Permissao.FREQUENCIA_VISUALIZAR,
+            Permissao.FREQUENCIA_LANCAR
+    )),
+
+    FINANCEIRO(EnumSet.of(
+            Permissao.FINANCEIRO_VISUALIZAR,
+            Permissao.FINANCEIRO_GERENCIAR
+    ));
+
+    private final Set<Permissao> permissoes;
+
+    Perfil(Set<Permissao> permissoes) {
+        this.permissoes = Set.copyOf(permissoes);
+    }
+
+    public boolean hasPermission(Permissao permissao) {
+        return permissao != null && permissoes.contains(permissao);
+    }
+
+    public Set<Permissao> getPermissoes() {
+        return permissoes;
+    }
+
+    /**
+     * Ponte temporaria para consumidores que ainda fornecem o nome da permissao como texto.
+     */
+    @Deprecated
     public boolean hasPermission(String permission) {
-        // Esta lógica é um placeholder e deve ser expandida com um sistema de permissões mais granular
-        // Exemplo: permission pode ser "ACADEMICO_VIEW", "FINANCEIRO_EDIT", "USUARIO_CREATE"
-        return switch (this) {
-            case SUPER_ADMIN -> true; // Acesso total
-            case GESTOR -> !permission.startsWith("SUPER_ADMIN_"); // Gestor não acessa funcionalidades de SUPER_ADMIN
-            case SECRETARIA -> permission.startsWith("ACADEMICO_") || permission.startsWith("ALUNO_") || permission.startsWith("TURMA_");
-            case PROFESSOR -> permission.startsWith("PROFESSOR_") || permission.startsWith("NOTA_") || permission.startsWith("FREQUENCIA_");
-            case FINANCEIRO -> permission.startsWith("FINANCEIRO_") || permission.startsWith("PAGAMENTO_") || permission.startsWith("MENSALIDADE_");
-            default -> false;
-        };
+        if (permission == null) {
+            return false;
+        }
+
+        try {
+            return hasPermission(Permissao.valueOf(permission));
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
     }
 }

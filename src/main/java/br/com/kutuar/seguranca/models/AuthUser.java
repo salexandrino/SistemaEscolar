@@ -1,6 +1,7 @@
 package br.com.kutuar.seguranca.models;
 
 import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.enums.Permissao;
 
 import java.util.UUID;
 
@@ -47,5 +48,9 @@ public class AuthUser {
 
     public boolean hasPermission(String permission) {
         return perfil.hasPermission(permission);
+    }
+
+    public boolean hasPermission(Permissao permissao) {
+        return perfil != null && perfil.hasPermission(permissao);
     }
 }
