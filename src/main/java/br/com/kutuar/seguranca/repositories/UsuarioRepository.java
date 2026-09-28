@@ -410,6 +410,26 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         }
     }
 
+    public void updatePerfilETenant(Usuario usuario) {
+        String sql = "UPDATE usuario SET perfil = ?, tenant_id = ?, escola_id = ?, atualizado_em = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getPerfil().name());
+            stmt.setObject(2, usuario.getTenantId());
+            stmt.setObject(3, usuario.getEscolaId());
+            stmt.setObject(4, LocalDateTime.now(), Types.TIMESTAMP);
+            stmt.setObject(5, usuario.getId());
+
+            if (stmt.executeUpdate() == 0) {
+                throw new RuntimeException("Usuario nao encontrado para atualizacao de perfil.");
+            }
+            logger.info("Perfil e vinculo de tenant do usuario ID {} atualizados.", usuario.getId());
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar perfil e tenant do usuario ID {}: {}", usuario.getId(), e.getMessage(), e);
+            throw new RuntimeException("Erro ao atualizar perfil do usuario no banco de dados.", e);
+        }
+    }
+
     public void inactivate(UUID id, UUID tenantId) {
         String sql = "UPDATE usuario SET ativo = FALSE, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
         try (Connection conn = getConnection();

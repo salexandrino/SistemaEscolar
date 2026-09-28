@@ -24,6 +24,7 @@ public class UsuarioAdminService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioAdminService.class);
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
 
     public UsuarioAdminService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -60,6 +61,7 @@ public class UsuarioAdminService {
         usuario.setCpf(dto.getCpf().trim());
         usuario.setTelefone(dto.getTelefone().trim());
 
+        usuarioTenantService.validarConsistencia(usuario);
         usuarioRepository.updateCadastro(usuario);
         logger.info("Usuario ID {} updated administrativamente.", id);
         return buscarPorId(id, currentUser);
@@ -91,7 +93,8 @@ public class UsuarioAdminService {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuario nao encontrado."));
-        usuarioRepository.updateProfile(usuario.getId(), usuario.getTenantId(), dto.getPerfil());
+        usuarioTenantService.validarTrocaDePerfil(usuario, dto.getPerfil());
+        usuarioRepository.updatePerfilETenant(usuario);
         logger.info("Perfil do usuario ID {} atualizado administrativamente.", id);
     }
 

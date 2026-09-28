@@ -27,6 +27,7 @@ public class AuthService {
     private final PasswordService passwordService;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
     private final Random random = new Random();
@@ -186,6 +187,8 @@ public class AuthService {
         if (usuario.getPerfil() == Perfil.GESTOR) {
             throw new AuthorizationException("O perfil de Gestor é criado automaticamente no cadastro da escola e não está disponível para auto-cadastro.");
         }
+
+        usuarioTenantService.validarConsistencia(usuario);
 
         // Escola
         if (usuario.getEscolaId() == null) {
