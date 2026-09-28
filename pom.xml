@@ -21,7 +21,7 @@
         <flyway.version>10.16.0</flyway.version>
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.18</logback.version>
-        <jackson.version>2.18.9</jackson.version>
+        <jackson.version>2.18.10</jackson.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <junit.version>5.9.3</junit.version>
