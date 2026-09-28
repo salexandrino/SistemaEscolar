@@ -9,8 +9,8 @@
     <version>1.0.0</version>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <javalin.version>6.7.0</javalin.version>
@@ -21,7 +21,7 @@
         <flyway.version>10.16.0</flyway.version>
         <slf4j.version>2.0.17</slf4j.version>
         <logback.version>1.5.18</logback.version>
-        <jackson.version>2.18.9</jackson.version>
+        <jackson.version>2.18.10</jackson.version>
         <jjwt.version>0.12.6</jjwt.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <junit.version>5.9.3</junit.version>
@@ -187,7 +187,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>25</release>
                 </configuration>
             </plugin>
 
