@@ -1,5 +1,8 @@
 package br.com.kutuar.seguranca.middlewares;
 
+import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.enums.Permissao;
+import br.com.kutuar.seguranca.exceptions.AuthenticationException;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
@@ -9,45 +12,54 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
+/** Autoriza uma rota a partir da permissao do perfil autenticado. */
 public class AuthorizationMiddleware implements Handler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthorizationMiddleware.class);
-    private final Set<String> requiredPermissions;
 
-    public AuthorizationMiddleware(String... requiredPermissions) {
-        this.requiredPermissions = Arrays.stream(requiredPermissions).collect(Collectors.toSet());
+    private final Permissao requiredPermission;
+    private final Perfil requiredGlobalProfile;
+
+    public AuthorizationMiddleware(Permissao requiredPermission) {
+        this(requiredPermission, null);
+    }
+
+    /**
+     * Use o perfil opcional apenas para recursos estritamente globais.
+     * O usuario precisa satisfazer tanto o perfil quanto a permissao.
+     */
+    public AuthorizationMiddleware(Permissao requiredPermission, Perfil requiredGlobalProfile) {
+        this.requiredPermission = Objects.requireNonNull(requiredPermission, "A permissao obrigatoria nao pode ser nula.");
+        this.requiredGlobalProfile = requiredGlobalProfile;
     }
 
     @Override
-    public void handle(@NotNull Context ctx) throws Exception {
+    public void handle(@NotNull Context ctx) {
         AuthUser authUser = AuthUserContext.getAuthUser();
 
         if (authUser == null) {
-            logger.warn("Acesso negado: Usuário não autenticado para recurso que requer autorização.");
-            throw new AuthorizationException("Acesso negado. Você não está autenticado.");
+            logger.warn("Acesso negado a {}: usuario nao autenticado.", ctx.path());
+            throw new AuthenticationException("Usuario nao autenticado.");
         }
 
-        // SUPER_ADMIN tem acesso total, ignora outras permissões
-        if (authUser.getPerfil().name().equals("SUPER_ADMIN")) {
-            return;
+        Perfil perfil = authUser.getPerfil();
+        if (perfil == null || (requiredGlobalProfile != null && perfil != requiredGlobalProfile)) {
+            deny(ctx, authUser);
         }
 
-        // Verifica se o usuário possui todas as permissões necessárias
-        boolean hasAllPermissions = requiredPermissions.stream()
-                .allMatch(authUser::hasPermission);
-
-        if (!hasAllPermissions) {
-            logger.warn("Acesso negado: Usuário {} com perfil {} não possui as permissões necessárias: {}",
-                    authUser.getCpf(), authUser.getPerfil(), requiredPermissions);
-            throw new AuthorizationException("Acesso negado. Você não tem permissão para acessar este recurso.");
+        // A autorizacao e definida exclusivamente pelo perfil, nao por strings legadas.
+        if (!perfil.hasPermission(requiredPermission)) {
+            deny(ctx, authUser);
         }
 
-        // Multi-Tenant: A validação do tenantId para dados específicos é responsabilidade do Service/Repository.
-        // Este middleware garante que o usuário está autenticado e tem o perfil certo.
+        // tenantId permanece disponivel em authUser para regras futuras, sem validacao aqui.
+    }
 
+    private void deny(Context ctx, AuthUser authUser) {
+        logger.warn("Acesso negado a {}: usuario {} com perfil {} nao possui a permissao {}.",
+                ctx.path(), authUser.getCpf(), authUser.getPerfil(), requiredPermission);
+        throw new AuthorizationException("Acesso negado. Voce nao tem permissao para acessar este recurso.");
     }
 }

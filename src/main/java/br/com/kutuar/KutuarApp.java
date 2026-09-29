@@ -675,7 +675,13 @@ public class KutuarApp {
 
 
         // TRATAMENTO DE EXCEÇÕES
-        app.exception(AuthenticationException.class, (e, ctx) -> ctx.redirect("/super-admin/login"));
+        app.exception(AuthenticationException.class, (e, ctx) -> {
+            if (ctx.path().startsWith("/api/")) {
+                ctx.status(401).json(Map.of("message", e.getMessage()));
+            } else {
+                ctx.redirect("/super-admin/login");
+            }
+        });
 
         app.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404);
