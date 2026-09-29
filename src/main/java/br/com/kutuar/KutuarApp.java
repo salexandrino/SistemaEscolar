@@ -578,33 +578,33 @@ public class KutuarApp {
         app.get("/api/escolas/{id}", escolaVisualizarGlobal.then(escolaController::obterEscola));
 
         // ACADÊMICO — DISCIPLINAS
-        app.get("/api/academico/disciplinas", disciplinaController::listar);
-        app.get("/api/academico/disciplinas/{id}", disciplinaController::obter);
-        app.post("/api/academico/disciplinas", disciplinaController::criar);
-        app.put("/api/academico/disciplinas/{id}", disciplinaController::atualizar);
-        app.delete("/api/academico/disciplinas/{id}", disciplinaController::remover);
+        app.get("/api/academico/disciplinas", turmaVisualizar.then(disciplinaController::listar));
+        app.get("/api/academico/disciplinas/{id}", turmaVisualizar.then(disciplinaController::obter));
+        app.post("/api/academico/disciplinas", turmaGerenciar.then(disciplinaController::criar));
+        app.put("/api/academico/disciplinas/{id}", turmaGerenciar.then(disciplinaController::atualizar));
+        app.delete("/api/academico/disciplinas/{id}", turmaGerenciar.then(disciplinaController::remover));
 
         // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ
-        app.get("/api/academico/anos-letivos", anoLetivoController::listar);
-        app.post("/api/academico/anos-letivos", anoLetivoController::criar);
-        app.put("/api/academico/anos-letivos/{id}", anoLetivoController::editar);
-        app.delete("/api/academico/anos-letivos/{id}", anoLetivoController::apagar);
-        app.patch("/api/academico/anos-letivos/{id}/arquivar", anoLetivoController::arquivar);
-        app.patch("/api/academico/anos-letivos/{id}/definir-ativo", anoLetivoController::definirAtivo);
-        app.get("/api/academico/anos-letivos/historico", anoLetivoController::historico);
-        app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", anoLetivoController::clonar);
+        app.get("/api/academico/anos-letivos", turmaVisualizar.then(anoLetivoController::listar));
+        app.post("/api/academico/anos-letivos", turmaGerenciar.then(anoLetivoController::criar));
+        app.put("/api/academico/anos-letivos/{id}", turmaGerenciar.then(anoLetivoController::editar));
+        app.delete("/api/academico/anos-letivos/{id}", turmaGerenciar.then(anoLetivoController::apagar));
+        app.patch("/api/academico/anos-letivos/{id}/arquivar", turmaGerenciar.then(anoLetivoController::arquivar));
+        app.patch("/api/academico/anos-letivos/{id}/definir-ativo", turmaGerenciar.then(anoLetivoController::definirAtivo));
+        app.get("/api/academico/anos-letivos/historico", turmaVisualizar.then(anoLetivoController::historico));
+        app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", turmaGerenciar.then(anoLetivoController::clonar));
 
         // Séries
-        app.get("/api/academico/series", serieController::listarPorAno);
-        app.get("/api/academico/series/{id}", serieController::obter);
-        app.post("/api/academico/series", serieController::criar);
-        app.put("/api/academico/series/{id}", serieController::atualizar);
-        app.delete("/api/academico/series/{id}", serieController::remover);
+        app.get("/api/academico/series", turmaVisualizar.then(serieController::listarPorAno));
+        app.get("/api/academico/series/{id}", turmaVisualizar.then(serieController::obter));
+        app.post("/api/academico/series", turmaGerenciar.then(serieController::criar));
+        app.put("/api/academico/series/{id}", turmaGerenciar.then(serieController::atualizar));
+        app.delete("/api/academico/series/{id}", turmaGerenciar.then(serieController::remover));
 
         // Matriz Curricular
-        app.get("/api/academico/series/{idSerie}/matriz", matrizCurricularController::listar);
-        app.post("/api/academico/series/{idSerie}/matriz", matrizCurricularController::definir);
-        app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", matrizCurricularController::remover);
+        app.get("/api/academico/series/{idSerie}/matriz", turmaVisualizar.then(matrizCurricularController::listar));
+        app.post("/api/academico/series/{idSerie}/matriz", turmaGerenciar.then(matrizCurricularController::definir));
+        app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", turmaGerenciar.then(matrizCurricularController::remover));
 
         // ACADÊMICO — TURMAS
         app.get("/api/academico/turmas", turmaVisualizar.then(turmaController::listar));

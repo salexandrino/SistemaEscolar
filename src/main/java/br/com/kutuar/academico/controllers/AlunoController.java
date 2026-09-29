@@ -2,6 +2,7 @@ package br.com.kutuar.academico.controllers;
 
 import br.com.kutuar.academico.dtos.*;
 import br.com.kutuar.academico.services.AlunoService;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import io.javalin.http.Context;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -67,7 +68,7 @@ public class AlunoController {
     }
 
     public void emitirHistoricoEscolar(Context ctx) {
-        UUID tenantId = br.com.kutuar.seguranca.utils.AuthUserContext.getAuthUser().getTenantId();
+        UUID tenantId = TenantAccessGuard.currentTenant();
         UUID idAluno = UUID.fromString(ctx.pathParam("id"));
         ctx.json(service.emitirHistoricoEscolar(tenantId, idAluno));
     }
