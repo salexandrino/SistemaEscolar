@@ -3,6 +3,7 @@ package br.com.kutuar.administrativo.controllers;
 import br.com.kutuar.administrativo.dto.DashboardDTO;
 import br.com.kutuar.administrativo.services.DashboardService;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.enums.Permissao;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario; // IMPORTANTE: Importar o modelo de Usuário
 import br.com.kutuar.seguranca.repositories.UsuarioRepository; // IMPORTANTE: Importar o repositório de usuários
@@ -38,10 +39,32 @@ public class DashboardController {
         this.templateEngine = templateEngine;
     }
 
+    private org.thymeleaf.context.Context novoContexto() {
+        AuthUser user = AuthUserContext.getAuthUser();
+        org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+        context.setVariable("currentUser", user);
+        context.setVariable("canCreateSchool", hasPermission(user, Permissao.ESCOLA_CRIAR));
+        context.setVariable("canEditSchool", hasPermission(user, Permissao.ESCOLA_EDITAR));
+        context.setVariable("canBlockSchool", hasPermission(user, Permissao.ESCOLA_BLOQUEAR));
+        context.setVariable("canViewSchool", hasPermission(user, Permissao.ESCOLA_VISUALIZAR));
+        context.setVariable("canCreateUser", hasPermission(user, Permissao.USUARIO_CRIAR));
+        context.setVariable("canEditUser", hasPermission(user, Permissao.USUARIO_EDITAR));
+        context.setVariable("canBlockUser", hasPermission(user, Permissao.USUARIO_BLOQUEAR));
+        context.setVariable("canApproveUser", hasPermission(user, Permissao.USUARIO_APROVAR));
+        context.setVariable("canViewUser", hasPermission(user, Permissao.USUARIO_VISUALIZAR));
+        context.setVariable("canViewFinance", hasPermission(user, Permissao.FINANCEIRO_VISUALIZAR));
+        context.setVariable("canViewAudit", hasPermission(user, Permissao.AUDITORIA_VISUALIZAR));
+        return context;
+    }
+
+    private boolean hasPermission(AuthUser user, Permissao permission) {
+        return user != null && user.getPerfil() != null && user.getPerfil().hasPermission(permission);
+    }
+
     // 1. Tela Inicial Principal do Dashboard
     public void dashboard(Context ctx) {
         DashboardDTO dashboard = dashboardService.buscarDashboardSuperAdmin();
-        org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleaf = novoContexto();
         thymeleaf.setVariable("dashboard", dashboard);
         thymeleaf.setVariable("content", "dashboard/index");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
@@ -52,13 +75,13 @@ public class DashboardController {
     // ==========================================
 
     public void escolas(Context ctx) {
-        org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleaf = novoContexto();
         thymeleaf.setVariable("content", "dashboard/escolas/index");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
     }
 
     public void novaEscola(Context ctx) {
-        org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleaf = novoContexto();
         thymeleaf.setVariable("content", "dashboard/escolas/nova");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
     }
@@ -73,7 +96,10 @@ public class DashboardController {
             String idParam = ctx.pathParam("id");
             UUID schoolId = UUID.fromString(idParam);
             Escola escola = escolaService.buscarEscolaPorId(schoolId, currentUser);
-            Map<String, Object> model = Map.of("escola", escola, "currentUser", currentUser);
+            Map<String, Object> model = Map.of(
+                    "escola", escola,
+                    "currentUser", currentUser,
+                    "canBlockSchool", hasPermission(currentUser, Permissao.ESCOLA_BLOQUEAR));
             ctx.render("dashboard/escolas/editar.html", model);
         } catch (Exception e) {
             logger.error("Erro ao carregar a página de edição de escola", e);
@@ -82,7 +108,7 @@ public class DashboardController {
     }
 
     public void visualizarEscola(Context ctx) {
-        org.thymeleaf.context.Context thymeleaf = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleaf = novoContexto();
         thymeleaf.setVariable("content", "dashboard/escolas/visualizar");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
     }
@@ -93,7 +119,7 @@ public class DashboardController {
 
     // ALTERAÇÃO 2: Buscar a lista real de usuários cadastrados no Banco de Dados
     public void usuarios(Context ctx) {
-        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleafContext = novoContexto();
 
         // Puxa todos os usuários do banco (seja criado na tela ou no cadastro geral)
         List<Usuario> listaUsuarios = usuarioRepository.findAll();
@@ -131,7 +157,7 @@ public class DashboardController {
 
     // 7. Cadastrar Novo Usuário (Busca as escolas reais para vincular no Select)
     public void novoUsuario(Context ctx) {
-        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleafContext = novoContexto();
 
         // Se sua amiga tiver um escolaRepository ou se o escolaService listar, usamos ele aqui:
         // Exemplo trazendo a lista real para o formulário de cadastro:
@@ -145,7 +171,7 @@ public class DashboardController {
 
     // ALTERAÇÃO 3: Buscar o usuário real pelo ID no Banco de Dados para carregar na tela de Edição
     public void editarUsuario(Context ctx) {
-        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleafContext = novoContexto();
 
         try {
             String idParam = ctx.pathParam("id");
@@ -171,7 +197,7 @@ public class DashboardController {
     }
     // Método para processar o envio do formulário de edição (POST)
     public void salvarEditarUsuario(Context ctx) {
-        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleafContext = novoContexto();
         try {
             // 1. Captura o ID da URL e converte para UUID
             java.util.UUID usuarioId = java.util.UUID.fromString(ctx.pathParam("id"));
@@ -220,7 +246,7 @@ public class DashboardController {
 
     // ALTERAÇÃO 4: Buscar o usuário real para a tela de Visualização completa
     public void visualizarUsuario(Context ctx) {
-        org.thymeleaf.context.Context thymeleafContext = new org.thymeleaf.context.Context();
+        org.thymeleaf.context.Context thymeleafContext = novoContexto();
 
         try {
             String idParam = ctx.pathParam("id");

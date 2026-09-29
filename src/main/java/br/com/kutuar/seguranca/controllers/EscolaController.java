@@ -12,6 +12,7 @@ import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
+import br.com.kutuar.seguranca.enums.Permissao;
 import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.dtos.EscolaExclusaoImpactoDTO;
@@ -690,6 +691,11 @@ public class EscolaController {
             List<EscolaResumoDTO> escolas = pagina.items();
 
             Map<String, Object> model = new java.util.HashMap<>();
+            model.put("currentUser", currentUser);
+            model.put("canCreateSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_CRIAR));
+            model.put("canEditSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_EDITAR));
+            model.put("canBlockSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_BLOQUEAR));
+            model.put("canViewSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_VISUALIZAR));
             model.put("escolas", escolas);
             model.put("filtroStatus", status == null ? "" : status.name());
             model.put("content", "dashboard/escolas/lista");
@@ -736,7 +742,12 @@ public class EscolaController {
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
 
-            Map<String, Object> model = Map.of("escola", escola, "content", "dashboard/escolas/visualizar");
+            Map<String, Object> model = Map.of(
+                    "escola", escola,
+                    "content", "dashboard/escolas/visualizar",
+                    "currentUser", currentUser,
+                    "canEditSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_EDITAR),
+                    "canBlockSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_BLOQUEAR));
             ctx.render("dashboard/escolas/visualizar.html", model);
 
         } catch (Exception e) {

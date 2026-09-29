@@ -644,6 +644,7 @@
 
                 <a
                     class="quick-action primary k-quick-action"
+                    th:if="${canCreateSchool}"
                     href="/dashboard/escolas/nova">
 
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
@@ -665,6 +666,7 @@
 
                 <a
                     class="quick-action k-quick-action"
+                    th:if="${canViewUser}"
                     href="/dashboard/usuarios">
 
                     <i class="bi bi-people" aria-hidden="true"></i>
@@ -686,6 +688,7 @@
 
                 <a
                     class="quick-action k-quick-action"
+                    th:if="${canApproveUser}"
                     href="/dashboard/usuarios?status=pendente">
 
                     <i class="bi bi-person-check" aria-hidden="true"></i>

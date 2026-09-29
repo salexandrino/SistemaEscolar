@@ -43,7 +43,7 @@
                 Gerenciamento de Escolas
             </h2>
         </div>
-        <div th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
+        <div th:if="${canCreateSchool}" th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
     </header>
 
     <section class="metrics-grid gestao-escolas-metrics" aria-label="Indicadores de escolas">
@@ -106,7 +106,7 @@
             <i class="bi bi-building" aria-hidden="true"></i>
             <h3>Nenhuma escola cadastrada ainda.</h3>
             <p>Cadastre a primeira instituição para começar a operação.</p>
-            <div th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
+            <div th:if="${canCreateSchool}" th:replace="~{components/button :: button('+ Nova escola', 'bi-plus-circle', 'primary', 'md', false, false, 'button', '/dashboard/escolas/nova')}"></div>
         </div>
 
         <div class="gestao-escolas-state" data-state="no-results" hidden>
@@ -147,16 +147,16 @@
             <td class="col-acoes">
                 <div th:replace="~{components/dropdown :: actions('Ações', 'bi-three-dots-vertical')}">
                     <th:block th:fragment="items">
-                        <a class="dropdown-item" data-school-action="details" href="#">
+                        <a th:if="${canViewSchool}" class="dropdown-item" data-school-action="details" href="#">
                             <i class="bi bi-eye me-2" aria-hidden="true"></i>
                             Ver detalhes
                         </a>
-                        <a class="dropdown-item" data-school-action="edit" href="#">
+                        <a th:if="${canEditSchool}" class="dropdown-item" data-school-action="edit" href="#">
                             <i class="bi bi-pencil me-2" aria-hidden="true"></i>
                             Editar
                         </a>
-                        <hr class="dropdown-divider">
-                        <button class="dropdown-item text-danger" type="button" data-school-action="toggle"></button>
+                        <hr th:if="${canBlockSchool}" class="dropdown-divider">
+                        <button th:if="${canBlockSchool}" class="dropdown-item text-danger" type="button" data-school-action="toggle"></button>
                     </th:block>
                 </div>
             </td>
