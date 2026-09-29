@@ -7,6 +7,7 @@ import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import io.javalin.http.Context;
+import io.javalin.http.Handler;
 import io.javalin.http.HttpStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class AuthorizationMiddlewareTest {
 
@@ -56,6 +59,30 @@ class AuthorizationMiddlewareTest {
         AuthUserContext.setAuthUser(usuario(Perfil.SUPER_ADMIN));
 
         assertDoesNotThrow(() -> middleware.handle(ctx));
+    }
+
+    @Test
+    void rotaAdministrativaGlobalRecusaPerfilComPermissaoMasSemEscopoGlobal() {
+        Handler controller = mock(Handler.class);
+        Handler rotaProtegida = new AuthorizationMiddleware(Permissao.ESCOLA_VISUALIZAR, Perfil.SUPER_ADMIN)
+                .then(controller);
+        AuthUserContext.setAuthUser(usuario(Perfil.GESTOR));
+
+        assertThrows(AuthorizationException.class, () -> rotaProtegida.handle(ctx));
+
+        verifyNoInteractions(controller);
+    }
+
+    @Test
+    void rotaAdministrativaGlobalChamaControllerParaSuperAdmin() throws Exception {
+        Handler controller = mock(Handler.class);
+        Handler rotaProtegida = new AuthorizationMiddleware(Permissao.ESCOLA_VISUALIZAR, Perfil.SUPER_ADMIN)
+                .then(controller);
+        AuthUserContext.setAuthUser(usuario(Perfil.SUPER_ADMIN));
+
+        rotaProtegida.handle(ctx);
+
+        verify(controller).handle(ctx);
     }
 
     private AuthUser usuario(Perfil perfil) {

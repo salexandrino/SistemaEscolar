@@ -57,6 +57,15 @@ public class AuthorizationMiddleware implements Handler {
         // tenantId permanece disponivel em authUser para regras futuras, sem validacao aqui.
     }
 
+    /** Encadeia a autorizacao a um handler de rota, sem duplicar a checagem nos controllers. */
+    public Handler then(Handler next) {
+        Objects.requireNonNull(next, "O handler protegido nao pode ser nulo.");
+        return ctx -> {
+            handle(ctx);
+            next.handle(ctx);
+        };
+    }
+
     private void deny(Context ctx, AuthUser authUser) {
         logger.warn("Acesso negado a {}: usuario {} com perfil {} nao possui a permissao {}.",
                 ctx.path(), authUser.getCpf(), authUser.getPerfil(), requiredPermission);
