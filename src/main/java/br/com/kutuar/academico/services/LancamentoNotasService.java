@@ -13,6 +13,7 @@ import br.com.kutuar.academico.services.media.CalculoMediaPonderada;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 
 import java.math.BigDecimal;
@@ -41,11 +42,7 @@ public class LancamentoNotasService {
         this.alunoRepository = alunoRepository;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     public void lancar(LancamentoNotaDTO dto) {
         if (dto.getValor() == null || dto.getValor().compareTo(BigDecimal.ZERO) < 0 || dto.getValor().compareTo(BigDecimal.TEN) > 0) {

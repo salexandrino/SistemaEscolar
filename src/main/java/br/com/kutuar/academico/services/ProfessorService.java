@@ -9,6 +9,7 @@ import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.strategies.ValidadorCpf;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 
 import java.time.LocalDateTime;
@@ -28,11 +29,7 @@ public class ProfessorService {
         this.validadorCpf = validadorCpf;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     public ProfessorResponseDTO criar(CriarProfessorDTO dto) {
         if (dto == null || dto.getNome() == null || dto.getNome().isBlank()) throw new ValidationException("Nome é obrigatório.");
