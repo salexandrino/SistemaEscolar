@@ -292,8 +292,8 @@ public class EscolaService {
             throw converterViolacaoCnpj(new RuntimeException("Erro ao cadastrar escola.", e));
         }
 
-        logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
-                escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
+        logger.info("Escola cadastrada com gestor inicial. escolaId={}, gestorId={}",
+                escolaSalva.getId(), gestor.getId());
         auditoriaService.registrar(authUser, escolaSalva.getTenantId(), "ESCOLA_CRIADA", "ESCOLA",
                 escolaSalva.getId(), "gestor_inicial_criado=true");
         auditoriaService.registrar(authUser, escolaSalva.getTenantId(), "USUARIO_CRIADO", "USUARIO",
@@ -360,7 +360,7 @@ public class EscolaService {
         // Se CNPJ foi alterado, verifica se já existe outro com o mesmo CNPJ
         String cnpjNormalizado = dto.getCnpj() == null ? null : CnpjUtil.normalizar(dto.getCnpj());
         if (cnpjNormalizado != null && escolaRepository.existsByCnpjAndIdNot(cnpjNormalizado, escolaId)) {
-            logger.warn("Tentativa de atualizar CNPJ duplicado. Novo CNPJ: {}", cnpjNormalizado);
+            logger.warn("Atualização de escola negada: CNPJ já cadastrado. escolaId={}", escolaId);
             throw cnpjEmUso();
         }
 
@@ -434,7 +434,7 @@ public class EscolaService {
             throw converterViolacaoCnpj(e);
         }
 
-        logger.info("Escola atualizada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
+        logger.info("Escola atualizada com sucesso. escolaId={}", escola.getId());
         auditoriaService.registrar(authUser, escola.getTenantId(), "ESCOLA_EDITADA", "ESCOLA",
                 escola.getId(), "campos_atualizados=" + camposAtualizados(dto));
 
@@ -557,7 +557,8 @@ public class EscolaService {
         verificarPermissaoMaster(authUser);
         auditoriaService.registrar(authUser, null, "ESCOLA_EXCLUSAO_BLOQUEADA", "ESCOLA", id,
                 "motivo=POLITICA_RETENCAO_PENDENTE");
-        logger.warn("Tentativa bloqueada de exclusão definitiva da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
+        logger.warn("Exclusão definitiva de escola bloqueada por política de retenção. escolaId={}, executorId={}",
+                id, authUser.getUserId());
         throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
     }
     /** Rota legada do dashboard, também bloqueada para impedir exclusão física acidental. */
@@ -565,7 +566,8 @@ public class EscolaService {
         verificarPermissaoMaster(authUser);
         auditoriaService.registrar(authUser, null, "ESCOLA_EXCLUSAO_BLOQUEADA", "ESCOLA", id,
                 "motivo=POLITICA_RETENCAO_PENDENTE");
-        logger.warn("Tentativa bloqueada de exclusão via dashboard da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
+        logger.warn("Exclusão de escola via dashboard bloqueada por política de retenção. escolaId={}, executorId={}",
+                id, authUser.getUserId());
         throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
     }
 

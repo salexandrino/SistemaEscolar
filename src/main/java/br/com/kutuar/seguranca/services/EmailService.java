@@ -74,18 +74,18 @@ public class EmailService {
 
         if (!configurado) {
             // Modo desenvolvimento: sem SMTP configurado, só loga (não quebra o fluxo).
-            logger.info("[E-MAIL SIMULADO] Para: {} | Assunto: {} | Código: {}", destinatario, assunto, codigo);
+            logger.info("Envio simulado de e-mail de recuperação de senha.");
             return;
         }
 
         try {
             enviar(destinatario, assunto, corpo);
-            logger.info("E-mail de recuperação de senha enviado para {}.", destinatario);
+            logger.info("E-mail de recuperação de senha enviado.");
         } catch (MessagingException e) {
             // Não relança: falha no envio de e-mail não deve travar o fluxo de
             // "esqueci minha senha" nem revelar detalhes técnicos ao usuário.
             // O código já foi salvo no banco por quem chamou este método.
-            logger.error("Falha ao enviar e-mail de recuperação para {}: {}", destinatario, e.getMessage(), e);
+            logger.error("Falha ao enviar e-mail de recuperação de senha.", e);
         }
     }
 
@@ -99,15 +99,15 @@ public class EmailService {
                 + "Equipe Kutuar Educação";
 
         if (!configurado) {
-            logger.info("[E-MAIL SIMULADO] Para: {} | Assunto: {} | CPF: {}", destinatario, assunto, cpf);
+            logger.info("Envio simulado de e-mail de credenciais do gestor.");
             return;
         }
 
         try {
             enviar(destinatario, assunto, corpo);
-            logger.info("E-mail de credenciais de Gestor enviado para {}.", destinatario);
+            logger.info("E-mail de credenciais do gestor enviado.");
         } catch (MessagingException e) {
-            logger.error("Falha ao enviar e-mail de credenciais para {}: {}", destinatario, e.getMessage(), e);
+            logger.error("Falha ao enviar e-mail de credenciais do gestor.", e);
         }
     }
 

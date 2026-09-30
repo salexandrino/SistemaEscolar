@@ -31,7 +31,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por CPF {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), e.getMessage(), e);
+            logger.error("Erro ao buscar usuário por CPF.", e);
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
@@ -50,7 +50,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por CPF {} e tenant {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), tenantId, e.getMessage(), e);
+            logger.error("Erro ao buscar usuário por CPF. tenantId={}", tenantId, e);
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
@@ -67,7 +67,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por email {}: {}", email, e.getMessage(), e);
+            logger.error("Erro ao buscar usuário por e-mail.", e);
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
@@ -86,7 +86,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por email {} e tenant {}: {}", email, tenantId, e.getMessage(), e);
+            logger.error("Erro ao buscar usuário por e-mail. tenantId={}", tenantId, e);
             throw new RuntimeException("Erro ao buscar usuário no banco de dados.", e);
         }
         return Optional.empty();
@@ -157,7 +157,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao verificar existência de CPF {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), e.getMessage(), e);
+            logger.error("Erro ao verificar existência de CPF.", e);
             throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
         return false;
@@ -176,7 +176,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao verificar existência de CPF {} para tenant {}: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"), tenantId, e.getMessage(), e);
+            logger.error("Erro ao verificar existência de CPF. tenantId={}", tenantId, e);
             throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
         return false;
@@ -214,7 +214,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar usuário por email {} e tenant {}", email, tenantId, e);
+            logger.error("Erro ao verificar usuário por e-mail. tenantId={}", tenantId, e);
             throw new RuntimeException("Erro ao verificar usuário no banco de dados.", e);
         }
         return false;
@@ -232,7 +232,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
             save(conn, usuario, tenantId);
             logger.info("Usuário salvo: {}", usuario.getId());
         } catch (SQLException e) {
-            logger.error("Erro ao salvar usuário {}: {}", usuario.getCpfMascarado(), e.getMessage(), e);
+            logger.error("Erro ao salvar usuário. tenantId={}", tenantId, e);
             throw new RuntimeException("Erro ao salvar usuário no banco de dados.", e);
         }
     }
@@ -518,7 +518,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
             logger.info("Senha do usuário ID {} atualizada para tenant ID {}", id, tenantId);
         } catch (SQLException e) {
-            logger.error("Erro ao atualizar senha do usuário ID {} para tenant ID {}: {}", id, tenantId, e.getMessage(), e);
+            logger.error("Erro ao atualizar senha do usuário. usuarioId={}, tenantId={}", id, tenantId, e);
             throw new RuntimeException("Erro ao atualizar senha do usuário no banco de dados.", e);
         }
     }

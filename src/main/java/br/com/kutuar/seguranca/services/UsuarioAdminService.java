@@ -131,7 +131,7 @@ public class UsuarioAdminService {
         usuario.setTentativasLogin(0);
         usuarioRepository.update(usuario);
         auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_DESBLOQUEADO", usuario.getId(), "tentativas_login=0");
-        logger.info("Usuario ID {} desbloqueado administrativamente por {}.", id, currentUser.getCpf());
+        logger.info("Usuário desbloqueado administrativamente. usuarioId={}, executorId={}", id, currentUser.getUserId());
     }
 
     public void inativar(UUID id, AuthUser currentUser) {
@@ -178,7 +178,7 @@ public class UsuarioAdminService {
         }
 
         usuarioRepository.deleteHard(usuario.getId(), usuario.getTenantId());
-        logger.info("Usuario ID {} excluido definitivamente por {}.", id, currentUser.getCpf());
+        logger.info("Usuário excluído definitivamente. usuarioId={}, executorId={}", id, currentUser.getUserId());
     }
 
     /**
@@ -195,7 +195,7 @@ public class UsuarioAdminService {
         }
 
         usuarioRepository.inactivate(usuario.getId(), usuario.getTenantId());
-        logger.info("Usuario ID {} excluído (soft delete) por {}.", id, currentUser.getCpf());
+        logger.info("Usuário inativado por exclusão lógica. usuarioId={}, executorId={}", id, currentUser.getUserId());
     }
 
     private Usuario buscarParaAlteracao(UUID id, AuthUser currentUser) {

@@ -32,9 +32,9 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
             stmt.setBoolean(5, recuperacaoSenha.isUtilizado());
             stmt.setObject(6, recuperacaoSenha.getCriadoEm(), Types.TIMESTAMP);
             stmt.executeUpdate();
-            logger.info("Código de recuperação salvo para usuário ID: {}", recuperacaoSenha.getUsuarioId());
+            logger.info("Recuperação de senha registrada. usuarioId={}", recuperacaoSenha.getUsuarioId());
         } catch (SQLException e) {
-            logger.error("Erro ao salvar código de recuperação para usuário ID {}: {}", recuperacaoSenha.getUsuarioId(), e.getMessage(), e);
+            logger.error("Erro ao registrar recuperação de senha. usuarioId={}", recuperacaoSenha.getUsuarioId(), e);
             throw new RuntimeException("Erro ao salvar código de recuperação no banco de dados.", e);
         }
         return recuperacaoSenha;
@@ -52,7 +52,7 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao buscar código de recuperação {} para usuário ID {}: {}", codigo, usuarioId, e.getMessage(), e);
+            logger.error("Erro ao consultar recuperação de senha. usuarioId={}", usuarioId, e);
         }
         return Optional.empty();
     }
@@ -63,9 +63,9 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setObject(1, id);
             stmt.executeUpdate();
-            logger.info("Código de recuperação ID {} marcado como utilizado.", id);
+            logger.info("Recuperação de senha marcada como utilizada. recuperacaoId={}", id);
         } catch (SQLException e) {
-            logger.error("Erro ao marcar código de recuperação ID {} como utilizado: {}", id, e.getMessage(), e);
+            logger.error("Erro ao marcar recuperação de senha como utilizada. recuperacaoId={}", id, e);
             throw new RuntimeException("Erro ao marcar código de recuperação como utilizado no banco de dados.", e);
         }
     }

@@ -78,14 +78,10 @@ public class UsuarioAdminController {
             UUID id = UUID.fromString(ctx.pathParam("id"));
             AuthUser currentUser = AuthUserContext.getAuthUser();
 
-            logger.info("=== CONTROLLER: INICIANDO ATUALIZAÇÃO DO USUÁRIO {} ===", id);
-
             boolean ehFormulario = ctx.formParamMap() != null && !ctx.formParamMap().isEmpty();
 
             // 1️⃣ Busca o usuário original
             Usuario usuarioOriginal = usuarioAdminService.buscarPorId(id, currentUser);
-            logger.info("CONTROLLER: Usuário original encontrado. Status atual: {}", usuarioOriginal.isAtivo());
-
             if (ehFormulario) {
                 AtualizarUsuarioDTO dto = new AtualizarUsuarioDTO();
                 dto.setNomeCompleto(ctx.formParam("nomeCompleto"));
@@ -95,29 +91,20 @@ public class UsuarioAdminController {
                 dto.setEscolaId(usuarioOriginal.getEscolaId());
 
                 // 2️⃣ Tenta atualizar cadastro (Nome, Email, Telefone)
-                logger.info("CONTROLLER: Chamando usuarioAdminService.atualizar...");
                 usuarioAdminService.atualizar(id, dto, currentUser);
-                logger.info("CONTROLLER: usuarioAdminService.atualizar executado com sucesso.");
 
                 // 3️⃣ Tenta alterar o Status
                 String aprovadoParam = ctx.formParam("aprovado");
-                logger.info("CONTROLLER: Parâmetro aprovado recebido da tela: {}", aprovadoParam);
-
                 if (aprovadoParam != null) {
                     boolean querAtivo = Boolean.parseBoolean(aprovadoParam);
                     if (querAtivo && !usuarioOriginal.isAtivo()) {
-                        logger.info("CONTROLLER: Ativando usuário via Service...");
                         usuarioAdminService.aprovar(id, currentUser);
                     } else if (!querAtivo && usuarioOriginal.isAtivo()) {
-                        logger.info("CONTROLLER: Inativando usuário via Service...");
                         usuarioAdminService.inativar(id, currentUser);
-                    } else {
-                        logger.info("CONTROLLER: Nenhuma mudança de status necessária.");
                     }
                 }
             }
 
-            logger.info("=== CONTROLLER: FINALIZADO COM SUCESSO. REDIRECIONANDO... ===");
             ctx.redirect("/dashboard/usuarios");
             return;
 
@@ -128,7 +115,7 @@ public class UsuarioAdminController {
             responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("❌ ERRO CRÍTICO NO CONTROLLER: O processo quebrou! Mensagem: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao atualizar usuário.", e);
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao atualizar usuario.");
         }
     }

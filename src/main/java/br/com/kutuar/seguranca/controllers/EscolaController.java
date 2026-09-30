@@ -479,12 +479,12 @@ public class EscolaController {
         } catch (AuthenticationException | AuthorizationException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha ao buscar escola por CNPJ: {}", e.getMessage());
+            logger.warn("Busca de escola por CNPJ rejeitada.");
         } catch (NotFoundException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            logger.error("Erro inesperado ao buscar escola por CNPJ: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao buscar escola por CNPJ.", e);
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao buscar escola."));
         }

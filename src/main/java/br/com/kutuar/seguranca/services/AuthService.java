@@ -74,25 +74,25 @@ public class AuthService {
 
         Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpfNormalizado);
         if (optionalUsuario.isEmpty()) {
-            logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
+            logger.warn("Login negado: credenciais não reconhecidas.");
             throw new AuthenticationException("CPF não cadastrado. Por favor, crie uma conta para continuar.");
         }
 
         Usuario usuario = optionalUsuario.get();
 
         if (!usuario.isAtivo()) { // Verifica se o usuário está ativo
-            logger.warn("Tentativa de login de usuário inativo/pendente: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: conta inativa ou pendente. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Sua conta ainda não foi aprovada pelo Gestor.");
         }
 
         if (usuario.isBloqueado()) { // Verifica se o usuário está bloqueado
-            logger.warn("Tentativa de login em conta bloqueada para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: conta bloqueada. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Sua conta está bloqueada. Entre em contato com o administrador.");
         }
 
         if (!passwordService.verificar(senha, usuario.getSenhaHash())) {
             registrarTentativaLoginFalha(usuario);
-            logger.warn("Tentativa de login com senha inválida para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: credenciais inválidas. usuarioId={}", usuario.getId());
             throw new AuthenticationException("CPF ou senha inválidos.");
         }
 
@@ -135,7 +135,7 @@ public class AuthService {
         if (usuario.getTentativasLogin() >= maxLoginAttempts) {
             usuario.setBloqueado(true); // Marca como bloqueado
             // usuario.setBloqueadoAte(LocalDateTime.now().plusMinutes(lockoutDurationMinutes)); // Se quiser bloqueio temporário
-            logger.warn("Conta bloqueada para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Conta bloqueada após exceder tentativas de login. usuarioId={}", usuario.getId());
         }
         usuarioRepository.update(usuario);
     }
@@ -178,12 +178,12 @@ public class AuthService {
         }
 
         if (usuarioRepository.existsByCpf(usuario.getCpf(), usuario.getTenantId())) {
-            logger.warn("Tentativa de registro com CPF duplicado: {}", usuario.getCpfMascarado());
+            logger.warn("Cadastro de usuário negado: CPF já cadastrado.");
             throw new ConflictException("CPF já cadastrado.");
         }
 
         if (usuarioRepository.existsByEmail(usuario.getEmail(), usuario.getTenantId())) {
-            logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmailMascarado());
+            logger.warn("Cadastro de usuário negado: e-mail já cadastrado.");
             throw new ConflictException("E-mail já cadastrado.");
         }
 
@@ -222,9 +222,9 @@ public class AuthService {
         usuarioRepository.save(usuario, usuario.getTenantId());
 
         if (usuario.isAtivo()) {
-            logger.info("Usuário {} cadastrado e ATIVO pronto para uso.", usuario.getCpfMascarado());
+            logger.info("Usuário cadastrado e ativo. usuarioId={}", usuario.getId());
         } else {
-            logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
+            logger.info("Usuário cadastrado com aprovação pendente. usuarioId={}", usuario.getId());
         }
     }
     public void approveUser(UUID userId, UUID tenantId, AuthUser approver) {
@@ -248,7 +248,8 @@ public class AuthService {
 
         // 4. Aprovar usuário
         usuarioRepository.approve(userId, tenantId);
-        logger.info("Usuário ID {} aprovado por Gestor {} (Tenant {}).", userId, approver.getCpf(), tenantId);
+        logger.info("Usuário aprovado por gestor. usuarioId={}, executorId={}, tenantId={}",
+                userId, approver.getUserId(), tenantId);
     }
 
     public void forgotPassword(String email) {
@@ -266,14 +267,14 @@ public class AuthService {
 
             try {
                 usuarioRepository.update(usuario);
-                logger.info("Token de recuperação gerado para usuário ID {}.", usuario.getId());
+                logger.info("Solicitação de recuperação de senha processada. usuarioId={}", usuario.getId());
                 emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryToken);
             } catch (Exception e) {
-                logger.error("Erro ao salvar token de recuperação para usuário ID {}: {}", usuario.getId(), e.getMessage(), e);
+                logger.error("Falha ao processar recuperação de senha. usuarioId={}", usuario.getId(), e);
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
             }
         } else {
-            logger.info("Solicitação de recuperação de senha para conta não localizada.");
+            logger.info("Solicitação de recuperação de senha processada sem conta elegível.");
             // Não revelar que o e-mail não existe por segurança — apenas registrar no log
         }
     }
@@ -328,24 +329,27 @@ public class AuthService {
 
     public String autenticarSuperAdmin(String email, String senha) {
 
-        logger.info("Iniciando tentativa de login para o Super Admin: {}", email);
+        logger.info("Tentativa de login do Super Admin recebida.");
 
         ValidationUtil.validateEmail(email);
 
         // Busca o usuário apenas UMA vez no banco para economizar performance
         Usuario usuario = usuarioRepository.findSuperAdminByEmail(email)
-                .orElseThrow(() -> new AuthenticationException("Email ou senha inválidos."));
+                .orElseThrow(() -> {
+                    logger.warn("Login do Super Admin negado: credenciais não reconhecidas.");
+                    return new AuthenticationException("Email ou senha inválidos.");
+                });
 
         // Verifica se a senha bate com o hash criptografado (Sem printar nada no console!)
         boolean senhaCorreta = passwordService.verificar(senha, usuario.getSenhaHash());
 
         if (!senhaCorreta) {
-            logger.warn("Tentativa de login falhou: Senha incorreta para o Super Admin: {}", email);
+            logger.warn("Login do Super Admin negado: credenciais inválidas. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Email ou senha inválidos.");
             // Dica: Use uma mensagem genérica para não dar pistas a invasores se o e-mail ou a senha estavam certos
         }
 
-        logger.info("Super Admin [{}] autenticado com sucesso.", email);
+        logger.info("Login do Super Admin concluído. usuarioId={}", usuario.getId());
 
         // Gera o token JWT com segurança
         String token = jwtService.gerarToken(

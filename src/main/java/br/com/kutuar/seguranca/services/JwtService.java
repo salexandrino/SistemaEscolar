@@ -93,7 +93,7 @@ public class JwtService {
 
         } catch (Exception e) {
 
-            logger.warn("Falha na validação do token JWT: {}", e.getMessage());
+            logger.warn("Falha na validação do token JWT.");
 
             return null;
         }
