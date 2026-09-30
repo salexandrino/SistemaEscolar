@@ -40,8 +40,6 @@
                 <div class="col-md-6" th:insert="~{components/input :: input('E-mail', 'email', 'email', 'email', ${usuario.email}, null, true, false, false, null, null, 'bi-envelope', null)}"></div>
                 <div class="col-md-4" th:insert="~{components/input :: input('CPF', 'cpf', 'cpf', 'text', ${usuario.cpf}, null, true, false, true, null, 'O CPF não pode ser alterado.', null, null)}"></div>
                 <div class="col-md-4" th:insert="~{components/input :: input('Telefone', 'telefone', 'telefone', 'text', ${usuario.telefone}, '(00) 00000-0000', false, false, false, null, null, 'bi-telephone', null)}"></div>
-                <div class="col-md-4" th:insert="~{components/input :: input('Data de Nascimento', 'dataNascimento', 'dataNascimento', 'date', '', null, false, false, false, null, null, null, null)}"></div>
-                <div class="col-md-4" th:insert="~{components/dropdown :: select('Sexo', 'sexo', 'sexo', ${ {'', 'MASCULINO', 'FEMININO', 'OUTRO'} }, '', false, false, null)}"></div>
             </div>
         </section>
 
@@ -57,25 +55,6 @@
             <div class="row g-3">
                 <div class="col-md-4" th:insert="~{components/dropdown :: select('Perfil', 'perfil', 'perfil', ${ {'GESTOR', 'SECRETARIA', 'PROFESSOR', 'FINANCEIRO'} }, ${usuario.perfil.name()}, true, false, null)}"></div>
                 <div class="col-md-4" th:insert="~{components/dropdown :: select('Status da Conta', 'aprovado', 'aprovado', ${ {'true', 'false'} }, ${usuario.ativo ? 'true' : 'false'}, true, false, null)}"></div>
-            </div>
-        </section>
-
-        <section class="dashboard-panel mb-4" aria-labelledby="enderecoTitulo">
-            <div class="panel-heading">
-                <div>
-                    <span class="panel-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
-                    <h2 id="enderecoTitulo">Endereço residencial</h2>
-                    <p>Informações complementares de localização.</p>
-                </div>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-md-3" th:insert="~{components/input :: input('CEP', 'cep', 'cep', 'text', '', '00000-000', false, false, false, null, null, null, null)}"></div>
-                <div class="col-md-6" th:insert="~{components/input :: input('Logradouro', 'endereco', 'endereco', 'text', '', 'Endereço', false, false, false, null, null, 'bi-signpost', null)}"></div>
-                <div class="col-md-3" th:insert="~{components/input :: input('Complemento', 'complemento', 'complemento', 'text', '', null, false, false, false, null, null, null, null)}"></div>
-                <div class="col-md-4" th:insert="~{components/input :: input('Bairro', 'bairro', 'bairro', 'text', '', null, false, false, false, null, null, null, null)}"></div>
-                <div class="col-md-5" th:insert="~{components/input :: input('Cidade', 'cidade', 'cidade', 'text', '', null, false, false, false, null, null, null, null)}"></div>
-                <div class="col-md-3" th:insert="~{components/input :: input('Estado (UF)', 'estado', 'estado', 'text', '', null, false, false, false, null, null, null, null)}"></div>
             </div>
         </section>
 

@@ -4,10 +4,13 @@ import br.com.kutuar.administrativo.dto.DashboardDTO;
 import br.com.kutuar.administrativo.services.DashboardService;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.enums.Permissao;
+import br.com.kutuar.seguranca.dtos.AtualizarPerfilUsuarioDTO;
+import br.com.kutuar.seguranca.dtos.AtualizarUsuarioDTO;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario; // IMPORTANTE: Importar o modelo de Usuário
 import br.com.kutuar.seguranca.repositories.UsuarioRepository; // IMPORTANTE: Importar o repositório de usuários
 import br.com.kutuar.seguranca.services.EscolaService;
+import br.com.kutuar.seguranca.services.UsuarioAdminService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import io.javalin.http.Context;
@@ -30,12 +33,14 @@ public class DashboardController {
 
     // ALTERAÇÃO 1: Adicionar a variável do repositório/service de Usuários aqui
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioAdminService usuarioAdminService;
 
     // ALTERAÇÃO 1.1: Atualizar o construtor para receber o UsuarioRepository
-    public DashboardController(DashboardService dashboardService, EscolaService escolaService, UsuarioRepository usuarioRepository, TemplateEngine templateEngine) {
+    public DashboardController(DashboardService dashboardService, EscolaService escolaService, UsuarioRepository usuarioRepository, UsuarioAdminService usuarioAdminService, TemplateEngine templateEngine) {
         this.dashboardService = dashboardService;
         this.escolaService = escolaService;
         this.usuarioRepository = usuarioRepository; // Inicializa aqui
+        this.usuarioAdminService = usuarioAdminService;
         this.templateEngine = templateEngine;
     }
 
@@ -199,42 +204,39 @@ public class DashboardController {
     public void salvarEditarUsuario(Context ctx) {
         org.thymeleaf.context.Context thymeleafContext = novoContexto();
         try {
-            // 1. Captura o ID da URL e converte para UUID
-            java.util.UUID usuarioId = java.util.UUID.fromString(ctx.pathParam("id"));
+            UUID usuarioId = UUID.fromString(ctx.pathParam("id"));
+            AuthUser currentUser = AuthUserContext.getAuthUser();
+            Usuario usuarioOriginal = usuarioAdminService.buscarPorId(usuarioId, currentUser);
 
-            // 2. Busca o usuário existente do banco de dados reais
-            br.com.kutuar.seguranca.models.Usuario usuario = usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new br.com.kutuar.seguranca.exceptions.NotFoundException("Usuário não encontrado."));
-
-            // 3. Captura os dados enviados pelo formulário HTML (ctx.formParam)
             String nomeForm = ctx.formParam("nomeCompleto");
             String emailForm = ctx.formParam("email");
             String telefoneForm = ctx.formParam("telefone");
             String perfilForm = ctx.formParam("perfil");
             String aprovadoForm = ctx.formParam("aprovado");
 
-            // 4. Aplica as alterações no objeto Java se os campos não vierem nulos
-            if (nomeForm != null) usuario.setNomeCompleto(nomeForm);
-            if (emailForm != null) usuario.setEmail(emailForm);
-            if (telefoneForm != null) usuario.setTelefone(telefoneForm);
+            AtualizarUsuarioDTO dto = new AtualizarUsuarioDTO();
+            dto.setNomeCompleto(nomeForm);
+            dto.setEmail(emailForm);
+            dto.setCpf(usuarioOriginal.getCpf());
+            dto.setTelefone(telefoneForm);
+            dto.setEscolaId(usuarioOriginal.getEscolaId());
+            usuarioAdminService.atualizar(usuarioId, dto, currentUser);
 
-            // Tratamento do Enum do Perfil baseado no pacote correto
             if (perfilForm != null && !perfilForm.isBlank()) {
-                usuario.setPerfil(br.com.kutuar.seguranca.enums.Perfil.valueOf(perfilForm));
+                AtualizarPerfilUsuarioDTO perfilDto = new AtualizarPerfilUsuarioDTO();
+                perfilDto.setPerfil(br.com.kutuar.seguranca.enums.Perfil.valueOf(perfilForm));
+                usuarioAdminService.alterarPerfil(usuarioId, perfilDto, currentUser);
             }
 
-            // Tratamento do Boolean de aprovação (ativo/inativo)
             if (aprovadoForm != null) {
-                usuario.setAprovado("true".equals(aprovadoForm));
+                boolean querAtivo = Boolean.parseBoolean(aprovadoForm);
+                if (querAtivo && !usuarioOriginal.isAtivo()) {
+                    usuarioAdminService.aprovar(usuarioId, currentUser);
+                } else if (!querAtivo && usuarioOriginal.isAtivo()) {
+                    usuarioAdminService.inativar(usuarioId, currentUser);
+                }
             }
 
-            // O PASSO CRUCIAL: Salva as alterações de fato no banco de dados e comita
-            usuarioRepository.update(usuario);
-
-            // Atualiza a sessão e força o motor de renderização a carregar os dados novos
-            thymeleafContext.setVariable("usuario", usuario);
-
-            // Redireciona de volta para a lista com os dados atualizados
             ctx.redirect("/dashboard/usuarios");
 
         } catch (Exception e) {
