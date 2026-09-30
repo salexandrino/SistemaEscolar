@@ -10,6 +10,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<RecuperacaoSenha, UUID> {
 
@@ -81,16 +83,49 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
 
     @Override
     public void update(RecuperacaoSenha entity) {
-        throw new UnsupportedOperationException("Ainda não implementado.");
+        String sql = "UPDATE recuperacao_senha SET usuario_id = ?, codigo = ?, expiracao = ?, utilizado = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, entity.getUsuarioId());
+            stmt.setString(2, entity.getCodigo());
+            stmt.setObject(3, entity.getExpiracao(), Types.TIMESTAMP);
+            stmt.setBoolean(4, entity.isUtilizado());
+            stmt.setObject(5, entity.getId());
+            if (stmt.executeUpdate() == 0) {
+                throw new RuntimeException("Recuperação de senha não encontrada.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar recuperação de senha.", e);
+        }
     }
 
     @Override
     public Optional<RecuperacaoSenha> findById(UUID id) {
-        throw new UnsupportedOperationException("Ainda não implementado.");
+        String sql = "SELECT id, usuario_id, codigo, expiracao, utilizado, criado_em FROM recuperacao_senha WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? Optional.of(mapResultSetToRecuperacaoSenha(rs)) : Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar recuperação de senha.", e);
+        }
     }
 
     @Override
-    public java.util.List<RecuperacaoSenha> findAll() {
-        throw new UnsupportedOperationException("Ainda não implementado.");
+    public List<RecuperacaoSenha> findAll() {
+        String sql = "SELECT id, usuario_id, codigo, expiracao, utilizado, criado_em FROM recuperacao_senha ORDER BY criado_em DESC";
+        List<RecuperacaoSenha> recuperacoes = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                recuperacoes.add(mapResultSetToRecuperacaoSenha(rs));
+            }
+            return recuperacoes;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar recuperações de senha.", e);
+        }
     }
 }

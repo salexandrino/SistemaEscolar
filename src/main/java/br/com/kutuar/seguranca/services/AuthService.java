@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
 public class AuthService {
@@ -30,7 +31,9 @@ public class AuthService {
     private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
-    private final Random random = new Random();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final int RECOVERY_TOKEN_BYTES = 32;
+    private static final long RECOVERY_TOKEN_EXPIRATION_MINUTES = 15;
 
     public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
@@ -244,26 +247,26 @@ public class AuthService {
     public void forgotPassword(String email) {
         ValidationUtil.validateEmail(email);
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email.trim().toLowerCase());
 
         if (optionalUsuario.isPresent()) {
             Usuario usuario = optionalUsuario.get();
-            String recoveryCode = String.format("%06d", random.nextInt(999999));
-            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(15);
+            String recoveryToken = gerarTokenRecuperacao();
+            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(RECOVERY_TOKEN_EXPIRATION_MINUTES);
 
-            usuario.setResetPasswordToken(recoveryCode);
+            usuario.setResetPasswordToken(BCrypt.hashpw(recoveryToken, BCrypt.gensalt()));
             usuario.setResetPasswordExpiresAt(expiresAt);
 
             try {
                 usuarioRepository.update(usuario);
-                logger.info("Código de recuperação gerado para usuário {}.", usuario.getEmail());
-                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryCode);
+                logger.info("Token de recuperação gerado para usuário ID {}.", usuario.getId());
+                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryToken);
             } catch (Exception e) {
-                logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
+                logger.error("Erro ao salvar token de recuperação para usuário ID {}: {}", usuario.getId(), e.getMessage(), e);
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
             }
         } else {
-            logger.warn("Tentativa de recuperação de senha para e-mail não existente: {}", email);
+            logger.info("Solicitação de recuperação de senha para conta não localizada.");
             // Não revelar que o e-mail não existe por segurança — apenas registrar no log
         }
     }
@@ -276,17 +279,21 @@ public class AuthService {
             throw new ValidationException("Nova senha e confirmação de senha não conferem.");
         }
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+        if (codigo == null || codigo.isBlank()) {
+            throw new ValidationException("Código de recuperação inválido.");
+        }
+
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email.trim().toLowerCase());
         if (optionalUsuario.isEmpty()) {
-            throw new NotFoundException("Usuário não encontrado."); // Mensagem genérica para segurança
+            throw new ValidationException("Código de recuperação inválido.");
         }
 
         Usuario usuario = optionalUsuario.get();
 
-        if (usuario.getResetPasswordToken() == null || !usuario.getResetPasswordToken().equals(codigo)) {
+        if (usuario.getResetPasswordToken() == null || !tokenRecuperacaoConfere(codigo, usuario.getResetPasswordToken())) {
             throw new ValidationException("Código de recuperação inválido.");
         }
-        if (usuario.getResetPasswordExpiresAt() == null || usuario.getResetPasswordExpiresAt().isBefore(LocalDateTime.now())) {
+        if (usuario.getResetPasswordExpiresAt() == null || !usuario.getResetPasswordExpiresAt().isAfter(LocalDateTime.now())) {
             throw new ValidationException("Código de recuperação expirado.");
         }
 
@@ -294,7 +301,21 @@ public class AuthService {
         String newPasswordHash = passwordService.hash(novaSenha);
         usuarioRepository.updatePassword(usuario.getId(), usuario.getTenantId(), newPasswordHash);
 
-        logger.info("Senha do usuário {} redefinida com sucesso.", usuario.getEmail());
+        logger.info("Senha redefinida com sucesso para usuário ID {}.", usuario.getId());
+    }
+
+    private String gerarTokenRecuperacao() {
+        byte[] bytes = new byte[RECOVERY_TOKEN_BYTES];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private boolean tokenRecuperacaoConfere(String token, String tokenHash) {
+        try {
+            return BCrypt.checkpw(token, tokenHash);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public String autenticarSuperAdmin(String email, String senha) {
