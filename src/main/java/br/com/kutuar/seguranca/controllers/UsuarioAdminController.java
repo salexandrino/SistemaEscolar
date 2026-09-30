@@ -50,7 +50,7 @@ public class UsuarioAdminController {
             logger.warn("Falha ao listar usuários (Acesso Negado): {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao listar usuários.");
-            logger.error("Erro inesperado ao listar usuários", e);
+            logger.error("Erro inesperado ao listar usuários. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -69,7 +69,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao buscar usuario.");
-            logger.error("Erro inesperado ao buscar usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao buscar usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -115,7 +115,7 @@ public class UsuarioAdminController {
             responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao atualizar usuário.", e);
+            logger.error("Erro inesperado ao atualizar usuário. tipo={}", e.getClass().getSimpleName());
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao atualizar usuario.");
         }
     }
@@ -137,7 +137,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao inativar usuario.");
-            logger.error("Erro inesperado ao inativar usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao inativar usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -159,7 +159,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao aprovar usuario.");
-            logger.error("Erro inesperado ao aprovar usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao aprovar usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -181,7 +181,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao desbloquear usuario.");
-            logger.error("Erro inesperado ao desbloquear usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao desbloquear usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -203,7 +203,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao reativar usuario.");
-            logger.error("Erro inesperado ao reativar usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao reativar usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -225,7 +225,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao excluir usuario.");
-            logger.error("Erro inesperado ao excluir usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao excluir usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -248,7 +248,7 @@ public class UsuarioAdminController {
             logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao alterar perfil de usuario.");
-            logger.error("Erro inesperado ao alterar perfil de usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao alterar perfil de usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -280,7 +280,7 @@ public class UsuarioAdminController {
             responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
         } catch (Exception e) {
             responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao excluir usuario.");
-            logger.error("Erro inesperado ao excluir usuario: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao excluir usuario. tipo={}", e.getClass().getSimpleName());
         }
     }
 

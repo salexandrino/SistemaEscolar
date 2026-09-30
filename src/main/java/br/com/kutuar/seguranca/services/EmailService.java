@@ -85,7 +85,7 @@ public class EmailService {
             // Não relança: falha no envio de e-mail não deve travar o fluxo de
             // "esqueci minha senha" nem revelar detalhes técnicos ao usuário.
             // O código já foi salvo no banco por quem chamou este método.
-            logger.error("Falha ao enviar e-mail de recuperação de senha.", e);
+            logger.error("Falha ao enviar e-mail de recuperação de senha. tipo={}", e.getClass().getSimpleName());
         }
     }
 
@@ -107,7 +107,7 @@ public class EmailService {
             enviar(destinatario, assunto, corpo);
             logger.info("E-mail de credenciais do gestor enviado.");
         } catch (MessagingException e) {
-            logger.error("Falha ao enviar e-mail de credenciais do gestor.", e);
+            logger.error("Falha ao enviar e-mail de credenciais do gestor. tipo={}", e.getClass().getSimpleName());
         }
     }
 

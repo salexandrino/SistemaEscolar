@@ -70,7 +70,7 @@ public class AuthController {
             ctx.sessionAttribute("errorMessage", e.getMessage());
             ctx.redirect("/login");
         } catch (Exception e) {
-            logger.error("Erro inesperado durante o login convencional", e);
+            logger.error("Erro inesperado durante o login convencional. tipo={}", e.getClass().getSimpleName());
             ctx.sessionAttribute("errorMessage", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
             ctx.redirect("/login");
         }
@@ -101,7 +101,7 @@ public class AuthController {
             ctx.sessionAttribute("errorMessage", e.getMessage());
             ctx.redirect("/super-admin/login");
         } catch (Exception e) {
-            logger.error("Erro inesperado durante login do Super Admin.", e);
+            logger.error("Erro inesperado durante login do Super Admin. tipo={}", e.getClass().getSimpleName());
             ctx.sessionAttribute("errorMessage", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
             ctx.redirect("/super-admin/login");
         }
@@ -166,7 +166,7 @@ public class AuthController {
             ctx.status(400).json(Map.of("message", e.getMessage()));
             logger.warn("Aviso de negócio ao registrar usuário: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro crítico e inesperado durante o registro de usuário", e);
+            logger.error("Erro crítico e inesperado durante o registro de usuário. tipo={}", e.getClass().getSimpleName());
             ctx.status(500).json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
     }
@@ -202,7 +202,7 @@ public class AuthController {
             ctx.json(Map.of("message", "ID de usuário inválido."));
             logger.warn("Formato de UUID inválido enviado na aprovação: {}", ctx.pathParam("id"));
         } catch (Exception e) {
-            logger.error("Erro crítico inesperado durante aprovação de usuário", e);
+            logger.error("Erro crítico inesperado durante aprovação de usuário. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -225,7 +225,7 @@ public class AuthController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Solicitação de recuperação de senha rejeitada por dados inválidos.");
         } catch (Exception e) {
-            logger.error("Erro inesperado na solicitação de recuperação de senha", e);
+            logger.error("Erro inesperado na solicitação de recuperação de senha. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -253,7 +253,7 @@ public class AuthController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Redefinição de senha rejeitada por validação.");
         } catch (Exception e) {
-            logger.error("Erro crítico inesperado durante a redefinição de senha", e);
+            logger.error("Erro crítico inesperado durante a redefinição de senha. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -281,7 +281,7 @@ public class AuthController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Alteração de senha rejeitada por validação.");
         } catch (Exception e) {
-            logger.error("Erro inesperado durante a alteração de senha do usuário logado", e);
+            logger.error("Erro inesperado durante a alteração de senha do usuário logado. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }

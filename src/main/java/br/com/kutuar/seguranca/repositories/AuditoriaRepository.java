@@ -32,8 +32,8 @@ public class AuditoriaRepository extends BaseDAO {
             statement.setObject(9, evento.getCriadoEm());
             statement.executeUpdate();
         } catch (SQLException e) {
-            logger.error("Falha ao persistir evento de auditoria: acao={}, entidadeId={}",
-                    evento.getAcao(), evento.getEntidadeId(), e);
+            logger.error("Falha ao persistir evento de auditoria: acao={}, entidadeId={}, tipo={}",
+                    evento.getAcao(), evento.getEntidadeId(), e.getClass().getSimpleName());
             throw new IllegalStateException("Não foi possível persistir o evento de auditoria.", e);
         }
     }

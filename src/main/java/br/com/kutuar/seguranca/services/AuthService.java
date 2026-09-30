@@ -270,7 +270,8 @@ public class AuthService {
                 logger.info("Solicitação de recuperação de senha processada. usuarioId={}", usuario.getId());
                 emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryToken);
             } catch (Exception e) {
-                logger.error("Falha ao processar recuperação de senha. usuarioId={}", usuario.getId(), e);
+                logger.error("Falha ao processar recuperação de senha. usuarioId={}, tipo={}",
+                        usuario.getId(), e.getClass().getSimpleName());
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
             }
         } else {

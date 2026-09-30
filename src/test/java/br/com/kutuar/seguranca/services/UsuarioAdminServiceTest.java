@@ -1,6 +1,7 @@
 package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.dtos.AtualizarUsuarioDTO;
+import br.com.kutuar.seguranca.dtos.AtualizarPerfilUsuarioDTO;
 import br.com.kutuar.seguranca.enums.Perfil;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.exceptions.ConflictException;
@@ -144,6 +145,20 @@ class UsuarioAdminServiceTest {
         verify(usuarioRepository).approve(usuarioId);
         verify(auditoriaService).registrar(eq(superAdmin), eq(tenantId), eq("USUARIO_APROVADO"),
                 eq("USUARIO"), eq(usuarioId), eq("status=ATIVO"));
+    }
+
+    @Test
+    void superAdminAlteraPerfilEGeraAuditoriaPersistente() {
+        Usuario usuario = usuarioEscolar();
+        AtualizarPerfilUsuarioDTO dto = new AtualizarPerfilUsuarioDTO();
+        dto.setPerfil(Perfil.PROFESSOR);
+        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
+
+        service.alterarPerfil(usuarioId, dto, superAdmin);
+
+        verify(usuarioRepository).updatePerfilETenant(usuario);
+        verify(auditoriaService).registrar(eq(superAdmin), eq(tenantId), eq("USUARIO_PERFIL_ALTERADO"),
+                eq("USUARIO"), eq(usuarioId), eq("perfil_anterior=GESTOR;perfil_novo=PROFESSOR"));
     }
 
     private void prepararAtualizacao(Usuario usuario) {

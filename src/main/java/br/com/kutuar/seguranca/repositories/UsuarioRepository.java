@@ -518,7 +518,8 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
 
             logger.info("Senha do usuário ID {} atualizada para tenant ID {}", id, tenantId);
         } catch (SQLException e) {
-            logger.error("Erro ao atualizar senha do usuário. usuarioId={}, tenantId={}", id, tenantId, e);
+            logger.error("Erro ao atualizar senha do usuário. usuarioId={}, tenantId={}, tipo={}",
+                    id, tenantId, e.getClass().getSimpleName());
             throw new RuntimeException("Erro ao atualizar senha do usuário no banco de dados.", e);
         }
     }

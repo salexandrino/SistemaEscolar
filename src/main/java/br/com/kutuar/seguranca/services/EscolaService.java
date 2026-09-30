@@ -279,7 +279,7 @@ public class EscolaService {
                 try {
                     conn.rollback();
                 } catch (SQLException rollbackError) {
-                    logger.error("Falha ao desfazer cadastro de escola", rollbackError);
+                    logger.error("Falha ao desfazer cadastro de escola. tipo={}", rollbackError.getClass().getSimpleName());
                 }
                 if (e instanceof RuntimeException runtimeException) {
                     throw converterViolacaoCnpj(runtimeException);
@@ -308,8 +308,8 @@ public class EscolaService {
             } catch (Exception e) {
                 // Um observador falhar não pode derrubar o cadastro da escola,
                 // que já foi salvo no banco antes desta notificação.
-                logger.error("Observador {} falhou ao processar cadastro de escola: {}",
-                        observer.getClass().getSimpleName(), e.getMessage(), e);
+                logger.error("Observador {} falhou ao processar cadastro de escola. tipo={}",
+                        observer.getClass().getSimpleName(), e.getClass().getSimpleName());
             }
         }
 

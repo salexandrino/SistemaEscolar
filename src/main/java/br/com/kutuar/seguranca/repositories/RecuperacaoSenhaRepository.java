@@ -34,7 +34,8 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
             stmt.executeUpdate();
             logger.info("Recuperação de senha registrada. usuarioId={}", recuperacaoSenha.getUsuarioId());
         } catch (SQLException e) {
-            logger.error("Erro ao registrar recuperação de senha. usuarioId={}", recuperacaoSenha.getUsuarioId(), e);
+            logger.error("Erro ao registrar recuperação de senha. usuarioId={}, tipo={}",
+                    recuperacaoSenha.getUsuarioId(), e.getClass().getSimpleName());
             throw new RuntimeException("Erro ao salvar código de recuperação no banco de dados.", e);
         }
         return recuperacaoSenha;
@@ -52,7 +53,8 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
                 }
             }
         } catch (SQLException e) {
-            logger.error("Erro ao consultar recuperação de senha. usuarioId={}", usuarioId, e);
+            logger.error("Erro ao consultar recuperação de senha. usuarioId={}, tipo={}",
+                    usuarioId, e.getClass().getSimpleName());
         }
         return Optional.empty();
     }
@@ -65,7 +67,8 @@ public class RecuperacaoSenhaRepository extends BaseDAO implements DAO<Recuperac
             stmt.executeUpdate();
             logger.info("Recuperação de senha marcada como utilizada. recuperacaoId={}", id);
         } catch (SQLException e) {
-            logger.error("Erro ao marcar recuperação de senha como utilizada. recuperacaoId={}", id, e);
+            logger.error("Erro ao marcar recuperação de senha como utilizada. recuperacaoId={}, tipo={}",
+                    id, e.getClass().getSimpleName());
             throw new RuntimeException("Erro ao marcar código de recuperação como utilizado no banco de dados.", e);
         }
     }

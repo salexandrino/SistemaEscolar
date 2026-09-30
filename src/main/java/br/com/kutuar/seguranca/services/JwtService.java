@@ -34,7 +34,7 @@ public class JwtService {
         }
 
         if (secretString == null || secretString.isBlank()) {
-            logger.error("JWT_SECRET não configurado.");
+            logger.error("Chave de assinatura JWT não configurada.");
             secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         } else {
             secretKey = Keys.hmacShaKeyFor(secretString.getBytes());
@@ -137,7 +137,7 @@ public class JwtService {
 
         } catch (Exception e) {
 
-            logger.error("Erro ao extrair AuthUser dos claims do JWT", e);
+            logger.error("Erro ao extrair AuthUser dos claims do JWT. tipo={}", e.getClass().getSimpleName());
 
             return null;
         }

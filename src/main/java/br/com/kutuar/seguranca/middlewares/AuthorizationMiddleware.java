@@ -67,8 +67,8 @@ public class AuthorizationMiddleware implements Handler {
     }
 
     private void deny(Context ctx, AuthUser authUser) {
-        logger.warn("Acesso negado a {}: usuario {} com perfil {} nao possui a permissao {}.",
-                ctx.path(), authUser.getCpf(), authUser.getPerfil(), requiredPermission);
+        logger.warn("Acesso negado a {}: usuarioId={} com perfil {} nao possui a permissao {}.",
+                ctx.path(), authUser.getUserId(), authUser.getPerfil(), requiredPermission);
         throw new AuthorizationException("Acesso negado. Voce nao tem permissao para acessar este recurso.");
     }
 }

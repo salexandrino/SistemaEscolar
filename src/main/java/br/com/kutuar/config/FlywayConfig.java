@@ -36,7 +36,7 @@ public class FlywayConfig {
 
             logger.info("Flyway concluído com sucesso. migrationsAplicadas={}", migrationsAplicadas);
         } catch (Exception e) {
-            logger.error("Falha ao validar ou aplicar migrations Flyway.", e);
+            logger.error("Falha ao validar ou aplicar migrations Flyway. tipo={}", e.getClass().getSimpleName());
             throw new RuntimeException(e);
         }
     }

@@ -118,11 +118,12 @@ class EscolaCadastroTransacaoTest {
         EscolaRepository escolas = mock(EscolaRepository.class);
         UsuarioRepository usuarios = mock(UsuarioRepository.class);
         EscolaCadastradaObserver observer = mock(EscolaCadastradaObserver.class);
+        AuditoriaService auditoriaService = mock(AuditoriaService.class);
         Escola escolaSalva = escolaSalva();
         when(escolas.existsByCnpj(connection, "04252011000110")).thenReturn(false);
         when(usuarios.existsByEmail(eq(connection), any())).thenReturn(false);
         when(escolas.save(eq(connection), any(Escola.class))).thenReturn(escolaSalva);
-        EscolaService service = service(escolas, usuarios, new PasswordService(), connection);
+        EscolaService service = new EscolaService(escolas, usuarios, new PasswordService(), () -> connection, auditoriaService);
         service.adicionarObserver(observer);
 
         CriarEscolaResponseDTO resposta = service.cadastrarEscola(dtoValido(), superAdmin);
@@ -140,6 +141,10 @@ class EscolaCadastroTransacaoTest {
         var ordem = inOrder(connection, observer);
         ordem.verify(connection).commit();
         ordem.verify(observer).aoCadastrarEscola(eq(escolaSalva), any(Usuario.class), eq(resposta.getSenhaGeradaGestor()));
+        verify(auditoriaService).registrar(eq(superAdmin), eq(escolaSalva.getTenantId()), eq("ESCOLA_CRIADA"),
+                eq("ESCOLA"), eq(escolaSalva.getId()), eq("gestor_inicial_criado=true"));
+        verify(auditoriaService).registrar(eq(superAdmin), eq(escolaSalva.getTenantId()), eq("USUARIO_CRIADO"),
+                eq("USUARIO"), org.mockito.ArgumentMatchers.isNull(), eq("perfil=GESTOR;origem=CADASTRO_ESCOLA"));
     }
 
     private EscolaService service(EscolaRepository escolas, UsuarioRepository usuarios,
