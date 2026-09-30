@@ -67,6 +67,7 @@ import br.com.kutuar.financeiro.services.MensalidadeService;
 import br.com.kutuar.financeiro.services.ParcelamentoService;
 import br.com.kutuar.financeiro.services.RelatorioFinanceiroService;
 import br.com.kutuar.seguranca.controllers.AuthController;
+import br.com.kutuar.seguranca.controllers.AuditoriaController;
 import br.com.kutuar.seguranca.controllers.EscolaController;
 import br.com.kutuar.seguranca.controllers.UsuarioAdminController;
 import br.com.kutuar.seguranca.enums.Perfil;
@@ -180,6 +181,7 @@ public class KutuarApp {
 
         // 3. Inicialização dos Controllers
         AuthController authController = new AuthController(authService);
+        AuditoriaController auditoriaController = new AuditoriaController(auditoriaService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(escolaService);
         DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, usuarioAdminService, templateEngine);
@@ -465,6 +467,7 @@ public class KutuarApp {
         app.post("/auth/logout", authController::logout);
         app.post("/auth/reset-password", authController::resetPassword);
         app.patch("/auth/change-password", authController::changePassword);
+        app.patch("/perfil/senha", authController::changePassword);
 
         // Recursos de administracao global exigem a permissao indicada e SUPER_ADMIN.
         // O perfil adicional preserva a natureza global dessas operacoes ate que exista RBAC por escopo.
@@ -665,6 +668,7 @@ public class KutuarApp {
         app.get("/api/admin/dashboard/alertas", dashboardGlobal.then(superAdminDashboardApiController::alertas));
         app.get("/api/admin/dashboard/atividades", dashboardGlobal.then(superAdminDashboardApiController::atividades));
         app.get("/api/admin/dashboard/ultimos-acessos", dashboardGlobal.then(superAdminDashboardApiController::ultimosAcessos));
+        app.get("/api/admin/auditoria", new RoleBasedMiddleware(Perfil.SUPER_ADMIN).then(auditoriaController::listar));
 
 
         // TRATAMENTO DE EXCEÇÕES
@@ -705,14 +709,19 @@ public class KutuarApp {
 
         app.exception(ConflictException.class, (e, ctx) -> {
             ctx.status(409);
-            ctx.json(Map.of("error", e.getMessage()));
+            ctx.json(Map.of("message", e.getMessage()));
         });
 
         app.exception(Exception.class, (e, ctx) -> {
             ctx.status(500);
-            Context thymeleafContext = new Context();
-            thymeleafContext.setVariable("message", "Ocorreu um erro interno inesperado.");
-            ctx.html(templateEngine.process("errors/500", thymeleafContext));
+            String message = "Ocorreu um erro interno inesperado.";
+            if (isJsonEndpoint(ctx.path())) {
+                ctx.json(Map.of("message", message));
+            } else {
+                Context thymeleafContext = new Context();
+                thymeleafContext.setVariable("message", message);
+                ctx.html(templateEngine.process("errors/500", thymeleafContext));
+            }
         });
 
         app.start(port);

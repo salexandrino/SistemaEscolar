@@ -6,6 +6,7 @@ import br.com.kutuar.seguranca.repositories.AuditoriaRepository;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 /** Implementação obrigatória em produção; não registra segredos nos detalhes. */
 public class AuditoriaPersistenteService implements AuditoriaService {
@@ -29,5 +30,10 @@ public class AuditoriaPersistenteService implements AuditoriaService {
         evento.setDetalhes(detalhes);
         evento.setCriadoEm(LocalDateTime.now());
         auditoriaRepository.save(evento);
+    }
+
+    @Override
+    public List<EventoAuditoria> listar() {
+        return auditoriaRepository.findAll();
     }
 }
