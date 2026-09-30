@@ -502,7 +502,7 @@ public class UsuarioRepository extends BaseDAO implements DAO<Usuario, UUID> {
         }
     }
     public void updatePassword(UUID id, UUID tenantId, String newPasswordHash) {
-        String sql = "UPDATE usuario SET senha_hash = ?, reset_password_token = NULL, reset_password_expires_at = NULL, atualizado_em = ? WHERE id = ? AND tenant_id = ?";
+        String sql = "UPDATE usuario SET senha_hash = ?, reset_password_token = NULL, reset_password_expires_at = NULL, atualizado_em = ? WHERE id = ? AND tenant_id IS NOT DISTINCT FROM ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, newPasswordHash);
