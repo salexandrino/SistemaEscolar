@@ -10,6 +10,7 @@ import br.com.kutuar.seguranca.exceptions.ConflictException;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 
 import java.time.LocalDate;
@@ -27,11 +28,7 @@ public class AnoLetivoService {
         this.cloneRepository = cloneRepository;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     public br.com.kutuar.academico.dtos.AnoLetivoResponseDTO criar(CriarAnoLetivoDTO dto) {
         if (dto == null || dto.getAno() == null) throw new ValidationException("Ano é obrigatório.");

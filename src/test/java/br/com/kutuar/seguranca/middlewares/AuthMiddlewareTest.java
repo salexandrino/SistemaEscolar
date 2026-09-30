@@ -1,7 +1,7 @@
 package br.com.kutuar.seguranca.middlewares;
 
 import br.com.kutuar.seguranca.enums.Perfil;
-import br.com.kutuar.seguranca.exceptions.AuthorizationException;
+import br.com.kutuar.seguranca.exceptions.AuthenticationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario;
@@ -52,7 +52,7 @@ class AuthMiddlewareTest {
 
         assertNull(AuthUserContext.getAuthUser());
         verify(ctx).cookie(any(io.javalin.http.Cookie.class));
-        assertThrows(AuthorizationException.class,
+        assertThrows(AuthenticationException.class,
                 () -> new RoleBasedMiddleware(Perfil.GESTOR).handle(ctx));
     }
 

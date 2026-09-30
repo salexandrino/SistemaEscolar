@@ -4,6 +4,7 @@ import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.enums.*;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
+import br.com.kutuar.seguranca.exceptions.AuthenticationException;
 import br.com.kutuar.seguranca.middlewares.RoleBasedMiddleware;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
@@ -99,8 +100,8 @@ class EscolaPaginacaoControllerTest {
         RoleBasedMiddleware middleware = new RoleBasedMiddleware(Perfil.SUPER_ADMIN);
         when(ctx.path()).thenReturn("/api/admin/escolas");
         AuthUserContext.clear();
-        AuthorizationException ausente = assertThrows(AuthorizationException.class, () -> middleware.handle(ctx));
-        assertEquals(io.javalin.http.HttpStatus.FORBIDDEN, ausente.getStatus());
+        AuthenticationException ausente = assertThrows(AuthenticationException.class, () -> middleware.handle(ctx));
+        assertEquals(io.javalin.http.HttpStatus.UNAUTHORIZED, ausente.getStatus());
 
         AuthUser gestor = new AuthUser(null, null, null, Perfil.GESTOR, "00000000000");
         AuthUserContext.setAuthUser(gestor);

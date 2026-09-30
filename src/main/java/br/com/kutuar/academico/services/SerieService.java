@@ -11,6 +11,7 @@ import br.com.kutuar.seguranca.exceptions.ConflictException;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +39,7 @@ public class SerieService {
         this.turmaRepository = turmaRepository;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     private String validarEtapa(String etapaEnsino) {
         if (etapaEnsino == null || etapaEnsino.isBlank()) return null; // opcional

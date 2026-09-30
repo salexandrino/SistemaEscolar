@@ -70,14 +70,15 @@ import br.com.kutuar.seguranca.controllers.AuthController;
 import br.com.kutuar.seguranca.controllers.EscolaController;
 import br.com.kutuar.seguranca.controllers.UsuarioAdminController;
 import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.enums.Permissao;
 import br.com.kutuar.seguranca.exceptions.AuthenticationException;
 import br.com.kutuar.seguranca.exceptions.AuthorizationException;
 import br.com.kutuar.seguranca.exceptions.ConflictException;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.middlewares.AuthMiddleware;
+import br.com.kutuar.seguranca.middlewares.AuthorizationMiddleware;
 import br.com.kutuar.seguranca.middlewares.RoleBasedMiddleware;
-import br.com.kutuar.seguranca.middlewares.SuperAdminMiddleware;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario;
@@ -120,7 +121,6 @@ public class KutuarApp {
 
         PasswordService passwordService = new PasswordService();
         JwtService jwtService = new JwtService();
-        SuperAdminMiddleware superAdminAuth = new SuperAdminMiddleware();
         DashboardRepository dashboardRepository = new DashboardRepository();
         // Acadêmico
         DisciplinaRepository disciplinaRepository = new DisciplinaRepository();
@@ -462,69 +462,70 @@ public class KutuarApp {
         app.post("/auth/reset-password", authController::resetPassword);
         app.patch("/auth/change-password", authController::changePassword);
 
-        app.before("/dashboard", superAdminAuth);
-        app.before("/dashboard/*", superAdminAuth);
+        // Recursos de administracao global exigem a permissao indicada e SUPER_ADMIN.
+        // O perfil adicional preserva a natureza global dessas operacoes ate que exista RBAC por escopo.
+        AuthorizationMiddleware dashboardGlobal = new AuthorizationMiddleware(Permissao.AUDITORIA_VISUALIZAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware escolaVisualizarGlobal = new AuthorizationMiddleware(Permissao.ESCOLA_VISUALIZAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware escolaCriarGlobal = new AuthorizationMiddleware(Permissao.ESCOLA_CRIAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware escolaEditarGlobal = new AuthorizationMiddleware(Permissao.ESCOLA_EDITAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware escolaBloquearGlobal = new AuthorizationMiddleware(Permissao.ESCOLA_BLOQUEAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware usuarioVisualizarGlobal = new AuthorizationMiddleware(Permissao.USUARIO_VISUALIZAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware usuarioCriarGlobal = new AuthorizationMiddleware(Permissao.USUARIO_CRIAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware usuarioEditarGlobal = new AuthorizationMiddleware(Permissao.USUARIO_EDITAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware usuarioBloquearGlobal = new AuthorizationMiddleware(Permissao.USUARIO_BLOQUEAR, Perfil.SUPER_ADMIN);
+        AuthorizationMiddleware usuarioAprovarGlobal = new AuthorizationMiddleware(Permissao.USUARIO_APROVAR, Perfil.SUPER_ADMIN);
 
 // ... antes do bloco de rotas ...
         // ATENÇÃO: não usamos mais um único "/api/academico/*" bloqueando PROFESSOR de tudo.
         // Antes disso, o professor não conseguia nem lançar a própria nota. Agora cada área
         // acadêmica tem sua própria regra de acesso:
 
+        AuthorizationMiddleware alunoVisualizar = new AuthorizationMiddleware(Permissao.ALUNO_VISUALIZAR);
+        AuthorizationMiddleware alunoCriar = new AuthorizationMiddleware(Permissao.ALUNO_CRIAR);
+        AuthorizationMiddleware alunoEditar = new AuthorizationMiddleware(Permissao.ALUNO_EDITAR);
+        AuthorizationMiddleware matriculaVisualizar = new AuthorizationMiddleware(Permissao.MATRICULA_VISUALIZAR);
+        AuthorizationMiddleware matriculaCriar = new AuthorizationMiddleware(Permissao.MATRICULA_CRIAR);
+        AuthorizationMiddleware matriculaEditar = new AuthorizationMiddleware(Permissao.MATRICULA_EDITAR);
+        AuthorizationMiddleware turmaVisualizar = new AuthorizationMiddleware(Permissao.TURMA_VISUALIZAR);
+        AuthorizationMiddleware turmaGerenciar = new AuthorizationMiddleware(Permissao.TURMA_GERENCIAR);
+        AuthorizationMiddleware notaVisualizar = new AuthorizationMiddleware(Permissao.NOTA_VISUALIZAR);
+        AuthorizationMiddleware notaLancar = new AuthorizationMiddleware(Permissao.NOTA_LANCAR);
+        AuthorizationMiddleware financeiroVisualizar = new AuthorizationMiddleware(Permissao.FINANCEIRO_VISUALIZAR);
+        AuthorizationMiddleware financeiroGerenciar = new AuthorizationMiddleware(Permissao.FINANCEIRO_GERENCIAR);
+
         // Áreas de uso do professor no dia a dia: avaliações, notas/recuperação/simulador,
         // boletim e a própria grade de aulas. Secretaria/Gestor/Super Admin continuam com acesso total a essas também.
-        RoleBasedMiddleware academicoDocente = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA, Perfil.PROFESSOR);
-        app.before("/api/academico/avaliacoes", academicoDocente);
-        app.before("/api/academico/avaliacoes/*", academicoDocente);
-        app.before("/api/academico/notas", academicoDocente);
-        app.before("/api/academico/notas/*", academicoDocente);
-        app.before("/api/academico/boletins", academicoDocente);
-        app.before("/api/academico/professores/{id}/grade", academicoDocente);
-
         // Áreas administrativas/estruturais (matrícula, turma, matriz curricular, disciplinas,
         // séries, ano letivo, alocação docente, CRUD de professor): só quem organiza a escola.
-        RoleBasedMiddleware academicoAdministrativo = new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.SECRETARIA);
-        app.before("/api/academico/disciplinas", academicoAdministrativo);
-        app.before("/api/academico/disciplinas/*", academicoAdministrativo);
-        app.before("/api/academico/anos-letivos", academicoAdministrativo);
-        app.before("/api/academico/anos-letivos/*", academicoAdministrativo);
-        app.before("/api/academico/series", academicoAdministrativo);
-        app.before("/api/academico/series/*", academicoAdministrativo);
-        app.before("/api/academico/turmas", academicoAdministrativo);
-        app.before("/api/academico/turmas/*", academicoAdministrativo);
-        app.before("/api/academico/professores", academicoAdministrativo);
-        app.before("/api/academico/professores/{id}", academicoAdministrativo);
-        app.before("/api/academico/alunos", academicoAdministrativo);
-        app.before("/api/academico/alunos/*", academicoAdministrativo);
-
         // SOLUÇÃO DEFINITIVA: Mapeamento linear direto na instância 'app' (Livre de erros de versão do Javalin)
-        app.post("/api/academico/avaliacoes", avaliacaoController::criar);
-        app.get("/api/academico/avaliacoes", avaliacaoController::listar);
-        app.get("/api/academico/avaliacoes/{id}", avaliacaoController::obterPorId); // mude para ::obter se der erro de assinatura no controller
-        app.put("/api/academico/avaliacoes/{id}", avaliacaoController::atualizar);
-        app.delete("/api/academico/avaliacoes/{id}", avaliacaoController::remover);
+        app.post("/api/academico/avaliacoes", notaLancar.then(avaliacaoController::criar));
+        app.get("/api/academico/avaliacoes", notaVisualizar.then(avaliacaoController::listar));
+        app.get("/api/academico/avaliacoes/{id}", notaVisualizar.then(avaliacaoController::obterPorId));
+        app.put("/api/academico/avaliacoes/{id}", notaLancar.then(avaliacaoController::atualizar));
+        app.delete("/api/academico/avaliacoes/{id}", notaLancar.then(avaliacaoController::remover));
 
         // Novas rotas da Gestão Pedagógica (Recuperação e Simulador) mapeadas de forma direta
-        app.post("/api/academico/notas", pedagogicaController::lancarNota);
-        app.get("/api/academico/notas/recuperacao", pedagogicaController::recuperacao);
-        app.get("/api/academico/notas/recuperacao/{mediaAtual}/nota-necessaria", pedagogicaController::notaNecessaria);
-        app.post("/api/academico/notas/simulador", pedagogicaController::simulador);
-        app.get("/api/academico/boletins", pedagogicaController::gerarBoletim);
+        app.post("/api/academico/notas", notaLancar.then(pedagogicaController::lancarNota));
+        app.get("/api/academico/notas/recuperacao", notaVisualizar.then(pedagogicaController::recuperacao));
+        app.get("/api/academico/notas/recuperacao/{mediaAtual}/nota-necessaria", notaVisualizar.then(pedagogicaController::notaNecessaria));
+        app.post("/api/academico/notas/simulador", notaVisualizar.then(pedagogicaController::simulador));
+        app.get("/api/academico/boletins", notaVisualizar.then(pedagogicaController::gerarBoletim));
 
         // Dashboard Home
-        app.get("/dashboard", dashboardController::dashboard);       // Gestão de Escolas
-        app.get("/dashboard/escolas", escolaController::exibirPaginaListagem);
-        app.get("/dashboard/escolas/nova", dashboardController::novaEscola);
-        app.get("/dashboard/escolas/editar/{id}", dashboardController::editarEscola);
-        app.get("/dashboard/escolas/visualizar/{id}", escolaController::exibirPaginaVisualizar);
-        app.post("/dashboard/escolas/{id}/deletar", escolaController::deletarEscola);
+        app.get("/dashboard", dashboardGlobal.then(dashboardController::dashboard));
+        app.get("/dashboard/escolas", escolaVisualizarGlobal.then(escolaController::exibirPaginaListagem));
+        app.get("/dashboard/escolas/nova", escolaCriarGlobal.then(dashboardController::novaEscola));
+        app.get("/dashboard/escolas/editar/{id}", escolaEditarGlobal.then(dashboardController::editarEscola));
+        app.get("/dashboard/escolas/visualizar/{id}", escolaVisualizarGlobal.then(escolaController::exibirPaginaVisualizar));
+        app.post("/dashboard/escolas/{id}/deletar", escolaBloquearGlobal.then(escolaController::deletarEscola));
 
         // Gestão de Usuários
-        app.get("/dashboard/usuarios", dashboardController::usuarios);
-        app.get("/dashboard/usuarios/novo", dashboardController::novoUsuario);
-        app.get("/dashboard/usuarios/editar/{id}", dashboardController::editarUsuario);
-        app.post("/dashboard/usuarios/editar/{id}", dashboardController::salvarEditarUsuario);
-        app.get("/dashboard/usuarios/visualizar/{id}", dashboardController::visualizarUsuario);
-        app.post("/dashboard/usuarios/{id}/deletar", usuarioAdminController::deletar);
+        app.get("/dashboard/usuarios", usuarioVisualizarGlobal.then(dashboardController::usuarios));
+        app.get("/dashboard/usuarios/novo", usuarioCriarGlobal.then(dashboardController::novoUsuario));
+        app.get("/dashboard/usuarios/editar/{id}", usuarioEditarGlobal.then(dashboardController::editarUsuario));
+        app.post("/dashboard/usuarios/editar/{id}", usuarioEditarGlobal.then(dashboardController::salvarEditarUsuario));
+        app.get("/dashboard/usuarios/visualizar/{id}", usuarioVisualizarGlobal.then(dashboardController::visualizarUsuario));
+        app.post("/dashboard/usuarios/{id}/deletar", usuarioBloquearGlobal.then(usuarioAdminController::deletar));
 
         app.get("/area-logada", ctx -> {
             try {
@@ -545,141 +546,135 @@ public class KutuarApp {
         });
 
         // API de Usuários
-        app.get("/users", usuarioAdminController::listar);
-        app.get("/users/{id}", usuarioAdminController::buscarPorId);
-        app.put("/users/{id}", usuarioAdminController::atualizar);
-        app.delete("/users/{id}", usuarioAdminController::inativar);
-        app.patch("/users/{id}/approve", usuarioAdminController::aprovar);
-        app.patch("/users/{id}/unlock", usuarioAdminController::desbloquear);
-        app.post("/users/{id}/unlock", usuarioAdminController::desbloquear);
-        app.patch("/users/{id}/reativar", usuarioAdminController::reativar);
-        app.post("/users/{id}/reativar", usuarioAdminController::reativar);
-        app.delete("/users/{id}/excluir", usuarioAdminController::excluir);
-        app.patch("/users/{id}/profile", usuarioAdminController::alterarPerfil);
-
-        app.post("/users/{id}/inativar", usuarioAdminController::inativar);
-        app.post("/users/{id}/approve", usuarioAdminController::aprovar);
+        app.get("/users", usuarioVisualizarGlobal.then(usuarioAdminController::listar));
+        app.get("/users/{id}", usuarioVisualizarGlobal.then(usuarioAdminController::buscarPorId));
+        app.put("/users/{id}", usuarioEditarGlobal.then(usuarioAdminController::atualizar));
+        app.delete("/users/{id}", usuarioBloquearGlobal.then(usuarioAdminController::inativar));
+        app.patch("/users/{id}/approve", usuarioAprovarGlobal.then(usuarioAdminController::aprovar));
+        app.patch("/users/{id}/unlock", usuarioBloquearGlobal.then(usuarioAdminController::desbloquear));
+        app.post("/users/{id}/unlock", usuarioBloquearGlobal.then(usuarioAdminController::desbloquear));
+        app.patch("/users/{id}/reativar", usuarioAprovarGlobal.then(usuarioAdminController::reativar));
+        app.post("/users/{id}/reativar", usuarioAprovarGlobal.then(usuarioAdminController::reativar));
+        app.delete("/users/{id}/excluir", usuarioBloquearGlobal.then(usuarioAdminController::excluir));
+        app.patch("/users/{id}/profile", usuarioEditarGlobal.then(usuarioAdminController::alterarPerfil));
+        app.post("/users/{id}/inativar", usuarioBloquearGlobal.then(usuarioAdminController::inativar));
+        app.post("/users/{id}/approve", usuarioAprovarGlobal.then(usuarioAdminController::aprovar));
         // API de Escolas
-        app.post("/escolas", escolaController::criarEscola);
-        app.patch("/escolas/{id}", escolaController::atualizarEscola);
-        app.post("/escolas/{id}", escolaController::atualizarEscola);
-        app.get("/escolas", escolaController::listarEscolas);
-        app.get("/escolas/ativas", escolaController::listarEscolasAtivas);
-        app.get("/escolas/inativas", escolaController::listarEscolasInativas);
-        app.get("/escolas/{id}", escolaController::obterEscola);
-        app.get("/escolas/cnpj/{cnpj}", escolaController::buscarPorCnpj);
+        app.post("/escolas", escolaCriarGlobal.then(escolaController::criarEscola));
+        app.patch("/escolas/{id}", escolaEditarGlobal.then(escolaController::atualizarEscola));
+        app.post("/escolas/{id}", escolaEditarGlobal.then(escolaController::atualizarEscola));
+        app.get("/escolas", escolaVisualizarGlobal.then(escolaController::listarEscolas));
+        app.get("/escolas/ativas", escolaVisualizarGlobal.then(escolaController::listarEscolasAtivas));
+        app.get("/escolas/inativas", escolaVisualizarGlobal.then(escolaController::listarEscolasInativas));
+        app.get("/escolas/{id}", escolaVisualizarGlobal.then(escolaController::obterEscola));
+        app.get("/escolas/cnpj/{cnpj}", escolaVisualizarGlobal.then(escolaController::buscarPorCnpj));
+        app.patch("/escolas/{id}/ativar", escolaBloquearGlobal.then(escolaController::ativarEscola));
+        app.post("/escolas/{id}/ativar", escolaBloquearGlobal.then(escolaController::ativarEscola));
+        app.patch("/escolas/{id}/inativar", escolaBloquearGlobal.then(escolaController::inativarEscola));
+        app.post("/escolas/{id}/inativar", escolaBloquearGlobal.then(escolaController::inativarEscola));
+        app.delete("/escolas/{id}/excluir", escolaBloquearGlobal.then(escolaController::excluirEscola));
 
-        app.before("/escolas/{id}/ativar", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.patch("/escolas/{id}/ativar", escolaController::ativarEscola);
-        app.post("/escolas/{id}/ativar", escolaController::ativarEscola);
-
-        app.before("/escolas/{id}/inativar", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.patch("/escolas/{id}/inativar", escolaController::inativarEscola);
-        app.post("/escolas/{id}/inativar", escolaController::inativarEscola);
-        app.delete("/escolas/{id}/excluir", escolaController::excluirEscola);
-
-        app.get("/api/escolas", escolaController::listarEscolas);
-        app.get("/api/escolas/{id}", escolaController::obterEscola);
+        app.get("/api/escolas", escolaVisualizarGlobal.then(escolaController::listarEscolas));
+        app.get("/api/escolas/{id}", escolaVisualizarGlobal.then(escolaController::obterEscola));
 
         // ACADÊMICO — DISCIPLINAS
-        app.get("/api/academico/disciplinas", disciplinaController::listar);
-        app.get("/api/academico/disciplinas/{id}", disciplinaController::obter);
-        app.post("/api/academico/disciplinas", disciplinaController::criar);
-        app.put("/api/academico/disciplinas/{id}", disciplinaController::atualizar);
-        app.delete("/api/academico/disciplinas/{id}", disciplinaController::remover);
+        app.get("/api/academico/disciplinas", turmaVisualizar.then(disciplinaController::listar));
+        app.get("/api/academico/disciplinas/{id}", turmaVisualizar.then(disciplinaController::obter));
+        app.post("/api/academico/disciplinas", turmaGerenciar.then(disciplinaController::criar));
+        app.put("/api/academico/disciplinas/{id}", turmaGerenciar.then(disciplinaController::atualizar));
+        app.delete("/api/academico/disciplinas/{id}", turmaGerenciar.then(disciplinaController::remover));
 
         // ACADÊMICO — ANO LETIVO / SÉRIES / MATRIZ
-        app.get("/api/academico/anos-letivos", anoLetivoController::listar);
-        app.post("/api/academico/anos-letivos", anoLetivoController::criar);
-        app.put("/api/academico/anos-letivos/{id}", anoLetivoController::editar);
-        app.delete("/api/academico/anos-letivos/{id}", anoLetivoController::apagar);
-        app.patch("/api/academico/anos-letivos/{id}/arquivar", anoLetivoController::arquivar);
-        app.patch("/api/academico/anos-letivos/{id}/definir-ativo", anoLetivoController::definirAtivo);
-        app.get("/api/academico/anos-letivos/historico", anoLetivoController::historico);
-        app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", anoLetivoController::clonar);
+        app.get("/api/academico/anos-letivos", turmaVisualizar.then(anoLetivoController::listar));
+        app.post("/api/academico/anos-letivos", turmaGerenciar.then(anoLetivoController::criar));
+        app.put("/api/academico/anos-letivos/{id}", turmaGerenciar.then(anoLetivoController::editar));
+        app.delete("/api/academico/anos-letivos/{id}", turmaGerenciar.then(anoLetivoController::apagar));
+        app.patch("/api/academico/anos-letivos/{id}/arquivar", turmaGerenciar.then(anoLetivoController::arquivar));
+        app.patch("/api/academico/anos-letivos/{id}/definir-ativo", turmaGerenciar.then(anoLetivoController::definirAtivo));
+        app.get("/api/academico/anos-letivos/historico", turmaVisualizar.then(anoLetivoController::historico));
+        app.post("/api/academico/anos-letivos/{id}/clonar-para/{destinoId}", turmaGerenciar.then(anoLetivoController::clonar));
 
         // Séries
-        app.get("/api/academico/series", serieController::listarPorAno);
-        app.get("/api/academico/series/{id}", serieController::obter);
-        app.post("/api/academico/series", serieController::criar);
-        app.put("/api/academico/series/{id}", serieController::atualizar);
-        app.delete("/api/academico/series/{id}", serieController::remover);
+        app.get("/api/academico/series", turmaVisualizar.then(serieController::listarPorAno));
+        app.get("/api/academico/series/{id}", turmaVisualizar.then(serieController::obter));
+        app.post("/api/academico/series", turmaGerenciar.then(serieController::criar));
+        app.put("/api/academico/series/{id}", turmaGerenciar.then(serieController::atualizar));
+        app.delete("/api/academico/series/{id}", turmaGerenciar.then(serieController::remover));
 
         // Matriz Curricular
-        app.get("/api/academico/series/{idSerie}/matriz", matrizCurricularController::listar);
-        app.post("/api/academico/series/{idSerie}/matriz", matrizCurricularController::definir);
-        app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", matrizCurricularController::remover);
+        app.get("/api/academico/series/{idSerie}/matriz", turmaVisualizar.then(matrizCurricularController::listar));
+        app.post("/api/academico/series/{idSerie}/matriz", turmaGerenciar.then(matrizCurricularController::definir));
+        app.delete("/api/academico/series/{idSerie}/matriz/{idDisciplina}", turmaGerenciar.then(matrizCurricularController::remover));
 
         // ACADÊMICO — TURMAS
-        app.get("/api/academico/turmas", turmaController::listar);
-        app.post("/api/academico/turmas", turmaController::criar);
-        app.get("/api/academico/turmas/{id}", turmaController::buscarPorId);
-        app.put("/api/academico/turmas/{id}", turmaController::editar);
-        app.delete("/api/academico/turmas/{id}", turmaController::apagar);
-        app.patch("/api/academico/turmas/{id}/encerrar", turmaController::encerrar);
-        app.get("/api/academico/turmas/{id}/capacidade", turmaController::capacidade);
+        app.get("/api/academico/turmas", turmaVisualizar.then(turmaController::listar));
+        app.post("/api/academico/turmas", turmaGerenciar.then(turmaController::criar));
+        app.get("/api/academico/turmas/{id}", turmaVisualizar.then(turmaController::buscarPorId));
+        app.put("/api/academico/turmas/{id}", turmaGerenciar.then(turmaController::editar));
+        app.delete("/api/academico/turmas/{id}", turmaGerenciar.then(turmaController::apagar));
+        app.patch("/api/academico/turmas/{id}/encerrar", turmaGerenciar.then(turmaController::encerrar));
+        app.get("/api/academico/turmas/{id}/capacidade", turmaVisualizar.then(turmaController::capacidade));
 
         // Atribuição Docente
-        app.post("/api/academico/turmas/{idTurma}/docentes", alocacaoDocenteController::atribuir);
-        app.delete("/api/academico/turmas/{idTurma}/docentes/{idDisciplina}/{idProfessor}", alocacaoDocenteController::remover);
+        app.post("/api/academico/turmas/{idTurma}/docentes", turmaGerenciar.then(alocacaoDocenteController::atribuir));
+        app.delete("/api/academico/turmas/{idTurma}/docentes/{idDisciplina}/{idProfessor}", turmaGerenciar.then(alocacaoDocenteController::remover));
 
         // Professores
-        app.get("/api/academico/professores", professorController::listar);
-        app.post("/api/academico/professores", professorController::criar);
-        app.get("/api/academico/professores/{id}", professorController::obterPorId);
-        app.put("/api/academico/professores/{id}", professorController::atualizar);
-        app.delete("/api/academico/professores/{id}", professorController::inativar);
-        app.get("/api/academico/professores/{id}/grade", professorController::consultarGrade);
+        app.get("/api/academico/professores", turmaVisualizar.then(professorController::listar));
+        app.post("/api/academico/professores", turmaGerenciar.then(professorController::criar));
+        app.get("/api/academico/professores/{id}", turmaVisualizar.then(professorController::obterPorId));
+        app.put("/api/academico/professores/{id}", turmaGerenciar.then(professorController::atualizar));
+        app.delete("/api/academico/professores/{id}", turmaGerenciar.then(professorController::inativar));
+        app.get("/api/academico/professores/{id}/grade", turmaVisualizar.then(professorController::consultarGrade));
 
         // Alunos
-        app.get("/api/academico/alunos", alunoController::listar);
-        app.post("/api/academico/alunos", alunoController::criar);
-        app.get("/api/academico/alunos/{id}", alunoController::obterPorId);
-        app.put("/api/academico/alunos/{id}", alunoController::atualizar);
-        app.patch("/api/academico/alunos/{id}/situacao", alunoController::alterarSituacao);
-        app.post("/api/academico/alunos/{id}/matriculas", alunoController::matricular);
-        app.post("/api/academico/alunos/{id}/transferencias", alunoController::transferir);
-        app.get("/api/academico/alunos/{id}/documentos", alunoController::listarDocumentos);
-        app.post("/api/academico/alunos/{id}/documentos", alunoController::adicionarDocumento);
-        app.get("/api/academico/alunos/{id}/historico-escolar", alunoController::emitirHistoricoEscolar);
+        app.get("/api/academico/alunos", alunoVisualizar.then(alunoController::listar));
+        app.post("/api/academico/alunos", alunoCriar.then(alunoController::criar));
+        app.get("/api/academico/alunos/{id}", alunoVisualizar.then(alunoController::obterPorId));
+        app.put("/api/academico/alunos/{id}", alunoEditar.then(alunoController::atualizar));
+        app.patch("/api/academico/alunos/{id}/situacao", alunoEditar.then(alunoController::alterarSituacao));
+        app.post("/api/academico/alunos/{id}/matriculas", matriculaCriar.then(alunoController::matricular));
+        app.post("/api/academico/alunos/{id}/transferencias", matriculaEditar.then(alunoController::transferir));
+        app.get("/api/academico/alunos/{id}/documentos", alunoVisualizar.then(alunoController::listarDocumentos));
+        app.post("/api/academico/alunos/{id}/documentos", alunoEditar.then(alunoController::adicionarDocumento));
+        app.get("/api/academico/alunos/{id}/historico-escolar", matriculaVisualizar.then(alunoController::emitirHistoricoEscolar));
 
         // Gestão Pedagógica (Apenas Notas e Boletins)
 
         // MÓDULO FINANCEIRO — PROTEÇÃO POR PERFIL
-        app.before("/api/financeiro/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
-
         // Rotas de Mensalidades e Transações
-        app.post("/api/financeiro/mensalidades", mensalidadeController::cadastrar);
-        app.post("/api/financeiro/mensalidades/descontos", mensalidadeController::aplicarDesconto);
-        app.post("/api/financeiro/mensalidades/pagamentos", mensalidadeController::registrarPagamento);
-        app.post("/api/financeiro/mensalidades/parcelar", mensalidadeController::parcelar);
-        app.get("/api/financeiro/mensalidades/aluno/{idAluno}", mensalidadeController::listarPorAluno);
+        app.post("/api/financeiro/mensalidades", financeiroGerenciar.then(mensalidadeController::cadastrar));
+        app.post("/api/financeiro/mensalidades/descontos", financeiroGerenciar.then(mensalidadeController::aplicarDesconto));
+        app.post("/api/financeiro/mensalidades/pagamentos", financeiroGerenciar.then(mensalidadeController::registrarPagamento));
+        app.post("/api/financeiro/mensalidades/parcelar", financeiroGerenciar.then(mensalidadeController::parcelar));
+        app.get("/api/financeiro/mensalidades/aluno/{idAluno}", financeiroVisualizar.then(mensalidadeController::listarPorAluno));
 
         // Rotas de Relatórios, Fluxo de Caixa e Inadimplência
-        app.get("/api/financeiro/relatorios/devedores", relatorioFinanceiroController::listarDevedores);
-        app.get("/api/financeiro/relatorios/previsao-fluxo", relatorioFinanceiroController::obterPrevisaoEFluxo);
+        app.get("/api/financeiro/relatorios/devedores", financeiroVisualizar.then(relatorioFinanceiroController::listarDevedores));
+        app.get("/api/financeiro/relatorios/previsao-fluxo", financeiroVisualizar.then(relatorioFinanceiroController::obterPrevisaoEFluxo));
         // SISTEMA DE ALERTAS
-        app.before("/api/alertas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN, Perfil.GESTOR, Perfil.FINANCEIRO));
-        app.get("/api/alertas", alertaController::obterAlertas);
+        app.get("/api/alertas", financeiroVisualizar.then(alertaController::obterAlertas));
 
-        app.before("/api/admin/dashboard", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.before("/api/admin/dashboard/*", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.before("/api/admin/escolas", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.get("/api/admin/escolas", escolaController::listarEscolasAdmin);
-        app.before("/api/admin/escolas/{id}/exclusao/impacto", new RoleBasedMiddleware(Perfil.SUPER_ADMIN));
-        app.get("/api/admin/escolas/{id}/exclusao/impacto", escolaController::analisarImpactoExclusao);
-        app.get("/api/admin/dashboard", superAdminDashboardApiController::dashboard);
-        app.get("/api/admin/dashboard/alertas", superAdminDashboardApiController::alertas);
-        app.get("/api/admin/dashboard/atividades", superAdminDashboardApiController::atividades);
-        app.get("/api/admin/dashboard/ultimos-acessos", superAdminDashboardApiController::ultimosAcessos);
+        app.get("/api/admin/escolas", escolaVisualizarGlobal.then(escolaController::listarEscolasAdmin));
+        app.get("/api/admin/escolas/{id}/exclusao/impacto", escolaBloquearGlobal.then(escolaController::analisarImpactoExclusao));
+        app.get("/api/admin/dashboard", dashboardGlobal.then(superAdminDashboardApiController::dashboard));
+        app.get("/api/admin/dashboard/alertas", dashboardGlobal.then(superAdminDashboardApiController::alertas));
+        app.get("/api/admin/dashboard/atividades", dashboardGlobal.then(superAdminDashboardApiController::atividades));
+        app.get("/api/admin/dashboard/ultimos-acessos", dashboardGlobal.then(superAdminDashboardApiController::ultimosAcessos));
 
 
         // TRATAMENTO DE EXCEÇÕES
-        app.exception(AuthenticationException.class, (e, ctx) -> ctx.redirect("/super-admin/login"));
+        app.exception(AuthenticationException.class, (e, ctx) -> {
+            if (isJsonEndpoint(ctx.path())) {
+                ctx.status(401).json(Map.of("message", e.getMessage()));
+            } else {
+                ctx.redirect("/super-admin/login");
+            }
+        });
 
         app.exception(NotFoundException.class, (e, ctx) -> {
             ctx.status(404);
-            if (ctx.path().startsWith("/api/")) {
+            if (isJsonEndpoint(ctx.path())) {
                 ctx.json(Map.of("message", e.getMessage()));
             } else {
                 Context thymeleafContext = new Context();
@@ -690,7 +685,7 @@ public class KutuarApp {
 
         app.exception(AuthorizationException.class, (e, ctx) -> {
             ctx.status(403);
-            if (ctx.path().startsWith("/api/")) {
+            if (isJsonEndpoint(ctx.path())) {
                 ctx.json(Map.of("message", e.getMessage()));
             } else {
                 Context thymeleafContext = new Context();
@@ -718,6 +713,10 @@ public class KutuarApp {
 
         app.start(port);
         logger.info("Servidor iniciado na porta {}", port);
+    }
+
+    private static boolean isJsonEndpoint(String path) {
+        return path.startsWith("/api/") || path.startsWith("/users") || path.startsWith("/escolas");
     }
 
     private static TemplateEngine createTemplateEngine() {

@@ -8,6 +8,7 @@ import br.com.kutuar.academico.repositories.ProfessorRepository;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 
 import java.util.UUID;
@@ -33,11 +34,7 @@ public class AlocacaoDocenteService {
         this.professorRepository = professorRepository;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     public void atribuir(UUID idTurma, AtribuirDocenteDTO dto) {
         if (dto == null || dto.getIdDisciplina() == null || dto.getIdProfessor() == null) {

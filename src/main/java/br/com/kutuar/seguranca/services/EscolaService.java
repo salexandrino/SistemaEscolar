@@ -44,6 +44,7 @@ public class EscolaService {
     private final EscolaRepository escolaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordService passwordService;
+    private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final ConnectionProvider connectionProvider;
     private final List<EscolaCadastradaObserver> observers = new java.util.ArrayList<>();
     private static final SecureRandom RANDOM = new SecureRandom();
@@ -259,6 +260,7 @@ public class EscolaService {
                 escolaSalva = escolaRepository.save(conn, escola);
                 gestor.setTenantId(escolaSalva.getTenantId());
                 gestor.setEscolaId(escolaSalva.getId());
+                usuarioTenantService.validarConsistencia(gestor);
                 usuarioRepository.save(conn, gestor, escolaSalva.getTenantId());
                 conn.commit();
             } catch (Exception e) {

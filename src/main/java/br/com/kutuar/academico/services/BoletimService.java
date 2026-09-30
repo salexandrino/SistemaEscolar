@@ -8,6 +8,7 @@ import br.com.kutuar.academico.repositories.NotaRepository;
 import br.com.kutuar.academico.services.media.CalculadoraMediaStrategy;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
 
 import java.math.BigDecimal;
@@ -29,11 +30,7 @@ public class BoletimService {
         this.calculadoraMedia = calculadoraMedia;
     }
 
-    private UUID tenant() {
-        AuthUser u = AuthUserContext.getAuthUser();
-        if (u == null || u.getTenantId() == null) throw new ValidationException("Tenant inválido ou não autenticado.");
-        return u.getTenantId();
-    }
+    private UUID tenant() { return TenantAccessGuard.currentTenant(); }
 
     public BoletimDTO gerarBoletim(UUID idAluno, UUID idTurma, UUID idDisciplina) {
         UUID tenantId = tenant();

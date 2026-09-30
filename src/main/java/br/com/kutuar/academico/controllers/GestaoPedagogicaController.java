@@ -4,7 +4,7 @@ import br.com.kutuar.academico.dtos.LancamentoNotaDTO;
 import br.com.kutuar.academico.dtos.SimulacaoNotaDTO;
 import br.com.kutuar.academico.services.BoletimService;
 import br.com.kutuar.academico.services.LancamentoNotasService;
-import br.com.kutuar.seguranca.utils.AuthUserContext;
+import br.com.kutuar.seguranca.services.TenantAccessGuard;
 import io.javalin.http.Context;
 
 import java.math.BigDecimal;
@@ -28,14 +28,14 @@ public class GestaoPedagogicaController {
     }
 
     public void gerarBoletim(Context ctx) {
-        UUID tenantId = AuthUserContext.getAuthUser().getTenantId();
+        UUID tenantId = TenantAccessGuard.currentTenant();
         UUID idTurma = UUID.fromString(ctx.queryParam("idTurma"));
         UUID idAluno = UUID.fromString(ctx.queryParam("idAluno"));
         ctx.json(boletimService.gerarBoletim(tenantId, idTurma, idAluno));
     }
 
     public void recuperacao(Context ctx) {
-        UUID tenantId = AuthUserContext.getAuthUser().getTenantId();
+        UUID tenantId = TenantAccessGuard.currentTenant();
         UUID idTurma = UUID.fromString(ctx.queryParam("idTurma"));
         UUID idDisciplina = UUID.fromString(ctx.queryParam("idDisciplina"));
         ctx.json(lancamentoNotasService.identificarAlunosEmRecuperacao(tenantId, idTurma, idDisciplina));
