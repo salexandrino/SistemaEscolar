@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "KutuarApp (Java 25)",
+            "request": "launch",
+            "mainClass": "br.com.kutuar.KutuarApp",
+            "projectName": "kutuar",
+            "javaExec": "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin\\java.exe"
+        }
+    ]
+}
