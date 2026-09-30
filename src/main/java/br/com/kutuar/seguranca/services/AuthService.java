@@ -381,11 +381,6 @@ public class AuthService {
         String novoHash = passwordService.hash(dto.getNovaSenha());
         usuario.setSenhaHash(novoHash);
 
-        // O prompt pede "persiste via usuarioRepository.updateCadastro(usuario)" mas esse método
-        // atualiza a data e outros campos, e especificamente a senha? Espera, o updateCadastro atualiza
-        // (escola_id, nome_completo, email, cpf, telefone, atualizado_em). Não atualiza senha_hash!
-        // No passo anterior vimos o repositório. O repositório tem updatePassword(UUID id, UUID tenantId, String newPasswordHash).
-        // Vou usar o updatePassword do repository que é feito para isso.
         usuarioRepository.updatePassword(usuarioId, tenantId, novoHash);
         auditarSenha(usuario, "SENHA_PROPRIA_ALTERADA", "origem=ALTERACAO_PROPRIA");
         

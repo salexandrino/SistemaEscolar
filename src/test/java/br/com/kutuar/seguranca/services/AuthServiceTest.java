@@ -140,7 +140,7 @@ public class AuthServiceTest {
     @Test
     void autenticaSenhaSemTransformacaoAntesDoPasswordService() {
         Usuario usuario = usuarioDaEscola(Perfil.SUPER_ADMIN);
-        String senha = "Admin123@";
+        String senha = "senha de teste";
         when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
         when(passwordService.verificar(senha, usuario.getSenhaHash())).thenReturn(true);
         when(jwtService.gerarToken(any(), any(), any(), any(), any())).thenReturn("jwt");
@@ -153,14 +153,14 @@ public class AuthServiceTest {
     @Test
     void naoRemoveEspacosDaSenhaAntesDoPasswordService() {
         Usuario usuario = usuarioDaEscola(Perfil.SUPER_ADMIN);
-        String senhaComEspacos = " Admin123@ ";
+        String senhaComEspacos = " senha de teste ";
         when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
         when(passwordService.verificar(senhaComEspacos, usuario.getSenhaHash())).thenReturn(false);
 
         assertThrows(AuthenticationException.class, () -> authService.autenticar(usuario.getCpf(), senhaComEspacos));
 
         verify(passwordService).verificar(senhaComEspacos, usuario.getSenhaHash());
-        verify(passwordService, never()).verificar("Admin123@", usuario.getSenhaHash());
+        verify(passwordService, never()).verificar("senha de teste", usuario.getSenhaHash());
     }
 
     @Test
@@ -204,7 +204,7 @@ public class AuthServiceTest {
     void deveAlterarSenhaPropriaComSucesso() {
         // GIVEN
         UUID usuarioId = superAdminFake.getId();
-        UUID tenantId = UUID.randomUUID();
+        UUID tenantId = null;
         AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO("senha_antiga", "NovaSenha@123", "NovaSenha@123");
 
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(superAdminFake));
