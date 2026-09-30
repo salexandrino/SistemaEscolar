@@ -44,14 +44,12 @@ public class AuthController {
     public void login(Context ctx) {
         try {
             LoginDTO loginDTO = new LoginDTO();
-            // .trim() é essencial aqui: o BCrypt compara byte a byte, então um
-            // espaço em branco extra vindo de copy-paste da senha temporária
-            // (mostrada na tela pro Super Admin) já é o suficiente pra dar
-            // "CPF ou senha inválidos" mesmo com a senha certa.
+            // CPF é um identificador e pode ser normalizado. A senha, por outro
+            // lado, é comparada byte a byte pelo BCrypt e deve ser preservada.
             String cpfParam = ctx.formParam("cpf");
             String senhaParam = ctx.formParam("senha");
             loginDTO.setCpf(cpfParam != null ? cpfParam.trim() : null);
-            loginDTO.setSenha(senhaParam != null ? senhaParam.trim() : null);
+            loginDTO.setSenha(senhaParam);
 
             if (loginDTO.getCpf() == null || loginDTO.getCpf().isBlank()) {
                 throw new ValidationException("O CPF não pode estar em branco.");
@@ -64,14 +62,15 @@ public class AuthController {
             CookieUtil.addJwtCookie(ctx, jwt);
             ctx.redirect("/hub");
 
-            logger.info("Usuário {} logado com sucesso.", loginDTO.getCpf().replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
-
-        } catch (ValidationException | AuthenticationException e) {
+        } catch (ValidationException e) {
             ctx.sessionAttribute("errorMessage", e.getMessage());
             ctx.redirect("/login");
-            logger.warn("Falha na tentativa de login: {}", e.getMessage());
+            logger.warn("Login negado por dados de entrada inválidos.");
+        } catch (AuthenticationException e) {
+            ctx.sessionAttribute("errorMessage", e.getMessage());
+            ctx.redirect("/login");
         } catch (Exception e) {
-            logger.error("Erro inesperado durante o login convencional", e);
+            logger.error("Erro inesperado durante o login convencional. tipo={}", e.getClass().getSimpleName());
             ctx.sessionAttribute("errorMessage", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
             ctx.redirect("/login");
         }
@@ -92,15 +91,18 @@ public class AuthController {
             String jwt = authService.autenticarSuperAdmin(email, senha);
             CookieUtil.addJwtCookie(ctx, jwt);
 
-            // CORREÇÃO: Adicionado log de auditoria seguro para o Super Admin
-            logger.info("SuperAdmin [{}] logado com sucesso no painel administrativo.", email);
             ctx.redirect("/dashboard");
 
-        } catch (Exception e) {
-            // CORREÇÃO CRÍTICA: Removido o e.printStackTrace() para evitar vazamento de senhas e adicionado log seguro
-            logger.warn("Tentativa falha de login como SuperAdmin com o email: {}. Motivo: {}", email, e.getMessage());
-
+        } catch (ValidationException e) {
+            logger.warn("Login do Super Admin negado por dados de entrada inválidos.");
             ctx.sessionAttribute("errorMessage", e.getMessage());
+            ctx.redirect("/super-admin/login");
+        } catch (AuthenticationException e) {
+            ctx.sessionAttribute("errorMessage", e.getMessage());
+            ctx.redirect("/super-admin/login");
+        } catch (Exception e) {
+            logger.error("Erro inesperado durante login do Super Admin. tipo={}", e.getClass().getSimpleName());
+            ctx.sessionAttribute("errorMessage", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde.");
             ctx.redirect("/super-admin/login");
         }
     }
@@ -164,7 +166,7 @@ public class AuthController {
             ctx.status(400).json(Map.of("message", e.getMessage()));
             logger.warn("Aviso de negócio ao registrar usuário: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro crítico e inesperado durante o registro de usuário", e);
+            logger.error("Erro crítico e inesperado durante o registro de usuário. tipo={}", e.getClass().getSimpleName());
             ctx.status(500).json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
     }
@@ -200,7 +202,7 @@ public class AuthController {
             ctx.json(Map.of("message", "ID de usuário inválido."));
             logger.warn("Formato de UUID inválido enviado na aprovação: {}", ctx.pathParam("id"));
         } catch (Exception e) {
-            logger.error("Erro crítico inesperado durante aprovação de usuário", e);
+            logger.error("Erro crítico inesperado durante aprovação de usuário. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -218,13 +220,12 @@ public class AuthController {
 
             ctx.status(HttpStatus.OK);
             ctx.json(Map.of("message", "Se existir uma conta vinculada a este e-mail, um código de recuperação foi enviado."));
-            logger.info("Solicitação de recuperação de senha registrada para o e-mail informado.");
         } catch (ValidationException e) {
             ctx.status(HttpStatus.BAD_REQUEST);
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha ao solicitar recuperação de senha: {}", e.getMessage());
+            logger.warn("Solicitação de recuperação de senha rejeitada por dados inválidos.");
         } catch (Exception e) {
-            logger.error("Erro inesperado na solicitação de recuperação de senha", e);
+            logger.error("Erro inesperado na solicitação de recuperação de senha. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -247,13 +248,12 @@ public class AuthController {
 
             ctx.status(HttpStatus.OK);
             ctx.json(Map.of("message", "Senha redefinida com sucesso."));
-            logger.info("Senha redefinida com sucesso para o usuário correspondente.");
         } catch (ValidationException | NotFoundException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha ao executar redefinição de senha: {}", e.getMessage());
+            logger.warn("Redefinição de senha rejeitada por validação.");
         } catch (Exception e) {
-            logger.error("Erro crítico inesperado durante a redefinição de senha", e);
+            logger.error("Erro crítico inesperado durante a redefinição de senha. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }
@@ -272,17 +272,16 @@ public class AuthController {
 
             ctx.status(HttpStatus.OK);
             ctx.json(Map.of("message", "Senha alterada com sucesso."));
-            logger.info("Senha alterada com sucesso para o usuário [ID: {}].", currentUser.getUserId());
         } catch (AuthenticationException | AuthorizationException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha de autorização na troca de senha: {}", e.getMessage());
+            logger.warn("Alteração de senha negada por autenticação ou autorização.");
         } catch (ValidationException | NotFoundException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha de validação na troca de senha: {}", e.getMessage());
+            logger.warn("Alteração de senha rejeitada por validação.");
         } catch (Exception e) {
-            logger.error("Erro inesperado durante a alteração de senha do usuário logado", e);
+            logger.error("Erro inesperado durante a alteração de senha do usuário logado. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Ocorreu um erro interno inesperado no sistema. Tente novamente mais tarde."));
         }

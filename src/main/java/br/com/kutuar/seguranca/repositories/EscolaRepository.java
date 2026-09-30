@@ -197,7 +197,7 @@ public class EscolaRepository extends BaseDAO implements DAO<Escola, UUID> {
 
         } catch (SQLException e) {
             // ✔️ LOG CORRIGIDO: Mais limpo e sem duplicar a mensagem da Stack Trace
-            logger.error("Erro ao buscar escola por CNPJ {}", cnpj, e);
+            logger.error("Erro ao buscar escola por CNPJ.", e);
             throw new RuntimeException("Erro ao buscar escola no banco de dados.", e);
         }
         return Optional.empty();

@@ -19,6 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.time.LocalDateTime;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -134,6 +137,48 @@ public class AuthServiceTest {
         assertEquals("jwt-ativo", authService.autenticar(usuario.getCpf(), "Senha@123"));
     }
 
+    @Test
+    void autenticaSenhaSemTransformacaoAntesDoPasswordService() {
+        Usuario usuario = usuarioDaEscola(Perfil.SUPER_ADMIN);
+        String senha = "senha de teste";
+        when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
+        when(passwordService.verificar(senha, usuario.getSenhaHash())).thenReturn(true);
+        when(jwtService.gerarToken(any(), any(), any(), any(), any())).thenReturn("jwt");
+
+        assertEquals("jwt", authService.autenticar(usuario.getCpf(), senha));
+
+        verify(passwordService).verificar(senha, usuario.getSenhaHash());
+    }
+
+    @Test
+    void naoRemoveEspacosDaSenhaAntesDoPasswordService() {
+        Usuario usuario = usuarioDaEscola(Perfil.SUPER_ADMIN);
+        String senhaComEspacos = " senha de teste ";
+        when(usuarioRepository.findByCpf(usuario.getCpf())).thenReturn(Optional.of(usuario));
+        when(passwordService.verificar(senhaComEspacos, usuario.getSenhaHash())).thenReturn(false);
+
+        assertThrows(AuthenticationException.class, () -> authService.autenticar(usuario.getCpf(), senhaComEspacos));
+
+        verify(passwordService).verificar(senhaComEspacos, usuario.getSenhaHash());
+        verify(passwordService, never()).verificar("senha de teste", usuario.getSenhaHash());
+    }
+
+    @Test
+    void redefinicaoPreservaSenhaComEspacosAoGerarHash() {
+        String email = "admin@kutuar.com";
+        String token = "token-de-recuperacao";
+        String senhaComEspacos = " NovaSenha@123 ";
+        superAdminFake.setResetPasswordToken(BCrypt.hashpw(token, BCrypt.gensalt()));
+        superAdminFake.setResetPasswordExpiresAt(LocalDateTime.now().plusMinutes(10));
+        when(usuarioRepository.findByEmail(email)).thenReturn(Optional.of(superAdminFake));
+        when(passwordService.hash(senhaComEspacos)).thenReturn("$2a$10$novoHash");
+
+        authService.resetPassword(email, token, senhaComEspacos, senhaComEspacos);
+
+        verify(passwordService).hash(senhaComEspacos);
+        verify(usuarioRepository).updatePassword(superAdminFake.getId(), superAdminFake.getTenantId(), "$2a$10$novoHash");
+    }
+
     private Usuario usuarioDaEscola(Perfil perfil) {
         Usuario usuario = new Usuario();
         usuario.setId(UUID.randomUUID());
@@ -159,7 +204,7 @@ public class AuthServiceTest {
     void deveAlterarSenhaPropriaComSucesso() {
         // GIVEN
         UUID usuarioId = superAdminFake.getId();
-        UUID tenantId = UUID.randomUUID();
+        UUID tenantId = null;
         AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO("senha_antiga", "NovaSenha@123", "NovaSenha@123");
 
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(superAdminFake));

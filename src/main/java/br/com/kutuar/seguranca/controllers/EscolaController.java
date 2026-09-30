@@ -100,7 +100,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao obter escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao obter escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao obter escola."));
         }
@@ -173,7 +173,7 @@ public class EscolaController {
             ctx.status(e.getStatus());
             ctx.json(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            logger.error("Erro ao cadastrar escola", e);
+            logger.error("Erro ao cadastrar escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("error", "Erro interno ao cadastrar escola."));
         }
@@ -273,7 +273,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao atualizar escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao atualizar escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao atualizar escola."));
         }
@@ -319,7 +319,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao obter escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao obter escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao obter escola."));
         }
@@ -394,7 +394,7 @@ public class EscolaController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Falha ao listar escolas: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao listar escolas: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao listar escolas. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao listar escolas."));
         }
@@ -424,7 +424,7 @@ public class EscolaController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Falha ao listar escolas ativas: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao listar escolas ativas: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao listar escolas ativas. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao listar escolas."));
         }
@@ -454,7 +454,7 @@ public class EscolaController {
             ctx.json(Map.of("message", e.getMessage()));
             logger.warn("Falha ao listar escolas inativas: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao listar escolas inativas: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao listar escolas inativas. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao listar escolas."));
         }
@@ -479,12 +479,12 @@ public class EscolaController {
         } catch (AuthenticationException | AuthorizationException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
-            logger.warn("Falha ao buscar escola por CNPJ: {}", e.getMessage());
+            logger.warn("Busca de escola por CNPJ rejeitada.");
         } catch (NotFoundException e) {
             ctx.status(e.getStatus());
             ctx.json(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            logger.error("Erro inesperado ao buscar escola por CNPJ: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao buscar escola por CNPJ. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao buscar escola."));
         }
@@ -529,7 +529,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao ativar escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao ativar escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao ativar escola."));
         }
@@ -574,7 +574,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao inativar escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao inativar escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao inativar escola."));
         }
@@ -608,7 +608,7 @@ public class EscolaController {
             ctx.json(Map.of("message", "ID de escola inválido."));
             logger.warn("ID de escola inválido: {}", e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro inesperado ao excluir escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao excluir escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao excluir escola."));
         }
@@ -632,7 +632,7 @@ public class EscolaController {
         } catch (IllegalArgumentException e) {
             ctx.status(HttpStatus.BAD_REQUEST).json(Map.of("message", "ID de escola inválido."));
         } catch (Exception e) {
-            logger.error("Erro inesperado ao analisar impacto de exclusão", e);
+            logger.error("Erro inesperado ao analisar impacto de exclusão. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of("message", "Não foi possível analisar a exclusão."));
         }
     }
@@ -669,7 +669,7 @@ public class EscolaController {
             ctx.status(HttpStatus.BAD_REQUEST);
             ctx.json(Map.of("message", "ID de escola inválido."));
         } catch (Exception e) {
-            logger.error("Erro inesperado ao excluir escola: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao excluir escola. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
             ctx.json(Map.of("message", "Erro interno ao excluir escola."));
         }
@@ -723,7 +723,7 @@ public class EscolaController {
             ctx.render("dashboard/escolas/lista.html", model);
 
         } catch (Exception e) {
-            logger.error("Erro ao carregar página de listagem", e);
+            logger.error("Erro ao carregar página de listagem. tipo={}", e.getClass().getSimpleName());
             ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).result("Erro ao carregar página.");
         }
     }
@@ -751,7 +751,7 @@ public class EscolaController {
             ctx.render("dashboard/escolas/visualizar.html", model);
 
         } catch (Exception e) {
-            logger.error("Erro ao carregar página de visualização", e);
+            logger.error("Erro ao carregar página de visualização. tipo={}", e.getClass().getSimpleName());
             ctx.redirect("/dashboard/escolas");
         }
     }

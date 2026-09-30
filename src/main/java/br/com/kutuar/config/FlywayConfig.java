@@ -31,12 +31,12 @@ public class FlywayConfig {
                     .validateOnMigrate(true)
                     .load();
 
-            logger.info("Aplicando as migrações na nuvem...");
-            flyway.migrate();
+            logger.info("Iniciando validação e aplicação de migrations Flyway.");
+            int migrationsAplicadas = flyway.migrate().migrationsExecuted;
 
-            logger.info("Flyway migrations aplicadas com sucesso.");
+            logger.info("Flyway concluído com sucesso. migrationsAplicadas={}", migrationsAplicadas);
         } catch (Exception e) {
-            logger.error("FALHA CRÍTICA NO FLYWAY: {}", e.getMessage(), e);
+            logger.error("Falha ao validar ou aplicar migrations Flyway.", e);
             throw new RuntimeException(e);
         }
     }

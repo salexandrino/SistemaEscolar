@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
 public class AuthService {
@@ -27,17 +28,26 @@ public class AuthService {
     private final PasswordService passwordService;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final AuditoriaService auditoriaService;
     private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
-    private final Random random = new Random();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final int RECOVERY_TOKEN_BYTES = 32;
+    private static final long RECOVERY_TOKEN_EXPIRATION_MINUTES = 15;
 
     public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService, EmailService emailService) {
+        this(usuarioRepository, escolaRepository, passwordService, jwtService, emailService, AuditoriaService.semPersistencia());
+    }
+
+    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService,
+                       JwtService jwtService, EmailService emailService, AuditoriaService auditoriaService) {
         this.usuarioRepository = usuarioRepository;
         this.escolaRepository = escolaRepository;
         this.passwordService = passwordService;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.auditoriaService = auditoriaService == null ? AuditoriaService.semPersistencia() : auditoriaService;
 
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
@@ -64,25 +74,25 @@ public class AuthService {
 
         Optional<Usuario> optionalUsuario = usuarioRepository.findByCpf(cpfNormalizado);
         if (optionalUsuario.isEmpty()) {
-            logger.warn("Tentativa de login com CPF inexistente: {}", cpf.replaceAll("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", "***.***.***-**"));
+            logger.warn("Login negado: credenciais não reconhecidas.");
             throw new AuthenticationException("CPF não cadastrado. Por favor, crie uma conta para continuar.");
         }
 
         Usuario usuario = optionalUsuario.get();
 
         if (!usuario.isAtivo()) { // Verifica se o usuário está ativo
-            logger.warn("Tentativa de login de usuário inativo/pendente: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: conta inativa ou pendente. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Sua conta ainda não foi aprovada pelo Gestor.");
         }
 
         if (usuario.isBloqueado()) { // Verifica se o usuário está bloqueado
-            logger.warn("Tentativa de login em conta bloqueada para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: conta bloqueada. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Sua conta está bloqueada. Entre em contato com o administrador.");
         }
 
         if (!passwordService.verificar(senha, usuario.getSenhaHash())) {
             registrarTentativaLoginFalha(usuario);
-            logger.warn("Tentativa de login com senha inválida para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Login negado: credenciais inválidas. usuarioId={}", usuario.getId());
             throw new AuthenticationException("CPF ou senha inválidos.");
         }
 
@@ -125,7 +135,7 @@ public class AuthService {
         if (usuario.getTentativasLogin() >= maxLoginAttempts) {
             usuario.setBloqueado(true); // Marca como bloqueado
             // usuario.setBloqueadoAte(LocalDateTime.now().plusMinutes(lockoutDurationMinutes)); // Se quiser bloqueio temporário
-            logger.warn("Conta bloqueada para CPF: {}", usuario.getCpfMascarado());
+            logger.warn("Conta bloqueada após exceder tentativas de login. usuarioId={}", usuario.getId());
         }
         usuarioRepository.update(usuario);
     }
@@ -168,12 +178,12 @@ public class AuthService {
         }
 
         if (usuarioRepository.existsByCpf(usuario.getCpf(), usuario.getTenantId())) {
-            logger.warn("Tentativa de registro com CPF duplicado: {}", usuario.getCpfMascarado());
+            logger.warn("Cadastro de usuário negado: CPF já cadastrado.");
             throw new ConflictException("CPF já cadastrado.");
         }
 
         if (usuarioRepository.existsByEmail(usuario.getEmail(), usuario.getTenantId())) {
-            logger.warn("Tentativa de registro com e-mail duplicado: {}", usuario.getEmailMascarado());
+            logger.warn("Cadastro de usuário negado: e-mail já cadastrado.");
             throw new ConflictException("E-mail já cadastrado.");
         }
 
@@ -212,9 +222,9 @@ public class AuthService {
         usuarioRepository.save(usuario, usuario.getTenantId());
 
         if (usuario.isAtivo()) {
-            logger.info("Usuário {} cadastrado e ATIVO pronto para uso.", usuario.getCpfMascarado());
+            logger.info("Usuário cadastrado e ativo. usuarioId={}", usuario.getId());
         } else {
-            logger.info("Usuário {} cadastrado com sucesso. Status: PENDENTE_APROVACAO.", usuario.getCpfMascarado());
+            logger.info("Usuário cadastrado com aprovação pendente. usuarioId={}", usuario.getId());
         }
     }
     public void approveUser(UUID userId, UUID tenantId, AuthUser approver) {
@@ -238,32 +248,34 @@ public class AuthService {
 
         // 4. Aprovar usuário
         usuarioRepository.approve(userId, tenantId);
-        logger.info("Usuário ID {} aprovado por Gestor {} (Tenant {}).", userId, approver.getCpf(), tenantId);
+        logger.info("Usuário aprovado por gestor. usuarioId={}, executorId={}, tenantId={}",
+                userId, approver.getUserId(), tenantId);
     }
 
     public void forgotPassword(String email) {
         ValidationUtil.validateEmail(email);
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email.trim().toLowerCase());
 
         if (optionalUsuario.isPresent()) {
             Usuario usuario = optionalUsuario.get();
-            String recoveryCode = String.format("%06d", random.nextInt(999999));
-            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(15);
+            String recoveryToken = gerarTokenRecuperacao();
+            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(RECOVERY_TOKEN_EXPIRATION_MINUTES);
 
-            usuario.setResetPasswordToken(recoveryCode);
+            usuario.setResetPasswordToken(BCrypt.hashpw(recoveryToken, BCrypt.gensalt()));
             usuario.setResetPasswordExpiresAt(expiresAt);
 
             try {
                 usuarioRepository.update(usuario);
-                logger.info("Código de recuperação gerado para usuário {}.", usuario.getEmail());
-                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryCode);
+                logger.info("Solicitação de recuperação de senha processada. usuarioId={}", usuario.getId());
+                emailService.enviarCodigoRecuperacaoSenha(usuario.getEmail(), usuario.getNomeCompleto(), recoveryToken);
             } catch (Exception e) {
-                logger.error("Erro ao salvar token de recuperação para {}: {}", usuario.getEmail(), e.getMessage(), e);
+                logger.error("Falha ao processar recuperação de senha. usuarioId={}, tipo={}",
+                        usuario.getId(), e.getClass().getSimpleName());
                 throw new InternalServerException("Erro interno ao gerar código de recuperação.");
             }
         } else {
-            logger.warn("Tentativa de recuperação de senha para e-mail não existente: {}", email);
+            logger.info("Solicitação de recuperação de senha processada sem conta elegível.");
             // Não revelar que o e-mail não existe por segurança — apenas registrar no log
         }
     }
@@ -276,47 +288,69 @@ public class AuthService {
             throw new ValidationException("Nova senha e confirmação de senha não conferem.");
         }
 
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+        if (codigo == null || codigo.isBlank()) {
+            throw new ValidationException("Código de recuperação inválido.");
+        }
+
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email.trim().toLowerCase());
         if (optionalUsuario.isEmpty()) {
-            throw new NotFoundException("Usuário não encontrado."); // Mensagem genérica para segurança
+            throw new ValidationException("Código de recuperação inválido.");
         }
 
         Usuario usuario = optionalUsuario.get();
 
-        if (usuario.getResetPasswordToken() == null || !usuario.getResetPasswordToken().equals(codigo)) {
+        if (usuario.getResetPasswordToken() == null || !tokenRecuperacaoConfere(codigo, usuario.getResetPasswordToken())) {
             throw new ValidationException("Código de recuperação inválido.");
         }
-        if (usuario.getResetPasswordExpiresAt() == null || usuario.getResetPasswordExpiresAt().isBefore(LocalDateTime.now())) {
+        if (usuario.getResetPasswordExpiresAt() == null || !usuario.getResetPasswordExpiresAt().isAfter(LocalDateTime.now())) {
             throw new ValidationException("Código de recuperação expirado.");
         }
 
         // Atualiza a senha e limpa o token de recuperação
         String newPasswordHash = passwordService.hash(novaSenha);
         usuarioRepository.updatePassword(usuario.getId(), usuario.getTenantId(), newPasswordHash);
+        auditarSenha(usuario, "SENHA_REDEFINIDA_POR_RECUPERACAO", "origem=RECUPERACAO_SENHA");
 
-        logger.info("Senha do usuário {} redefinida com sucesso.", usuario.getEmail());
+        logger.info("Senha redefinida com sucesso para usuário ID {}.", usuario.getId());
+    }
+
+    private String gerarTokenRecuperacao() {
+        byte[] bytes = new byte[RECOVERY_TOKEN_BYTES];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private boolean tokenRecuperacaoConfere(String token, String tokenHash) {
+        try {
+            return BCrypt.checkpw(token, tokenHash);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public String autenticarSuperAdmin(String email, String senha) {
 
-        logger.info("Iniciando tentativa de login para o Super Admin: {}", email);
+        logger.info("Tentativa de login do Super Admin recebida.");
 
         ValidationUtil.validateEmail(email);
 
         // Busca o usuário apenas UMA vez no banco para economizar performance
         Usuario usuario = usuarioRepository.findSuperAdminByEmail(email)
-                .orElseThrow(() -> new AuthenticationException("Email ou senha inválidos."));
+                .orElseThrow(() -> {
+                    logger.warn("Login do Super Admin negado: credenciais não reconhecidas.");
+                    return new AuthenticationException("Email ou senha inválidos.");
+                });
 
         // Verifica se a senha bate com o hash criptografado (Sem printar nada no console!)
         boolean senhaCorreta = passwordService.verificar(senha, usuario.getSenhaHash());
 
         if (!senhaCorreta) {
-            logger.warn("Tentativa de login falhou: Senha incorreta para o Super Admin: {}", email);
+            logger.warn("Login do Super Admin negado: credenciais inválidas. usuarioId={}", usuario.getId());
             throw new AuthenticationException("Email ou senha inválidos.");
             // Dica: Use uma mensagem genérica para não dar pistas a invasores se o e-mail ou a senha estavam certos
         }
 
-        logger.info("Super Admin [{}] autenticado com sucesso.", email);
+        logger.info("Login do Super Admin concluído. usuarioId={}", usuario.getId());
 
         // Gera o token JWT com segurança
         String token = jwtService.gerarToken(
@@ -347,13 +381,15 @@ public class AuthService {
         String novoHash = passwordService.hash(dto.getNovaSenha());
         usuario.setSenhaHash(novoHash);
 
-        // O prompt pede "persiste via usuarioRepository.updateCadastro(usuario)" mas esse método
-        // atualiza a data e outros campos, e especificamente a senha? Espera, o updateCadastro atualiza
-        // (escola_id, nome_completo, email, cpf, telefone, atualizado_em). Não atualiza senha_hash!
-        // No passo anterior vimos o repositório. O repositório tem updatePassword(UUID id, UUID tenantId, String newPasswordHash).
-        // Vou usar o updatePassword do repository que é feito para isso.
         usuarioRepository.updatePassword(usuarioId, tenantId, novoHash);
+        auditarSenha(usuario, "SENHA_PROPRIA_ALTERADA", "origem=ALTERACAO_PROPRIA");
         
         logger.info("Usuário {} alterou a própria senha com sucesso.", usuarioId);
+    }
+
+    private void auditarSenha(Usuario usuario, String acao, String detalhes) {
+        AuthUser executor = new AuthUser(usuario.getId(), usuario.getTenantId(), usuario.getEscolaId(),
+                usuario.getPerfil(), usuario.getCpf());
+        auditoriaService.registrar(executor, usuario.getTenantId(), acao, "USUARIO", usuario.getId(), detalhes);
     }
 }

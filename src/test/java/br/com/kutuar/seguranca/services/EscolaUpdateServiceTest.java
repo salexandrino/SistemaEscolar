@@ -19,7 +19,8 @@ import static org.mockito.Mockito.*;
 
 class EscolaUpdateServiceTest {
     private final EscolaRepository repository = mock(EscolaRepository.class);
-    private final EscolaService service = new EscolaService(repository, mock(UsuarioRepository.class), mock(PasswordService.class));
+    private final AuditoriaService auditoriaService = mock(AuditoriaService.class);
+    private final EscolaService service = new EscolaService(repository, mock(UsuarioRepository.class), mock(PasswordService.class), auditoriaService);
     private final AuthUser admin = new AuthUser(UUID.randomUUID(), null, null, Perfil.SUPER_ADMIN, "00000000000");
 
     @Test
@@ -42,6 +43,8 @@ class EscolaUpdateServiceTest {
         assertEquals(tenantOriginal, escola.getTenantId());
         assertEquals(criadoEmOriginal, escola.getCriadoEm());
         verify(repository).update(escola);
+        verify(auditoriaService).registrar(eq(admin), eq(tenantOriginal), eq("ESCOLA_EDITADA"),
+                eq("ESCOLA"), eq(idOriginal), eq("campos_atualizados=nome"));
     }
 
     @Test

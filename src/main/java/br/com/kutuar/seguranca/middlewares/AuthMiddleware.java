@@ -62,7 +62,7 @@ public class AuthMiddleware implements Handler {
                 }
             } catch (Exception e) {
                 // Em caso de erro inesperado no parsing do token, limpar cookie e continuar
-                logger.warn("Falha ao processar token JWT: {}. Removendo cookie.", e.getMessage());
+                logger.warn("Falha ao processar token JWT; removendo cookie.");
                 CookieUtil.removeJwtCookie(ctx);
             }
         }

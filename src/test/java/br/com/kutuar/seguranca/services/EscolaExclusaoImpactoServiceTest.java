@@ -21,7 +21,8 @@ import static org.mockito.Mockito.*;
 class EscolaExclusaoImpactoServiceTest {
     private final EscolaRepository repository = mock(EscolaRepository.class);
     private final UsuarioRepository usuarioRepository = mock(UsuarioRepository.class);
-    private final EscolaService service = new EscolaService(repository, usuarioRepository, mock(PasswordService.class));
+    private final AuditoriaService auditoriaService = mock(AuditoriaService.class);
+    private final EscolaService service = new EscolaService(repository, usuarioRepository, mock(PasswordService.class), auditoriaService);
     private final AuthUser superAdmin = new AuthUser(null, null, null, Perfil.SUPER_ADMIN, null);
 
     @Test void analisaEscolaAtivaComContagensDoTenantDaEscola() {
@@ -68,6 +69,8 @@ class EscolaExclusaoImpactoServiceTest {
         assertThrows(BusinessException.class, () -> service.deletarEscola(id, superAdmin));
 
         verifyNoInteractions(repository, usuarioRepository);
+        verify(auditoriaService, times(2)).registrar(eq(superAdmin), isNull(), eq("ESCOLA_EXCLUSAO_BLOQUEADA"),
+                eq("ESCOLA"), eq(id), eq("motivo=POLITICA_RETENCAO_PENDENTE"));
     }
 
     private Escola escola(String status) {
