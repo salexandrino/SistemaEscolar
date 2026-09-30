@@ -5,8 +5,8 @@
 </head>
 <body>
 
-<div th:fragment="content">
-    <nav class="breadcrumb-admin mb-4">
+<div th:fragment="content" class="gestao-escolas-page" data-page="usuario-form">
+    <nav class="breadcrumb-admin mb-4" aria-label="Breadcrumb">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
         <a href="/dashboard/usuarios" class="text-decoration-none">Usuários</a>
@@ -14,122 +14,57 @@
         <span class="text-muted">Editar Usuário</span>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="gestao-escolas-header">
         <div>
-            <h2 class="page-title mb-1">
-                <i class="bi bi-pencil-square text-warning me-2"></i>Editar Usuário
+            <h2 class="page-title mb-0">
+                <i class="bi bi-pencil-square me-2"></i>
+                Editar Usuário
             </h2>
-            <small class="text-muted">Modifique as informações cadastrais e atualize os registros do usuário.</small>
+            <p class="text-muted small mb-0">Atualize as informações cadastrais do usuário.</p>
         </div>
-        <a href="/dashboard/usuarios" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
-    </div>
+        <div th:replace="~{components/button :: button('Voltar', 'bi-arrow-left', 'outline', 'md', false, false, 'button', '/dashboard/usuarios')}"></div>
+    </header>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-person-gear me-2"></i>Atualizar Cadastro</h5>
+    <form th:action="'/users/' + ${usuario.id}" method="post" data-method="PUT" th:attr="data-profile-endpoint=${'/users/' + usuario.id + '/profile'}" data-usuario-form data-success-param="atualizado">
+        <section class="dashboard-panel mb-4" aria-labelledby="dadosPessoaisTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+                    <h2 id="dadosPessoaisTitulo">Dados pessoais</h2>
+                    <p>Identificação e contato do usuário.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6" th:insert="~{components/input :: input('Nome Completo', 'nomeCompleto', 'nomeCompleto', 'text', ${usuario.nomeCompleto}, null, true, false, false, null, null, 'bi-person', null)}"></div>
+                <div class="col-md-6" th:insert="~{components/input :: input('E-mail', 'email', 'email', 'email', ${usuario.email}, null, true, false, false, null, null, 'bi-envelope', null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('CPF', 'cpf', 'cpf', 'text', ${usuario.cpf}, null, true, false, true, null, 'O CPF não pode ser alterado.', null, null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('Telefone', 'telefone', 'telefone', 'text', ${usuario.telefone}, '(00) 00000-0000', false, false, false, null, null, 'bi-telephone', null)}"></div>
+            </div>
+        </section>
+
+        <section class="dashboard-panel mb-4" aria-labelledby="perfilStatusTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+                    <h2 id="perfilStatusTitulo">Perfil e Status</h2>
+                    <p>Acesso e aprovação do usuário.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4" th:insert="~{components/dropdown :: select('Perfil', 'perfil', 'perfil', ${ {'GESTOR', 'SECRETARIA', 'PROFESSOR', 'FINANCEIRO'} }, ${usuario.perfil.name()}, true, false, null)}"></div>
+                <div class="col-md-4" th:insert="~{components/dropdown :: select('Status da Conta', 'aprovado', 'aprovado', ${ {'true', 'false'} }, ${usuario.ativo ? 'true' : 'false'}, true, false, null)}"></div>
+            </div>
+        </section>
+
+        <div class="d-flex justify-content-end gap-2">
+            <div th:replace="~{components/button :: button('Cancelar', 'bi-x-circle', 'secondary', 'md', false, false, 'button', '/dashboard/usuarios')}"></div>
+            <div th:replace="~{components/button :: button('Salvar Alterações', 'bi-save', 'primary', 'md', false, false, 'submit', null)}"></div>
         </div>
-        <div class="card-body p-4">
-            <form th:action="'/dashboard/usuarios/editar/' + ${usuario.id}" method="post">
+    </form>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Nome Completo</label>
-                        <input type="text" class="form-control" name="nomeCompleto" th:value="${usuario.nomeCompleto}" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">E-mail</label>
-                        <input type="email" class="form-control" name="email" th:value="${usuario.email}" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">CPF</label>
-                        <input type="text" class="form-control bg-light" name="cpf" th:value="${usuario.cpf}" readonly>
-                        <div class="form-text small">O CPF não pode ser alterado.</div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Telefone</label>
-                        <input type="text" class="form-control" name="telefone" th:value="${usuario.telefone}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Data de Nascimento</label>
-                        <input type="date" class="form-control" name="dataNascimento">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Sexo</label>
-                        <select class="form-select" name="sexo">
-                            <option value="MASCULINO">Masculino</option>
-                            <option value="FEMININO">Feminino</option>
-                            <option value="OUTRO">Outro</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Perfil</label>
-                        <select class="form-select" name="perfil" required>
-                            <option value="" disabled>Selecione o perfil</option>
-                            <option value="GESTOR" th:selected="${usuario.perfil.name() == 'GESTOR'}">Gestor</option>
-                            <option value="SECRETARIA" th:selected="${usuario.perfil.name() == 'SECRETARIA'}">Secretaria / Administrativo</option>
-                            <option value="PROFESSOR" th:selected="${usuario.perfil.name() == 'PROFESSOR'}">Professor / Pedagógico</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Status da Conta</label>
-                        <select class="form-select" name="aprovado">
-                            <option value="true" th:selected="${usuario.aprovado}">Ativo / Aprovado</option>
-                            <option value="false" th:selected="${!usuario.aprovado}">Inativo / Pendente</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h6 class="text-success fw-bold mt-4 mb-3"><i class="bi bi-geo-alt me-2"></i>Informações de Endereço</h6>
-
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">CEP</label>
-                        <input type="text" class="form-control" name="cep">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Logradouro (Endereço)</label>
-                        <input type="text" class="form-control" name="endereco">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Complemento</label>
-                        <input type="text" class="form-control" name="complemento">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Bairro</label>
-                        <input type="text" class="form-control" name="bairro">
-                    </div>
-                    <div class="col-md-5 mb-3">
-                        <label class="form-label fw-semibold">Cidade</label>
-                        <input type="text" class="form-control" name="cidade">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Estado (UF)</label>
-                        <input type="text" class="form-control" name="estado" maxlength="2">
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="/dashboard/usuarios" class="btn btn-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-warning text-dark fw-bold px-4">
-                        <i class="bi bi-check-circle me-1"></i> Salvar Alterações
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <script src="/js/pages/usuario-form.js"></script>
 </div>
 
 </body>

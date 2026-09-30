@@ -178,7 +178,7 @@ public class KutuarApp {
         AuthController authController = new AuthController(authService);
         UsuarioAdminController usuarioAdminController = new UsuarioAdminController(usuarioAdminService);
         EscolaController escolaController = new EscolaController(escolaService);
-        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, templateEngine);
+        DashboardController dashboardController = new DashboardController(dashboardService, escolaService, usuarioRepository, usuarioAdminService, templateEngine);
         SuperAdminDashboardApiController superAdminDashboardApiController = new SuperAdminDashboardApiController(dashboardService);
         // Acadêmico
         DisciplinaController disciplinaController = new DisciplinaController(disciplinaService);

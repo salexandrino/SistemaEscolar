@@ -2,9 +2,9 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<div th:fragment="content">
+<div th:fragment="content" class="gestao-escolas-page">
 
-    <nav class="breadcrumb-admin mb-4">
+    <nav class="breadcrumb-admin mb-4" aria-label="Breadcrumb">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
         <a href="/dashboard/usuarios" class="text-decoration-none">Usuários</a>
@@ -12,217 +12,93 @@
         <span class="text-muted">Visualizar Usuário</span>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="gestao-escolas-header">
         <div>
-            <h2 class="page-title mb-1">
-                <i class="bi bi-person-lines-fill me-2 text-success"></i>
+            <h2 class="page-title mb-0">
+                <i class="bi bi-person-lines-fill me-2"></i>
                 Ficha do Usuário
             </h2>
-            <p class="text-muted small mb-0">Detalhamento completo dos dados cadastrais do usuário no sistema.</p>
+            <p class="text-muted small mb-0" th:text="${usuario.nomeCompleto}">Usuário</p>
         </div>
-        <a href="/dashboard/usuarios" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Dados do Usuário</h5>
+        <div class="d-flex gap-2">
+            <div th:replace="~{components/button :: button('Voltar', 'bi-arrow-left', 'outline', 'md', false, false, 'button', '/dashboard/usuarios')}"></div>
+            <div th:replace="~{components/button :: button('Editar', 'bi-pencil', 'primary', 'md', false, false, 'button', ${'/dashboard/usuarios/editar/' + usuario.id})}"></div>
         </div>
-        <div class="card-body p-4">
+    </header>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="fw-semibold text-secondary small mb-1">Nome Completo</label>
-                    <div class="form-control bg-light" th:text="${usuario.nomeCompleto}">Nome Completo</div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="fw-semibold text-secondary small mb-1">Endereço de E-mail</label>
-                    <div class="form-control bg-light" th:text="${usuario.email}">email@exemplo.com</div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="fw-semibold text-secondary small mb-1">Número de CPF</label>
-                    <div class="form-control bg-light" th:text="${usuario.cpfFormatado}">000.000.000-00</div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="fw-semibold text-secondary small mb-1">Telefone de Contato</label>
-                    <div class="form-control bg-light" th:text="${usuario.telefone != null && usuario.telefone != '' ? usuario.telefone : 'Não informado'}">(00) 00000-0000</div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="fw-semibold text-secondary small mb-1">Perfil de Acesso</label>
-                    <div class="form-control bg-light">
-                        <span class="badge bg-secondary px-2 py-1" th:text="${usuario.perfil}">Perfil</span>
-                    </div>
-                </div>
-            </div>
-
-            <h6 class="text-muted fw-bold mt-4 mb-3"><i class="bi bi-shield-check me-2"></i>Status da Conta</h6>
-            <div class="d-flex gap-2 mb-3">
-                <span class="badge px-3 py-2" th:classappend="${usuario.ativo} ? 'bg-success' : 'bg-secondary'"
-                      th:text="${usuario.ativo} ? 'Ativo' : 'Inativo'">Ativo</span>
-                <span class="badge px-3 py-2" th:classappend="${usuario.aprovado} ? 'bg-success' : 'bg-warning text-dark'"
-                      th:text="${usuario.aprovado} ? 'Aprovado' : 'Pendente de aprovação'">Aprovado</span>
-                <span th:if="${usuario.bloqueado}" class="badge bg-danger px-3 py-2">Bloqueado (excesso de tentativas de login)</span>
-            </div>
-
-            <h6 class="text-muted fw-bold mt-4 mb-3"><i class="bi bi-clock-history me-2"></i>Informações do Sistema</h6>
-            <div class="row">
-                <div class="col-md-6 mb-3" th:if="${usuario.criadoEm != null}">
-                    <label class="fw-semibold text-secondary small mb-1">Data de Criação do Cadastro</label>
-                    <div class="form-control bg-light text-muted small" th:text="${#temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
-                </div>
-                <div class="col-md-6 mb-3" th:if="${usuario.atualizadoEm != null}">
-                    <label class="fw-semibold text-secondary small mb-1">Última Atualização Registrada</label>
-                    <div class="form-control bg-light text-muted small" th:text="${#temporals.format(usuario.atualizadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
-                </div>
-            </div>
-
-            <hr class="my-4">
-
-            <div id="alertaAcaoUsuario" class="alert d-none" role="alert"></div>
-
-            <div class="d-flex justify-content-end gap-2">
-                <button th:if="${!usuario.aprovado}" type="button" class="btn btn-success fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}"
-                        onclick="executarAcaoUsuario('/users/' + this.dataset.usuarioId + '/approve', 'Usuário aprovado com sucesso.')">
-                    <i class="bi bi-check-circle"></i> Aprovar
-                </button>
-                <button th:if="${usuario.bloqueado}" type="button" class="btn btn-outline-danger fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}"
-                        onclick="executarAcaoUsuario('/users/' + this.dataset.usuarioId + '/unlock', 'Usuário desbloqueado com sucesso.')">
-                    <i class="bi bi-unlock"></i> Desbloquear
-                </button>
-                <button th:if="${usuario.ativo}" type="button" class="btn btn-outline-danger fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}"
-                        onclick="confirmarEExecutar('Tem certeza que deseja inativar este usuário? Ele não conseguirá mais fazer login.', '/users/' + this.dataset.usuarioId, 'DELETE', 'Usuário inativado com sucesso.')">
-                    <i class="bi bi-person-dash"></i> Inativar
-                </button>
-                <button th:unless="${usuario.ativo}" type="button" class="btn btn-outline-success fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}"
-                        onclick="executarAcaoUsuario('/users/' + this.dataset.usuarioId + '/reativar', 'Usuário reativado com sucesso.')">
-                    <i class="bi bi-person-check"></i> Reativar
-                </button>
-                <!-- Botão que abre o modal de exclusão definitiva -->
-                <button th:unless="${usuario.ativo}" type="button" class="btn btn-danger fw-bold px-4"
-                        th:attr="data-usuario-id=${usuario.id}, data-usuario-nome=${usuario.nomeCompleto}"
-                        onclick="abrirModalExcluirUsuario(this.dataset.usuarioId, this.dataset.usuarioNome)">
-                    <i class="bi bi-trash3"></i> Excluir Definitivamente
-                </button>
-                <a th:href="'/dashboard/usuarios/editar/' + ${usuario.id}" class="btn btn-warning text-dark fw-bold px-4">
-                    <i class="bi bi-pencil"></i> Editar Cadastro
-                </a>
+    <section class="dashboard-panel mb-4" aria-labelledby="dadosUsuarioTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-person-circle" aria-hidden="true"></i></span>
+                <h2 id="dadosUsuarioTitulo">Dados do Usuário</h2>
+                <p>Informações cadastrais e de acesso.</p>
             </div>
         </div>
-    </div>
 
-    <!-- Modal de Exclusão Definitiva do Usuário (igual ao das escolas) -->
-    <div class="modal fade" id="modalExcluirUsuario" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle me-2"></i>Excluir Usuário Definitivamente
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-2">Você está prestes a excluir <strong>permanentemente</strong> o usuário:</p>
-                    <p class="fw-bold fs-5 text-danger" id="nomeUsuarioExcluir">—</p>
-                    <div class="alert alert-warning py-2 mb-3">
-                        <i class="bi bi-exclamation-triangle me-1"></i>
-                        Esta ação <strong>não pode ser desfeita</strong>. Todos os dados vinculados ao usuário serão removidos permanentemente.
-                    </div>
-                    <label class="form-label fw-semibold">Digite <code>EXCLUIR</code> para confirmar:</label>
-                    <input type="text" id="inputConfirmacaoExcluirUsuario" class="form-control" placeholder="EXCLUIR" autocomplete="off">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" id="btnConfirmarExclusaoUsuario" class="btn btn-danger" disabled
-                            onclick="executarExclusaoUsuario()">
-                        <i class="bi bi-trash3 me-1"></i> Excluir Definitivamente
-                    </button>
-                </div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <span class="k-field__label">Nome Completo</span>
+                <div class="k-input" th:text="${usuario.nomeCompleto ?: 'Não informado'}">Nome Completo</div>
+            </div>
+            <div class="col-md-6">
+                <span class="k-field__label">Endereço de E-mail</span>
+                <div class="k-input" th:text="${usuario.email ?: 'Não informado'}">email@exemplo.com</div>
+            </div>
+            <div class="col-md-4">
+                <span class="k-field__label">Número de CPF</span>
+                <div class="k-input" th:text="${usuario.cpf ?: 'Não informado'}">000.000.000-00</div>
+            </div>
+            <div class="col-md-4">
+                <span class="k-field__label">Telefone de Contato</span>
+                <div class="k-input" th:text="${usuario.telefone != null && usuario.telefone != '' ? usuario.telefone : 'Não informado'}">(00) 00000-0000</div>
+            </div>
+            <div class="col-md-4">
+                <span class="k-field__label">Perfil de Acesso</span>
+                <div class="k-input" th:text="${usuario.perfil}">Perfil</div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <script th:inline="javascript">
-        function mostrarAlerta(sucesso, mensagem) {
-            const el = document.getElementById('alertaAcaoUsuario');
-            el.className = 'alert ' + (sucesso ? 'alert-success' : 'alert-danger');
-            el.textContent = mensagem;
-            el.classList.remove('d-none');
-        }
+    <section class="dashboard-panel mb-4" aria-labelledby="statusUsuarioTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+                <h2 id="statusUsuarioTitulo">Status da Conta</h2>
+                <p>Condição atual de acesso.</p>
+            </div>
+        </div>
 
-        async function executarAcaoUsuario(url, mensagemSucesso, method) {
-            method = method || 'PATCH';
-            try {
-                const response = await fetch(url, { method: method });
-                if (response.ok) {
-                    mostrarAlerta(true, mensagemSucesso);
-                    setTimeout(() => window.location.reload(), 900);
-                } else {
-                    const data = await response.json().catch(() => ({}));
-                    mostrarAlerta(false, data.message || 'Não foi possível concluir a ação.');
-                }
-            } catch (e) {
-                mostrarAlerta(false, 'Erro de conexão ao tentar executar a ação.');
-            }
-        }
+        <div class="d-flex gap-2 flex-wrap">
+            <span class="status-badge"
+                  th:classappend="${usuario.bloqueado} ? ' is-danger' : (${usuario.ativo} ? '' : ' is-inactive')"
+                  th:text="${usuario.bloqueado} ? 'Bloqueado' : (${usuario.ativo} ? 'Ativo' : 'Pendente')">Ativo</span>
+        </div>
+    </section>
 
-        function confirmarEExecutar(mensagemConfirmacao, url, method, mensagemSucesso) {
-            if (window.confirm(mensagemConfirmacao)) {
-                executarAcaoUsuario(url, mensagemSucesso, method);
-            }
-        }
+    <section class="dashboard-panel" aria-labelledby="sistemaUsuarioTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+                <h2 id="sistemaUsuarioTitulo">Informações do Sistema</h2>
+                <p>Auditoria básica do cadastro.</p>
+            </div>
+        </div>
 
-        // Substitui o prompt por modal de confirmação (igual ao das escolas)
-        let _idUsuarioParaExcluir = null;
-
-        function abrirModalExcluirUsuario(id, nome) {
-            _idUsuarioParaExcluir = id;
-            document.getElementById('nomeUsuarioExcluir').textContent = nome || '—';
-            document.getElementById('inputConfirmacaoExcluirUsuario').value = '';
-            document.getElementById('btnConfirmarExclusaoUsuario').disabled = true;
-            new bootstrap.Modal(document.getElementById('modalExcluirUsuario')).show();
-        }
-
-        // Habilita o botão só quando o usuário digitar EXCLUIR corretamente
-        document.addEventListener('DOMContentLoaded', function () {
-            const input = document.getElementById('inputConfirmacaoExcluirUsuario');
-            if (input) {
-                input.addEventListener('input', function () {
-                    const btn = document.getElementById('btnConfirmarExclusaoUsuario');
-                    btn.disabled = (this.value !== 'EXCLUIR');
-                });
-            }
-        });
-
-        // Executar o DELETE no backend para exclusão definitiva
-        async function executarExclusaoUsuario() {
-            if (!_idUsuarioParaExcluir) return;
-            try {
-                const response = await fetch('/users/' + _idUsuarioParaExcluir + '/excluir', { method: 'DELETE' });
-                if (response.ok) {
-                    window.location.href = '/dashboard/usuarios';
-                } else {
-                    const data = await response.json().catch(() => ({}));
-                    alert(data.message || 'Não foi possível excluir o usuário. Verifique se há restrições.');
-                    bootstrap.Modal.getInstance(document.getElementById('modalExcluirUsuario')).hide();
-                }
-            } catch (e) {
-                alert('Erro de conexão ao tentar excluir o usuário.');
-            }
-        }
-
-        // Mantém a compatibilidade com o comportamento antigo caso ainda seja usado
-        function confirmarExclusaoUsuario(id) {
-            abrirModalExcluirUsuario(id, '—');
-        }
-    </script>
+        <div class="row g-3">
+            <div class="col-md-4" th:if="${usuario.ultimoLogin != null}">
+                <span class="k-field__label">Último Login</span>
+                <div class="k-input" th:text="${#temporals.format(usuario.ultimoLogin, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
+            </div>
+            <div class="col-md-4" th:if="${usuario.criadoEm != null}">
+                <span class="k-field__label">Data de Criação</span>
+                <div class="k-input" th:text="${#temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
+            </div>
+            <div class="col-md-4" th:if="${usuario.atualizadoEm != null}">
+                <span class="k-field__label">Última Atualização</span>
+                <div class="k-input" th:text="${#temporals.format(usuario.atualizadoEm, 'dd/MM/yyyy HH:mm')}">00/00/0000</div>
+            </div>
+        </div>
+    </section>
 </div>
 
 </body>

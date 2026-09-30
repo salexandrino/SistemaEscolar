@@ -1,0 +1,124 @@
+.gestao-usuarios-header {
+    align-items: flex-start;
+}
+
+.gestao-usuarios-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(160px, .8fr));
+    gap: var(--kutuar-space-3);
+    margin-bottom: var(--kutuar-space-4);
+}
+
+.gestao-usuarios-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gestao-usuarios-panel-heading {
+    align-items: flex-start;
+}
+
+.gestao-usuarios-table-wrap {
+    overflow-x: auto;
+}
+
+.gestao-usuarios-table .status-badge {
+    justify-content: center;
+    min-width: 78px;
+}
+
+.status-badge.is-danger {
+    background: color-mix(in srgb, var(--kutuar-danger) 12%, var(--kutuar-white));
+    color: var(--kutuar-danger);
+}
+
+.gestao-usuarios-state {
+    display: grid;
+    place-items: center;
+    gap: var(--kutuar-space-2);
+    padding: var(--kutuar-space-6);
+    color: var(--kutuar-muted);
+    text-align: center;
+}
+
+.gestao-usuarios-state i {
+    color: var(--kutuar-accent);
+    font-size: 2rem;
+}
+
+.gestao-usuarios-state h3 {
+    color: var(--kutuar-text);
+    font-size: var(--kutuar-font-lg);
+    margin: 0;
+}
+
+.gestao-usuarios-state p {
+    margin: 0;
+}
+
+.gestao-usuarios-loading {
+    display: grid;
+    gap: var(--kutuar-space-2);
+}
+
+.gestao-usuarios-skeleton {
+    min-height: 54px;
+    border-radius: var(--kutuar-radius-md);
+    background: linear-gradient(90deg, var(--kutuar-background), var(--kutuar-primary-light), var(--kutuar-background));
+    background-size: 200% 100%;
+    animation: gestaoUsuariosPulse 1.2s ease-in-out infinite;
+}
+
+.gestao-usuarios-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--kutuar-space-3);
+    padding-top: var(--kutuar-space-4);
+    color: var(--kutuar-muted);
+    font-size: var(--kutuar-font-sm);
+}
+
+.gestao-usuarios-pagination nav,
+.gestao-usuarios-pages {
+    display: flex;
+    align-items: center;
+    gap: var(--kutuar-space-2);
+    flex-wrap: wrap;
+}
+
+.gestao-usuarios-page-button.is-current {
+    color: var(--kutuar-white);
+    background: var(--kutuar-primary);
+    border-color: var(--kutuar-primary);
+}
+
+@keyframes gestaoUsuariosPulse {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (max-width: 992px) {
+    .gestao-usuarios-toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .gestao-usuarios-toolbar,
+    .gestao-usuarios-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .gestao-usuarios-table .col-escola {
+        display: none;
+    }
+
+    .gestao-usuarios-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

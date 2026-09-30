@@ -5,8 +5,8 @@
 </head>
 <body>
 
-<div th:fragment="content">
-    <nav class="breadcrumb-admin mb-4">
+<div th:fragment="content" class="gestao-escolas-page" data-page="usuario-form">
+    <nav class="breadcrumb-admin mb-4" aria-label="Breadcrumb">
         <a href="/dashboard" class="text-decoration-none">Dashboard</a>
         <span class="mx-2">></span>
         <a href="/dashboard/usuarios" class="text-decoration-none">Usuários</a>
@@ -14,141 +14,100 @@
         <span class="text-muted">Novo Usuário</span>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <header class="gestao-escolas-header">
         <div>
-            <h2 class="page-title mb-1">
-                <i class="bi bi-person-plus me-2"></i> Novo Usuário
+            <h2 class="page-title mb-0">
+                <i class="bi bi-person-plus me-2"></i>
+                Novo Usuário
             </h2>
-            <small class="text-muted">Insira as informações completas para cadastrar o novo usuário no sistema.</small>
+            <p class="text-muted small mb-0">Insira as informações para cadastrar um novo usuário.</p>
         </div>
-        <a href="/dashboard/usuarios" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
-    </div>
+        <div th:replace="~{components/button :: button('Voltar', 'bi-arrow-left', 'outline', 'md', false, false, 'button', '/dashboard/usuarios')}"></div>
+    </header>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-person-fill-add me-2"></i>Formulário de Cadastro</h5>
+    <form action="/auth/register" method="post" data-usuario-form data-success-param="criado">
+        <section class="dashboard-panel mb-4" aria-labelledby="dadosPessoaisTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+                    <h2 id="dadosPessoaisTitulo">Dados pessoais</h2>
+                    <p>Identificação e contato do usuário.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6" th:insert="~{components/input :: input('Nome Completo', 'nomeCompleto', 'nomeCompleto', 'text', '', 'Digite o nome completo', true, false, false, null, null, 'bi-person', null)}"></div>
+                <div class="col-md-6" th:insert="~{components/input :: input('Email', 'email', 'email', 'email', '', 'nome@exemplo.com', true, false, false, null, null, 'bi-envelope', null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('CPF', 'cpf', 'cpf', 'text', '', '000.000.000-00', true, false, false, null, null, null, null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('Telefone', 'telefone', 'telefone', 'text', '', '(00) 00000-0000', true, false, false, null, null, 'bi-telephone', null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('Data de Nascimento', 'dataNascimento', 'dataNascimento', 'date', '', null, true, false, false, null, null, null, null)}"></div>
+                <div class="col-md-4" th:insert="~{components/dropdown :: select('Sexo', 'sexo', 'sexo', ${ {'', 'MASCULINO', 'FEMININO', 'OUTRO'} }, '', true, false, null)}"></div>
+            </div>
+        </section>
+
+        <section class="dashboard-panel mb-4" aria-labelledby="perfilEscolaTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-building-gear" aria-hidden="true"></i></span>
+                    <h2 id="perfilEscolaTitulo">Perfil e Escola</h2>
+                    <p>Atribuição de acesso e vínculo institucional.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4" th:insert="~{components/dropdown :: select('Perfil', 'perfil', 'perfil', ${ {'', 'PROFESSOR', 'GESTOR', 'SECRETARIA', 'FINANCEIRO'} }, '', true, false, null)}"></div>
+                <div class="col-md-6 k-field">
+                    <label class="k-field__label" for="escolaId">Escola Vínculo<span class="k-field__required" aria-hidden="true"> *</span></label>
+                    <select class="k-select" name="escolaId" id="escolaId" required>
+                        <option value="">Selecione a instituição...</option>
+                        <option th:each="escola : ${escolas}" th:value="${escola.id}" th:text="${escola.nome}">Escola</option>
+                    </select>
+                </div>
+                <div class="col-md-2" th:insert="~{components/dropdown :: select('Status Inicial', 'aprovado', 'aprovado', ${ {'true', 'false'} }, 'true', true, false, null)}"></div>
+            </div>
+        </section>
+
+        <section class="dashboard-panel mb-4" aria-labelledby="credenciaisTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-key" aria-hidden="true"></i></span>
+                    <h2 id="credenciaisTitulo">Credenciais</h2>
+                    <p>Senha temporária para o primeiro acesso.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6" th:insert="~{components/input :: input('Senha de Acesso', 'senha', 'senha', 'password', '', 'Crie uma senha temporária', true, false, false, null, null, 'bi-lock', null)}"></div>
+                <div class="col-md-6" th:insert="~{components/input :: input('Confirmar Senha', 'confirmacaoSenha', 'confirmacaoSenha', 'password', '', 'Digite a senha novamente', true, false, false, null, null, 'bi-lock-fill', null)}"></div>
+            </div>
+        </section>
+
+        <section class="dashboard-panel mb-4" aria-labelledby="enderecoTitulo">
+            <div class="panel-heading">
+                <div>
+                    <span class="panel-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+                    <h2 id="enderecoTitulo">Endereço residencial</h2>
+                    <p>Informações complementares de localização.</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-3" th:insert="~{components/input :: input('CEP', 'cep', 'cep', 'text', '', '00000-000', false, false, false, null, null, null, null)}"></div>
+                <div class="col-md-6" th:insert="~{components/input :: input('Endereço', 'endereco', 'endereco', 'text', '', 'Ex.: Av. Brasil', false, false, false, null, null, 'bi-signpost', null)}"></div>
+                <div class="col-md-3" th:insert="~{components/input :: input('Complemento', 'complemento', 'complemento', 'text', '', 'Apto, bloco, etc.', false, false, false, null, null, null, null)}"></div>
+                <div class="col-md-4" th:insert="~{components/input :: input('Bairro', 'bairro', 'bairro', 'text', '', 'Nome do bairro', false, false, false, null, null, null, null)}"></div>
+                <div class="col-md-5" th:insert="~{components/input :: input('Cidade', 'cidade', 'cidade', 'text', '', 'Nome da cidade', false, false, false, null, null, null, null)}"></div>
+                <div class="col-md-3" th:insert="~{components/input :: input('Estado (UF)', 'estado', 'estado', 'text', '', 'Ex.: SP', false, false, false, null, null, null, null)}"></div>
+            </div>
+        </section>
+
+        <div class="d-flex justify-content-end gap-2">
+            <div th:replace="~{components/button :: button('Cancelar', 'bi-x-circle', 'secondary', 'md', false, false, 'button', '/dashboard/usuarios')}"></div>
+            <div th:replace="~{components/button :: button('Cadastrar Usuário', 'bi-check-circle', 'primary', 'md', false, false, 'submit', null)}"></div>
         </div>
-        <div class="card-body p-4">
-            <form action="/auth/register" method="post">
+    </form>
 
-                <h6 class="text-success fw-bold mb-3"><i class="bi bi-person-vcard me-2"></i>Dados Pessoais e de Acesso</h6>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Nome Completo</label>
-                        <input type="text" class="form-control" name="nomeCompleto" placeholder="Digite o nome completo" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control" name="email" placeholder="nome@exemplo.com" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">CPF</label>
-                        <input type="text" class="form-control" name="cpf" placeholder="000.000.000-00" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Senha de Acesso</label>
-                        <input type="password" class="form-control" name="senha" placeholder="Crie uma senha temporária" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Confirmar Senha</label>
-                        <input type="password" class="form-control" name="confirmacaoSenha" placeholder="Digite a senha novamente" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Telefone</label>
-                        <input type="text" class="form-control" name="telefone" placeholder="(00) 00000-0000" required>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Data de Nascimento</label>
-                        <input type="date" class="form-control" name="dataNascimento" required>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Sexo</label>
-                        <select class="form-select" name="sexo" required>
-                            <option value="">Selecione...</option>
-                            <option value="MASCULINO">Masculino</option>
-                            <option value="FEMININO">Feminino</option>
-                            <option value="OUTRO">Outro</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Status Inicial</label>
-                        <select class="form-select" name="aprovado" required>
-                            <option value="true" selected>Ativo</option>
-                            <option value="false">Inativo</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h6 class="text-success fw-bold mt-4 mb-3"><i class="bi bi-building-gear me-2"></i>Atribuição e Vínculo</h6>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Perfil Atual</label>
-                        <select class="form-select" name="perfil" required>
-                            <option value="">Selecione o perfil profissional...</option>
-                            <option value="PROFESSOR">Professor</option>
-                            <option value="GESTOR">Gestor</option>
-                            <option value="SECRETARIA">Secretaria</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Escola Vínculo</label>
-                        <select class="form-select" name="escolaId" required>
-                            <option value="">Selecione a instituição...</option>
-                            <option th:each="escola : ${escolas}" th:value="${escola.id}" th:text="${escola.nome}"></option>
-                        </select>
-                    </div>
-                </div>
-
-                <h6 class="text-success fw-bold mt-4 mb-3"><i class="bi bi-geo-alt me-2"></i>Endereço Residencial</h6>
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">CEP</label>
-                        <input type="text" class="form-control" name="cep" placeholder="00000-000">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Endereço (Rua/Av.)</label>
-                        <input type="text" class="form-control" name="endereco" placeholder="Ex: Av. Brasil">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Complemento</label>
-                        <input type="text" class="form-control" name="complemento" placeholder="Apto, Bloco, etc.">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Bairro</label>
-                        <input type="text" class="form-control" name="bairro" placeholder="Nome do bairro">
-                    </div>
-                    <div class="col-md-5 mb-3">
-                        <label class="form-label fw-semibold">Cidade</label>
-                        <input type="text" class="form-control" name="cidade" placeholder="Nome da cidade">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label fw-semibold">Estado (UF)</label>
-                        <input type="text" class="form-control" name="estado" maxlength="2" placeholder="Ex: SP">
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="/dashboard/usuarios" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-success px-4">
-                        <i class="bi bi-check-circle me-1"></i> Cadastrar Usuário
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <script src="/js/pages/usuario-form.js"></script>
 </div>
 
 </body>

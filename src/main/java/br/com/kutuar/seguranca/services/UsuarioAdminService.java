@@ -46,6 +46,9 @@ public class UsuarioAdminService {
 
     public Usuario atualizar(UUID id, AtualizarUsuarioDTO dto, AuthUser currentUser) {
         validarUsuarioAutenticado(currentUser);
+        if (dto != null) {
+            dto.setTelefone(normalizarTelefone(dto.getTelefone()));
+        }
         validarDtoAtualizacao(dto);
 
         Usuario usuario = buscarParaAlteracao(id, currentUser);
@@ -59,7 +62,9 @@ public class UsuarioAdminService {
         usuario.setNomeCompleto(dto.getNomeCompleto().trim());
         usuario.setEmail(dto.getEmail().trim().toLowerCase());
         usuario.setCpf(dto.getCpf().trim());
-        usuario.setTelefone(dto.getTelefone().trim());
+        if (dto.getTelefone() != null && !dto.getTelefone().isBlank()) {
+            usuario.setTelefone(dto.getTelefone());
+        }
 
         usuarioTenantService.validarConsistencia(usuario);
         usuarioRepository.updateCadastro(usuario);
@@ -201,7 +206,26 @@ public class UsuarioAdminService {
         ValidationUtil.validateNomeCompleto(dto.getNomeCompleto());
         ValidationUtil.validateEmail(dto.getEmail());
         ValidationUtil.validarCpfComStrategy(dto.getCpf());
-        ValidationUtil.validateTelefone(dto.getTelefone());
+        if (dto.getTelefone() != null && !dto.getTelefone().isBlank()) {
+            ValidationUtil.validateTelefone(dto.getTelefone());
+        }
+    }
+
+    private String normalizarTelefone(String telefone) {
+        if (telefone == null) {
+            return null;
+        }
+
+        String valor = telefone.trim().replaceAll("\\s+", "");
+        if (valor.isBlank()) {
+            return "";
+        }
+
+        String digitos = valor.replaceAll("\\D", "");
+        if (digitos.length() == 11) {
+            return "(%s)%s-%s".formatted(digitos.substring(0, 2), digitos.substring(2, 7), digitos.substring(7));
+        }
+        return valor;
     }
 
     private void validarConflitos(Usuario usuario, AtualizarUsuarioDTO dto, AuthUser currentUser) {

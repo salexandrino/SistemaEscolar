@@ -121,9 +121,15 @@ public class UsuarioAdminController {
             ctx.redirect("/dashboard/usuarios");
             return;
 
+        } catch (AuthenticationException | AuthorizationException | NotFoundException | ValidationException | ConflictException e) {
+            responderErro(ctx, e.getStatus(), e.getMessage());
+            logger.warn("Falha ao atualizar usuario: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            responderErro(ctx, HttpStatus.BAD_REQUEST, "ID de usuario invalido.");
+            logger.warn("ID de usuario invalido: {}", e.getMessage());
         } catch (Exception e) {
             logger.error("❌ ERRO CRÍTICO NO CONTROLLER: O processo quebrou! Mensagem: {}", e.getMessage(), e);
-            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao atualizar: " + e.getMessage());
+            responderErro(ctx, HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao atualizar usuario.");
         }
     }
     public void inativar(Context ctx) {
