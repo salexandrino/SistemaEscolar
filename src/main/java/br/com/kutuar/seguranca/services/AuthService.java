@@ -28,6 +28,7 @@ public class AuthService {
     private final PasswordService passwordService;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final AuditoriaService auditoriaService;
     private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final int maxLoginAttempts;
     private final long lockoutDurationMinutes;
@@ -36,11 +37,17 @@ public class AuthService {
     private static final long RECOVERY_TOKEN_EXPIRATION_MINUTES = 15;
 
     public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService, JwtService jwtService, EmailService emailService) {
+        this(usuarioRepository, escolaRepository, passwordService, jwtService, emailService, AuditoriaService.semPersistencia());
+    }
+
+    public AuthService(UsuarioRepository usuarioRepository, EscolaRepository escolaRepository, PasswordService passwordService,
+                       JwtService jwtService, EmailService emailService, AuditoriaService auditoriaService) {
         this.usuarioRepository = usuarioRepository;
         this.escolaRepository = escolaRepository;
         this.passwordService = passwordService;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.auditoriaService = auditoriaService == null ? AuditoriaService.semPersistencia() : auditoriaService;
 
         Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
@@ -300,6 +307,7 @@ public class AuthService {
         // Atualiza a senha e limpa o token de recuperação
         String newPasswordHash = passwordService.hash(novaSenha);
         usuarioRepository.updatePassword(usuario.getId(), usuario.getTenantId(), newPasswordHash);
+        auditarSenha(usuario, "SENHA_REDEFINIDA_POR_RECUPERACAO", "origem=RECUPERACAO_SENHA");
 
         logger.info("Senha redefinida com sucesso para usuário ID {}.", usuario.getId());
     }
@@ -374,7 +382,14 @@ public class AuthService {
         // No passo anterior vimos o repositório. O repositório tem updatePassword(UUID id, UUID tenantId, String newPasswordHash).
         // Vou usar o updatePassword do repository que é feito para isso.
         usuarioRepository.updatePassword(usuarioId, tenantId, novoHash);
+        auditarSenha(usuario, "SENHA_PROPRIA_ALTERADA", "origem=ALTERACAO_PROPRIA");
         
         logger.info("Usuário {} alterou a própria senha com sucesso.", usuarioId);
+    }
+
+    private void auditarSenha(Usuario usuario, String acao, String detalhes) {
+        AuthUser executor = new AuthUser(usuario.getId(), usuario.getTenantId(), usuario.getEscolaId(),
+                usuario.getPerfil(), usuario.getCpf());
+        auditoriaService.registrar(executor, usuario.getTenantId(), acao, "USUARIO", usuario.getId(), detalhes);
     }
 }

@@ -24,10 +24,16 @@ public class UsuarioAdminService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioAdminService.class);
     private final UsuarioRepository usuarioRepository;
+    private final AuditoriaService auditoriaService;
     private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
 
     public UsuarioAdminService(UsuarioRepository usuarioRepository) {
+        this(usuarioRepository, AuditoriaService.semPersistencia());
+    }
+
+    public UsuarioAdminService(UsuarioRepository usuarioRepository, AuditoriaService auditoriaService) {
         this.usuarioRepository = usuarioRepository;
+        this.auditoriaService = auditoriaService == null ? AuditoriaService.semPersistencia() : auditoriaService;
     }
 
     public List<Usuario> listarTodos() {
@@ -68,6 +74,7 @@ public class UsuarioAdminService {
 
         usuarioTenantService.validarConsistencia(usuario);
         usuarioRepository.updateCadastro(usuario);
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_EDITADO", usuario.getId(), "campos=cadastro");
         logger.info("Usuario ID {} updated administrativamente.", id);
         return buscarPorId(id, currentUser);
     }
@@ -78,12 +85,12 @@ public class UsuarioAdminService {
         if (usuario.isAtivo()) {
             throw new BusinessException("Usuario ja esta ativo.");
         }
-
         if (isMaster(currentUser)) {
             usuarioRepository.approve(id);
         } else {
             usuarioRepository.approve(id, currentUser.getTenantId());
         }
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_APROVADO", usuario.getId(), "status=ATIVO");
         logger.info("Usuario ID {} aprovado administrativamente.", id);
     }
 
@@ -98,8 +105,11 @@ public class UsuarioAdminService {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuario nao encontrado."));
+        Perfil perfilAnterior = usuario.getPerfil();
         usuarioTenantService.validarTrocaDePerfil(usuario, dto.getPerfil());
         usuarioRepository.updatePerfilETenant(usuario);
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_PERFIL_ALTERADO", usuario.getId(),
+                "perfil_anterior=" + perfilAnterior + ";perfil_novo=" + usuario.getPerfil());
         logger.info("Perfil do usuario ID {} atualizado administrativamente.", id);
     }
 
@@ -120,6 +130,7 @@ public class UsuarioAdminService {
         usuario.setBloqueado(false);
         usuario.setTentativasLogin(0);
         usuarioRepository.update(usuario);
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_DESBLOQUEADO", usuario.getId(), "tentativas_login=0");
         logger.info("Usuario ID {} desbloqueado administrativamente por {}.", id, currentUser.getCpf());
     }
 
@@ -130,6 +141,7 @@ public class UsuarioAdminService {
             throw new BusinessException("Usuario ja esta inativo.");
         }
         usuarioRepository.inactivate(usuario.getId(), usuario.getTenantId());
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_INATIVADO", usuario.getId(), "status=INATIVO");
         logger.info("Usuario ID {} inativado administrativamente.", id);
     }
 
@@ -144,6 +156,7 @@ public class UsuarioAdminService {
             throw new BusinessException("Usuario ja esta ativo.");
         }
         usuarioRepository.activate(usuario.getId(), usuario.getTenantId());
+        auditarSeSuperAdmin(currentUser, usuario.getTenantId(), "USUARIO_REATIVADO", usuario.getId(), "status=ATIVO");
         logger.info("Usuario ID {} reativado administrativamente.", id);
     }
 
@@ -192,6 +205,12 @@ public class UsuarioAdminService {
         }
         validarAdministradorEscola(currentUser);
         return buscarUsuarioDoTenantOuNegar(id, currentUser.getTenantId());
+    }
+
+    private void auditarSeSuperAdmin(AuthUser executor, UUID tenantId, String acao, UUID entidadeId, String detalhes) {
+        if (isMaster(executor)) {
+            auditoriaService.registrar(executor, tenantId, acao, "USUARIO", entidadeId, detalhes);
+        }
     }
 
     private Usuario buscarUsuarioDoTenantOuNegar(UUID id, UUID tenantId) {

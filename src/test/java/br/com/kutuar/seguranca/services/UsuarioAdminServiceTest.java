@@ -24,12 +24,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioAdminServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+    @Mock
+    private AuditoriaService auditoriaService;
 
     private UsuarioAdminService service;
     private UUID usuarioId;
@@ -38,7 +41,7 @@ class UsuarioAdminServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new UsuarioAdminService(usuarioRepository);
+        service = new UsuarioAdminService(usuarioRepository, auditoriaService);
         usuarioId = UUID.randomUUID();
         tenantId = UUID.randomUUID();
         superAdmin = new AuthUser(UUID.randomUUID(), null, null, Perfil.SUPER_ADMIN, "00000000000");
@@ -128,6 +131,19 @@ class UsuarioAdminServiceTest {
 
         assertThrows(AuthorizationException.class, () -> service.atualizar(usuarioId, dtoComTelefone(""), secretaria));
         verify(usuarioRepository, never()).findById(any(), any());
+    }
+
+    @Test
+    void superAdminAprovaUsuarioEGeraAuditoriaPersistente() {
+        Usuario usuario = usuarioEscolar();
+        usuario.setAtivo(false);
+        when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
+
+        service.aprovar(usuarioId, superAdmin);
+
+        verify(usuarioRepository).approve(usuarioId);
+        verify(auditoriaService).registrar(eq(superAdmin), eq(tenantId), eq("USUARIO_APROVADO"),
+                eq("USUARIO"), eq(usuarioId), eq("status=ATIVO"));
     }
 
     private void prepararAtualizacao(Usuario usuario) {

@@ -44,21 +44,33 @@ public class EscolaService {
     private final EscolaRepository escolaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordService passwordService;
+    private final AuditoriaService auditoriaService;
     private final UsuarioTenantService usuarioTenantService = new UsuarioTenantService();
     private final ConnectionProvider connectionProvider;
     private final List<EscolaCadastradaObserver> observers = new java.util.ArrayList<>();
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository, PasswordService passwordService) {
-        this(escolaRepository, usuarioRepository, passwordService, DatabaseConfig::getConnection);
+        this(escolaRepository, usuarioRepository, passwordService, DatabaseConfig::getConnection, AuditoriaService.semPersistencia());
+    }
+
+    public EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository,
+                         PasswordService passwordService, AuditoriaService auditoriaService) {
+        this(escolaRepository, usuarioRepository, passwordService, DatabaseConfig::getConnection, auditoriaService);
     }
 
     EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository,
                   PasswordService passwordService, ConnectionProvider connectionProvider) {
+        this(escolaRepository, usuarioRepository, passwordService, connectionProvider, AuditoriaService.semPersistencia());
+    }
+
+    EscolaService(EscolaRepository escolaRepository, UsuarioRepository usuarioRepository,
+                  PasswordService passwordService, ConnectionProvider connectionProvider, AuditoriaService auditoriaService) {
         this.escolaRepository = escolaRepository;
         this.usuarioRepository = usuarioRepository;
         this.passwordService = passwordService;
         this.connectionProvider = connectionProvider;
+        this.auditoriaService = auditoriaService == null ? AuditoriaService.semPersistencia() : auditoriaService;
     }
 
     @FunctionalInterface
@@ -282,6 +294,10 @@ public class EscolaService {
 
         logger.info("Escola '{}' cadastrada com Gestor inicial '{}' (id: {}).",
                 escolaSalva.getNome(), gestor.getEmail(), gestor.getId());
+        auditoriaService.registrar(authUser, escolaSalva.getTenantId(), "ESCOLA_CRIADA", "ESCOLA",
+                escolaSalva.getId(), "gestor_inicial_criado=true");
+        auditoriaService.registrar(authUser, escolaSalva.getTenantId(), "USUARIO_CRIADO", "USUARIO",
+                gestor.getId(), "perfil=GESTOR;origem=CADASTRO_ESCOLA");
 
         // Padrão Observer: notifica quem estiver registrado (auditoria,
         // e-mail com credenciais, etc.) sem o EscolaService precisar
@@ -419,6 +435,8 @@ public class EscolaService {
         }
 
         logger.info("Escola atualizada com sucesso: {} (ID: {})", escola.getNome(), escola.getId());
+        auditoriaService.registrar(authUser, escola.getTenantId(), "ESCOLA_EDITADA", "ESCOLA",
+                escola.getId(), "campos_atualizados=" + camposAtualizados(dto));
 
         return escola;
     }
@@ -527,6 +545,9 @@ public class EscolaService {
         escola.setStatus(novoStatus.name());
         escola.setAtualizadoEm(atualizadoEm);
         logger.info("Status da escola alterado com sucesso: escolaId={}, status={}", escola.getId(), novoStatus);
+        auditoriaService.registrar(authUser, escola.getTenantId(),
+                novoStatus == EscolaStatus.ATIVA ? "ESCOLA_ATIVADA" : "ESCOLA_INATIVADA",
+                "ESCOLA", escola.getId(), "status=" + novoStatus.name());
 
         return escola;
     }
@@ -534,12 +555,16 @@ public class EscolaService {
     /** Endpoint legado mantido apenas para responder bloqueio seguro até haver política de retenção. */
     public void excluirEscola(UUID id, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
+        auditoriaService.registrar(authUser, null, "ESCOLA_EXCLUSAO_BLOQUEADA", "ESCOLA", id,
+                "motivo=POLITICA_RETENCAO_PENDENTE");
         logger.warn("Tentativa bloqueada de exclusão definitiva da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
         throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
     }
     /** Rota legada do dashboard, também bloqueada para impedir exclusão física acidental. */
     public void deletarEscola(UUID id, AuthUser authUser) {
         verificarPermissaoMaster(authUser);
+        auditoriaService.registrar(authUser, null, "ESCOLA_EXCLUSAO_BLOQUEADA", "ESCOLA", id,
+                "motivo=POLITICA_RETENCAO_PENDENTE");
         logger.warn("Tentativa bloqueada de exclusão via dashboard da escola {} por {}: política de retenção pendente.", id, authUser.getCpf());
         throw new BusinessException("A exclusão definitiva está temporariamente bloqueada até a definição da política de retenção de dados.");
     }
@@ -567,6 +592,19 @@ public class EscolaService {
 
     private ConflictException cnpjEmUso() {
         return new ConflictException("Já existe uma escola cadastrada com este CNPJ.");
+    }
+
+    private String camposAtualizados(AtualizarEscolaDTO dto) {
+        List<String> campos = new java.util.ArrayList<>();
+        if (dto.getNome() != null) campos.add("nome");
+        if (dto.getCnpj() != null) campos.add("cnpj");
+        if (dto.getEmailInstitucional() != null) campos.add("email_institucional");
+        if (dto.getTelefone() != null) campos.add("telefone");
+        if (dto.getEndereco() != null) campos.add("endereco");
+        if (dto.getCidade() != null) campos.add("cidade");
+        if (dto.getEstado() != null) campos.add("estado");
+        if (dto.getNomeResponsavel() != null) campos.add("nome_responsavel");
+        return campos.isEmpty() ? "nenhum" : String.join(",", campos);
     }
 
     /** A constraint é a garantia final quando duas requisições passam pela pré-validação. */

@@ -1,6 +1,7 @@
 package br.com.kutuar.seguranca.services;
 
 import br.com.kutuar.seguranca.enums.Perfil;
+import br.com.kutuar.seguranca.dtos.AlterarSenhaPropriaDTO;
 import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.Usuario;
 import br.com.kutuar.seguranca.repositories.EscolaRepository;
@@ -29,13 +30,14 @@ class RecuperacaoSenhaServiceTest {
     @Mock private EscolaRepository escolaRepository;
     @Mock private JwtService jwtService;
     @Mock private EmailService emailService;
+    @Mock private AuditoriaService auditoriaService;
 
     private AuthService authService;
     private Usuario usuario;
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(usuarioRepository, escolaRepository, new PasswordService(), jwtService, emailService);
+        authService = new AuthService(usuarioRepository, escolaRepository, new PasswordService(), jwtService, emailService, auditoriaService);
         usuario = new Usuario();
         usuario.setId(UUID.randomUUID());
         usuario.setTenantId(UUID.randomUUID());
@@ -98,6 +100,8 @@ class RecuperacaoSenhaServiceTest {
         PasswordService passwordService = new PasswordService();
         assertTrue(passwordService.verificar("NovaSenha@123", usuario.getSenhaHash()));
         assertFalse(passwordService.verificar("SenhaAntiga@123", usuario.getSenhaHash()));
+        verify(auditoriaService).registrar(any(), eq(usuario.getTenantId()), eq("SENHA_REDEFINIDA_POR_RECUPERACAO"),
+                eq("USUARIO"), eq(usuario.getId()), eq("origem=RECUPERACAO_SENHA"));
         assertThrows(ValidationException.class,
                 () -> authService.resetPassword(EMAIL, token, "OutraSenha@123", "OutraSenha@123"));
     }
@@ -120,6 +124,23 @@ class RecuperacaoSenhaServiceTest {
 
         verify(usuarioRepository, never()).update(any());
         verify(emailService, never()).enviarCodigoRecuperacaoSenha(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void alteracaoDaPropriaSenhaGeraAuditoriaSemRegistrarSenhaOuHash() {
+        AlterarSenhaPropriaDTO dto = new AlterarSenhaPropriaDTO();
+        dto.setSenhaAtual("SenhaAntiga@123");
+        dto.setNovaSenha("NovaSenha@123");
+        dto.setConfirmacaoNovaSenha("NovaSenha@123");
+        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        authService.alterarSenhaPropria(usuario.getId(), usuario.getTenantId(), dto);
+
+        ArgumentCaptor<String> detalhes = ArgumentCaptor.forClass(String.class);
+        verify(auditoriaService).registrar(any(), eq(usuario.getTenantId()), eq("SENHA_PROPRIA_ALTERADA"),
+                eq("USUARIO"), eq(usuario.getId()), detalhes.capture());
+        assertEquals("origem=ALTERACAO_PROPRIA", detalhes.getValue());
+        verify(usuarioRepository).updatePassword(eq(usuario.getId()), eq(usuario.getTenantId()), startsWith("$2"));
     }
 
     private String solicitarToken() {

@@ -21,7 +21,8 @@ import static org.mockito.Mockito.*;
 
 class EscolaStatusServiceTest {
     private final EscolaRepository repository = mock(EscolaRepository.class);
-    private final EscolaService service = new EscolaService(repository, mock(UsuarioRepository.class), mock(PasswordService.class));
+    private final AuditoriaService auditoriaService = mock(AuditoriaService.class);
+    private final EscolaService service = new EscolaService(repository, mock(UsuarioRepository.class), mock(PasswordService.class), auditoriaService);
     private final AuthUser admin = new AuthUser(null, null, null, Perfil.SUPER_ADMIN, null);
 
     @Test void ativaEscolaInativaEAtualizaDataSemUpdateCompleto() {
@@ -38,6 +39,8 @@ class EscolaStatusServiceTest {
         assertTrue(resultado.getAtualizadoEm().isAfter(dataAnterior));
         verify(repository).updateStatus(eq(escola.getId()), eq(br.com.kutuar.seguranca.enums.EscolaStatus.INATIVA),
                 eq(br.com.kutuar.seguranca.enums.EscolaStatus.ATIVA), any(LocalDateTime.class));
+        verify(auditoriaService).registrar(eq(admin), isNull(), eq("ESCOLA_ATIVADA"), eq("ESCOLA"),
+                eq(escola.getId()), eq("status=ATIVA"));
         verify(repository, never()).update(any());
     }
 

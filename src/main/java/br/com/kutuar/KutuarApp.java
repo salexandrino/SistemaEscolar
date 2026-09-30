@@ -83,7 +83,10 @@ import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.models.Usuario;
 import br.com.kutuar.seguranca.repositories.EscolaRepository;
+import br.com.kutuar.seguranca.repositories.AuditoriaRepository;
 import br.com.kutuar.seguranca.repositories.UsuarioRepository;
+import br.com.kutuar.seguranca.services.AuditoriaPersistenteService;
+import br.com.kutuar.seguranca.services.AuditoriaService;
 import br.com.kutuar.seguranca.services.AuthService;
 import br.com.kutuar.seguranca.services.EmailService;
 import br.com.kutuar.seguranca.services.EscolaService;
@@ -145,7 +148,8 @@ public class KutuarApp {
         DashboardService dashboardService = new DashboardService(dashboardRepository);
         EmailService emailService = new EmailService();
 
-        EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService);
+        AuditoriaService auditoriaService = new AuditoriaPersistenteService(new AuditoriaRepository());
+        EscolaService escolaService = new EscolaService(escolaRepository, usuarioRepository, passwordService, auditoriaService);
         // Padrão Observer: registra quem deve ser notificado quando uma
         // escola nova for cadastrada (mesmo molde do alunoService.adicionarObserver
         // já usado em academico). Pra adicionar uma nova reação, basta
@@ -153,8 +157,8 @@ public class KutuarApp {
         escolaService.adicionarObserver(new br.com.kutuar.seguranca.services.observers.AuditLogEscolaObserver());
         escolaService.adicionarObserver(new br.com.kutuar.seguranca.services.observers.EmailGestorObserver(emailService));
 
-        UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository);
-        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService, emailService);
+        UsuarioAdminService usuarioAdminService = new UsuarioAdminService(usuarioRepository, auditoriaService);
+        AuthService authService = new AuthService(usuarioRepository, escolaRepository, passwordService, jwtService, emailService, auditoriaService);
         // Acadêmico
         DisciplinaService disciplinaService = new DisciplinaService(disciplinaRepository);
         AnoLetivoService anoLetivoService = new AnoLetivoService(anoLetivoRepository, cloneRepository);
