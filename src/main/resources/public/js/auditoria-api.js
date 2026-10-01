@@ -1,12 +1,18 @@
 (function () {
-    // TODO backend: registrar endpoint real para listagem de eventos de auditoria.
-    const AUDITORIA_ENDPOINT = null;
+    const AUDITORIA_ENDPOINT = '/api/admin/auditoria';
 
-    async function listarEventos() {
-        if (!AUDITORIA_ENDPOINT) {
-            return { items: [], pendingBackend: true };
-        }
-        return window.kutuarApi.apiFetch(AUDITORIA_ENDPOINT);
+    function listarEventos(filtros) {
+        const params = new URLSearchParams();
+        const valores = filtros || {};
+        params.set('page', String(valores.page || 1));
+        params.set('size', String(valores.size || 20));
+        ['acao', 'entidade', 'dataInicio', 'dataFim'].forEach((campo) => {
+            const valor = valores[campo];
+            if (valor !== undefined && valor !== null && String(valor).trim()) {
+                params.set(campo, String(valor).trim());
+            }
+        });
+        return window.kutuarApi.apiFetch(`${AUDITORIA_ENDPOINT}?${params.toString()}`);
     }
 
     function buscarDashboard() {

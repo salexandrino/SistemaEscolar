@@ -24,6 +24,23 @@
     border-radius: var(--kutuar-radius-md);
 }
 
+.auditoria-clear-filters {
+    justify-self: start;
+}
+
+.auditoria-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--kutuar-space-3);
+    margin-top: var(--kutuar-space-3);
+}
+
+.auditoria-pagination [data-audit-page-info] {
+    color: var(--kutuar-muted);
+    font-size: var(--kutuar-font-sm);
+}
+
 .auditoria-loading {
     display: grid;
     gap: var(--kutuar-space-2);
