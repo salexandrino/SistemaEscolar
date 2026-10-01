@@ -522,6 +522,7 @@ public class KutuarApp {
         app.get("/dashboard/escolas/editar/{id}", escolaEditarGlobal.then(dashboardController::editarEscola));
         app.get("/dashboard/escolas/visualizar/{id}", escolaVisualizarGlobal.then(escolaController::exibirPaginaVisualizar));
         app.post("/dashboard/escolas/{id}/deletar", escolaBloquearGlobal.then(escolaController::deletarEscola));
+        app.get("/dashboard/auditoria", dashboardGlobal.then(dashboardController::auditoria));
 
         // Gestão de Usuários
         app.get("/dashboard/usuarios", usuarioVisualizarGlobal.then(dashboardController::usuarios));

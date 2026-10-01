@@ -539,9 +539,9 @@
                 </div>
 
 
-                <a href="/dashboard/usuarios?status=todos">
+                <a href="/dashboard/auditoria">
 
-                    Ver todos os usuários
+                    Ver auditoria
 
                     <i class="bi bi-arrow-right"></i>
 
@@ -718,18 +718,19 @@
 
                 <a
                     class="quick-action k-quick-action"
-                    href="#atividades-recentes">
+                    th:if="${canViewAudit}"
+                    href="/dashboard/auditoria">
 
                     <i class="bi bi-journal-text" aria-hidden="true"></i>
 
                     <span>
 
                         <strong>
-                            Ver Atividades
+                            Auditoria
                         </strong>
 
                         <small>
-                            Cadastros recentes
+                            Alertas e atividades
                         </small>
 
                     </span>

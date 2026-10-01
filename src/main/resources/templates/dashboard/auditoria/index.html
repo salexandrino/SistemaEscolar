@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/master-admin :: html}">
+<head>
+    <title>Auditoria - Kutuar Educação</title>
+</head>
+<body>
+
+<div th:fragment="content" class="auditoria-page" data-page="auditoria">
+    <link href="/css/pages/auditoria.css" rel="stylesheet">
+
+    <nav class="breadcrumb-admin mb-4" aria-label="Breadcrumb">
+        <a href="/dashboard" class="text-decoration-none">Dashboard</a>
+        <span class="mx-2">></span>
+        <span class="text-muted">Auditoria</span>
+    </nav>
+
+    <header class="gestao-escolas-header">
+        <div>
+            <h2 class="page-title mb-0">
+                <i class="bi bi-shield-check me-2"></i>
+                Auditoria
+            </h2>
+            <p class="text-muted small mb-0">Eventos, alertas e atividades recentes da plataforma.</p>
+        </div>
+    </header>
+
+    <section class="auditoria-tabs" aria-label="Seções de auditoria">
+        <button class="k-button k-button--primary k-button--sm" type="button" data-audit-tab="eventos">Eventos</button>
+        <button class="k-button k-button--outline k-button--sm" type="button" data-audit-tab="alertas">Alertas</button>
+        <button class="k-button k-button--outline k-button--sm" type="button" data-audit-tab="atividades">Atividades</button>
+    </section>
+
+    <section class="dashboard-panel auditoria-panel" data-audit-panel="eventos" aria-labelledby="eventosAuditoriaTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
+                <h2 id="eventosAuditoriaTitulo">Eventos de auditoria</h2>
+                <p data-audit-summary>Endpoint de auditoria pendente no backend.</p>
+            </div>
+        </div>
+
+        <section class="auditoria-toolbar" aria-label="Filtros de auditoria">
+            <div th:insert="~{components/input :: input('Ação', 'acao', 'auditAction', 'text', '', 'Ex.: USUARIO_APROVADO', false, false, false, null, null, 'bi-search', null)}"></div>
+            <div th:insert="~{components/input :: input('Entidade', 'entidade', 'auditEntity', 'text', '', 'Ex.: USUARIO', false, false, false, null, null, 'bi-diagram-3', null)}"></div>
+            <div th:insert="~{components/input :: input('Data inicial', 'dataInicio', 'auditStartDate', 'date', '', null, false, false, false, null, null, null, null)}"></div>
+            <div th:insert="~{components/input :: input('Data final', 'dataFim', 'auditEndDate', 'date', '', null, false, false, false, null, null, null, null)}"></div>
+        </section>
+
+        <div class="auditoria-loading" data-audit-state="loading" hidden>
+            <div class="auditoria-skeleton"></div>
+            <div class="auditoria-skeleton"></div>
+            <div class="auditoria-skeleton"></div>
+        </div>
+
+        <div class="table-responsive auditoria-table-wrap" data-audit-state="table" hidden>
+            <table class="dashboard-table k-dashboard-table auditoria-table">
+                <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Executor</th>
+                    <th>Ação</th>
+                    <th>Entidade</th>
+                    <th>Detalhes</th>
+                </tr>
+                </thead>
+                <tbody data-audit-events></tbody>
+            </table>
+        </div>
+
+        <div class="auditoria-state" data-audit-state="empty">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <h3>Eventos de auditoria aguardando backend.</h3>
+            <p>TODO: criar endpoint de listagem de auditoria antes de ativar esta tabela.</p>
+        </div>
+
+        <div class="auditoria-state" data-audit-state="no-results" hidden>
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <h3>Nenhum evento encontrado com esses filtros.</h3>
+            <p>Ajuste ação, entidade ou intervalo de data.</p>
+        </div>
+
+        <div class="auditoria-state" data-audit-state="error" hidden>
+            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+            <h3>Não foi possível carregar a auditoria.</h3>
+            <p>Confira sua conexão e tente novamente.</p>
+        </div>
+    </section>
+
+    <section class="dashboard-panel auditoria-panel" data-audit-panel="alertas" hidden aria-labelledby="alertasAuditoriaTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
+                <h2 id="alertasAuditoriaTitulo">Alertas do sistema</h2>
+                <p>Dados de GET /api/admin/dashboard.</p>
+            </div>
+        </div>
+        <div class="auditoria-card-list" data-alerts-list></div>
+        <div class="auditoria-state" data-alerts-empty hidden>
+            <i class="bi bi-check-circle" aria-hidden="true"></i>
+            <h3>Nenhum alerta no momento.</h3>
+        </div>
+    </section>
+
+    <section class="dashboard-panel auditoria-panel" data-audit-panel="atividades" hidden aria-labelledby="atividadesAuditoriaTitulo">
+        <div class="panel-heading">
+            <div>
+                <span class="panel-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+                <h2 id="atividadesAuditoriaTitulo">Atividades recentes</h2>
+                <p>Dados de GET /api/admin/dashboard.</p>
+            </div>
+        </div>
+        <div class="auditoria-card-list" data-activities-list></div>
+        <div class="auditoria-state" data-activities-empty hidden>
+            <i class="bi bi-inbox" aria-hidden="true"></i>
+            <h3>Nenhuma atividade recente.</h3>
+        </div>
+    </section>
+
+    <template id="audit-event-template">
+        <tr>
+            <td data-audit-field="criadoEm"></td>
+            <td data-audit-field="executor"></td>
+            <td><span class="operational-badge" data-audit-field="acao"></span></td>
+            <td data-audit-field="entidade"></td>
+            <td data-audit-field="detalhes"></td>
+        </tr>
+    </template>
+
+    <script src="/js/auditoria-api.js"></script>
+    <script src="/js/pages/auditoria.js"></script>
+</div>
+
+</body>
+</html>
