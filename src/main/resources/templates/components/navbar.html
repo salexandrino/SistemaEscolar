@@ -1,1 +1,114 @@
-<!DOCTYPE html><html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"><body><header th:fragment="topbar(title)" class="k-topbar"><button class="k-button k-button--outline k-button--sm d-md-none" type="button" data-k-sidebar-toggle aria-controls="adminSidebar" aria-expanded="false" aria-label="Abrir menu"><i class="bi bi-list" aria-hidden="true"></i></button><h1 class="k-topbar__title ms-2" th:text="${title}">Painel Administrativo</h1><div class="k-topbar__actions"><span class="k-topbar__user" th:if="${currentUser}" th:text="${currentUser.cpf}">Usuário</span><a href="/auth/logout" class="k-button k-button--danger k-button--sm"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Sair</span></a></div></header></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="topbar(title)">
+    <header class="k-topbar">
+        <button class="k-button k-button--outline k-button--sm d-md-none"
+                type="button"
+                data-k-sidebar-toggle
+                aria-controls="adminSidebar"
+                aria-expanded="false"
+                aria-label="Abrir menu">
+            <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <h1 class="k-topbar__title ms-2" th:text="${title}">Painel Administrativo</h1>
+
+        <div class="k-topbar__actions">
+            <span class="k-topbar__user" th:if="${currentUser}" th:text="${currentUser.cpf}">Usuário</span>
+            <button class="k-button k-button--outline k-button--sm" type="button" data-change-password-open>
+                <i class="bi bi-key" aria-hidden="true"></i>
+                <span>Alterar senha</span>
+            </button>
+            <a href="/auth/logout" class="k-button k-button--danger k-button--sm">
+                <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalTitle" aria-hidden="true" data-change-password-modal>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form data-change-password-form>
+                    <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="changePasswordModalTitle">Alterar senha</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="k-field mb-3">
+                            <label class="k-field__label" for="senhaAtual">Senha atual</label>
+                            <div class="input-group">
+                                <input class="form-control"
+                                       id="senhaAtual"
+                                       name="senhaAtual"
+                                       type="password"
+                                       autocomplete="current-password"
+                                       required>
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        data-password-toggle
+                                        data-target="senhaAtual"
+                                        aria-label="Mostrar senha atual">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="k-field mb-3">
+                            <label class="k-field__label" for="novaSenha">Nova senha</label>
+                            <div class="input-group">
+                                <input class="form-control"
+                                       id="novaSenha"
+                                       name="novaSenha"
+                                       type="password"
+                                       autocomplete="new-password"
+                                       required>
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        data-password-toggle
+                                        data-target="novaSenha"
+                                        aria-label="Mostrar nova senha">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="k-field">
+                            <label class="k-field__label" for="confirmacaoNovaSenha">Confirmar nova senha</label>
+                            <div class="input-group">
+                                <input class="form-control"
+                                       id="confirmacaoNovaSenha"
+                                       name="confirmacaoNovaSenha"
+                                       type="password"
+                                       autocomplete="new-password"
+                                       required>
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        data-password-toggle
+                                        data-target="confirmacaoNovaSenha"
+                                        aria-label="Mostrar confirmação de senha">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-danger small mb-0 mt-3" data-change-password-feedback hidden></p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="k-button k-button--outline" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="k-button k-button--primary" data-change-password-submit disabled>
+                            <span data-submit-label>Salvar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/components/change-password.js"></script>
+</th:block>
+</body>
+</html>

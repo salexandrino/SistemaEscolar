@@ -12,12 +12,12 @@ import br.com.kutuar.seguranca.exceptions.ValidationException;
 import br.com.kutuar.seguranca.models.AuthUser;
 import br.com.kutuar.seguranca.models.Escola;
 import br.com.kutuar.seguranca.enums.EscolaStatus;
-import br.com.kutuar.seguranca.enums.Permissao;
 import br.com.kutuar.seguranca.dtos.PageResponse;
 import br.com.kutuar.seguranca.dtos.EscolaResumoDTO;
 import br.com.kutuar.seguranca.dtos.EscolaExclusaoImpactoDTO;
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
+import br.com.kutuar.seguranca.utils.PermissaoModelUtil;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
@@ -691,11 +691,7 @@ public class EscolaController {
             List<EscolaResumoDTO> escolas = pagina.items();
 
             Map<String, Object> model = new java.util.HashMap<>();
-            model.put("currentUser", currentUser);
-            model.put("canCreateSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_CRIAR));
-            model.put("canEditSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_EDITAR));
-            model.put("canBlockSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_BLOQUEAR));
-            model.put("canViewSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_VISUALIZAR));
+            PermissaoModelUtil.popularPermissoes(model, currentUser);
             model.put("escolas", escolas);
             model.put("filtroStatus", status == null ? "" : status.name());
             model.put("content", "dashboard/escolas/lista");
@@ -742,12 +738,10 @@ public class EscolaController {
             UUID escolaId = UUID.fromString(ctx.pathParam("id"));
             Escola escola = escolaService.buscarEscolaPorId(escolaId, currentUser);
 
-            Map<String, Object> model = Map.of(
-                    "escola", escola,
-                    "content", "dashboard/escolas/visualizar",
-                    "currentUser", currentUser,
-                    "canEditSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_EDITAR),
-                    "canBlockSchool", currentUser.getPerfil().hasPermission(Permissao.ESCOLA_BLOQUEAR));
+            Map<String, Object> model = new java.util.HashMap<>();
+            PermissaoModelUtil.popularPermissoes(model, currentUser);
+            model.put("escola", escola);
+            model.put("content", "dashboard/escolas/visualizar");
             ctx.render("dashboard/escolas/visualizar.html", model);
 
         } catch (Exception e) {

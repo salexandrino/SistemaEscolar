@@ -3,11 +3,16 @@ package br.com.kutuar.seguranca.controllers;
 import br.com.kutuar.seguranca.services.AuditoriaService;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 public class AuditoriaController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuditoriaController.class);
     private final AuditoriaService auditoriaService;
 
     public AuditoriaController(AuditoriaService auditoriaService) {
@@ -15,20 +20,37 @@ public class AuditoriaController {
     }
 
     public void listar(Context ctx) {
-        var eventos = auditoriaService.listar();
-        ctx.status(HttpStatus.OK);
-        ctx.json(Map.of("total", eventos.size(), "auditoria", eventos.stream().map(evento -> {
-            Map<String, Object> item = new LinkedHashMap<>();
-            item.put("id", evento.getId());
-            item.put("executorId", evento.getExecutorId());
-            item.put("executorPerfil", evento.getExecutorPerfil());
-            item.put("tenantId", evento.getTenantId());
-            item.put("acao", evento.getAcao());
-            item.put("entidade", evento.getEntidade());
-            item.put("entidadeId", evento.getEntidadeId());
-            item.put("detalhes", evento.getDetalhes());
-            item.put("criadoEm", evento.getCriadoEm());
-            return item;
-        }).toList()));
+        try {
+            LocalDate dataInicio = parseDate(ctx.queryParam("dataInicio"), "dataInicio");
+            LocalDate dataFim = parseDate(ctx.queryParam("dataFim"), "dataFim");
+            var response = auditoriaService.listar(
+                    ctx.queryParam("acao"), ctx.queryParam("entidade"), dataInicio, dataFim,
+                    parseInteger(ctx.queryParam("page"), 1, "page"),
+                    parseInteger(ctx.queryParam("size"), 20, "size"));
+            ctx.status(HttpStatus.OK).json(response);
+        } catch (DateTimeParseException | IllegalArgumentException e) {
+            ctx.status(HttpStatus.BAD_REQUEST).json(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao consultar auditoria. tipo={}", e.getClass().getSimpleName());
+            ctx.status(HttpStatus.INTERNAL_SERVER_ERROR).json(Map.of("message", "Erro interno ao consultar auditoria."));
+        }
+    }
+
+    private LocalDate parseDate(String value, String parameter) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException e) {
+            throw new DateTimeParseException("Parâmetro " + parameter + " deve usar o formato AAAA-MM-DD.", value, e.getErrorIndex(), e);
+        }
+    }
+
+    private Integer parseInteger(String value, int defaultValue, String parameter) {
+        if (value == null || value.isBlank()) return defaultValue;
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Parâmetro " + parameter + " deve ser um número inteiro.");
+        }
     }
 }

@@ -85,6 +85,24 @@ class AuthorizationMiddlewareTest {
         verify(controller).handle(ctx);
     }
 
+        @Test
+        void endpointDeAuditoriaExigeLoginPerfilSuperAdminEPermissao() throws Exception {
+        Handler controller = mock(Handler.class);
+        Handler rotaProtegida = new AuthorizationMiddleware(Permissao.AUDITORIA_VISUALIZAR, Perfil.SUPER_ADMIN)
+            .then(controller);
+
+        assertEquals(HttpStatus.UNAUTHORIZED,
+            assertThrows(AuthenticationException.class, () -> rotaProtegida.handle(ctx)).getStatus());
+
+        AuthUserContext.setAuthUser(usuario(Perfil.GESTOR));
+        assertEquals(HttpStatus.FORBIDDEN,
+            assertThrows(AuthorizationException.class, () -> rotaProtegida.handle(ctx)).getStatus());
+
+        AuthUserContext.setAuthUser(usuario(Perfil.SUPER_ADMIN));
+        assertDoesNotThrow(() -> rotaProtegida.handle(ctx));
+        verify(controller).handle(ctx);
+        }
+
     private AuthUser usuario(Perfil perfil) {
         return new AuthUser(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), perfil, "52998224725");
     }

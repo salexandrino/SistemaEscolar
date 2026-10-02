@@ -3,7 +3,6 @@ package br.com.kutuar.administrativo.controllers;
 import br.com.kutuar.administrativo.dto.DashboardDTO;
 import br.com.kutuar.administrativo.services.DashboardService;
 import br.com.kutuar.seguranca.models.AuthUser;
-import br.com.kutuar.seguranca.enums.Permissao;
 import br.com.kutuar.seguranca.dtos.AtualizarPerfilUsuarioDTO;
 import br.com.kutuar.seguranca.dtos.AtualizarUsuarioDTO;
 import br.com.kutuar.seguranca.models.Escola;
@@ -12,6 +11,7 @@ import br.com.kutuar.seguranca.repositories.UsuarioRepository; // IMPORTANTE: Im
 import br.com.kutuar.seguranca.services.EscolaService;
 import br.com.kutuar.seguranca.services.UsuarioAdminService;
 import br.com.kutuar.seguranca.utils.AuthUserContext;
+import br.com.kutuar.seguranca.utils.PermissaoModelUtil;
 import br.com.kutuar.seguranca.exceptions.NotFoundException;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
@@ -47,23 +47,8 @@ public class DashboardController {
     private org.thymeleaf.context.Context novoContexto() {
         AuthUser user = AuthUserContext.getAuthUser();
         org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
-        context.setVariable("currentUser", user);
-        context.setVariable("canCreateSchool", hasPermission(user, Permissao.ESCOLA_CRIAR));
-        context.setVariable("canEditSchool", hasPermission(user, Permissao.ESCOLA_EDITAR));
-        context.setVariable("canBlockSchool", hasPermission(user, Permissao.ESCOLA_BLOQUEAR));
-        context.setVariable("canViewSchool", hasPermission(user, Permissao.ESCOLA_VISUALIZAR));
-        context.setVariable("canCreateUser", hasPermission(user, Permissao.USUARIO_CRIAR));
-        context.setVariable("canEditUser", hasPermission(user, Permissao.USUARIO_EDITAR));
-        context.setVariable("canBlockUser", hasPermission(user, Permissao.USUARIO_BLOQUEAR));
-        context.setVariable("canApproveUser", hasPermission(user, Permissao.USUARIO_APROVAR));
-        context.setVariable("canViewUser", hasPermission(user, Permissao.USUARIO_VISUALIZAR));
-        context.setVariable("canViewFinance", hasPermission(user, Permissao.FINANCEIRO_VISUALIZAR));
-        context.setVariable("canViewAudit", hasPermission(user, Permissao.AUDITORIA_VISUALIZAR));
+        PermissaoModelUtil.popularPermissoes(context, user);
         return context;
-    }
-
-    private boolean hasPermission(AuthUser user, Permissao permission) {
-        return user != null && user.getPerfil() != null && user.getPerfil().hasPermission(permission);
     }
 
     // 1. Tela Inicial Principal do Dashboard
@@ -101,10 +86,9 @@ public class DashboardController {
             String idParam = ctx.pathParam("id");
             UUID schoolId = UUID.fromString(idParam);
             Escola escola = escolaService.buscarEscolaPorId(schoolId, currentUser);
-            Map<String, Object> model = Map.of(
-                    "escola", escola,
-                    "currentUser", currentUser,
-                    "canBlockSchool", hasPermission(currentUser, Permissao.ESCOLA_BLOQUEAR));
+            Map<String, Object> model = new java.util.HashMap<>();
+            PermissaoModelUtil.popularPermissoes(model, currentUser);
+            model.put("escola", escola);
             ctx.render("dashboard/escolas/editar.html", model);
         } catch (Exception e) {
             logger.error("Erro ao carregar a página de edição de escola", e);
@@ -115,6 +99,12 @@ public class DashboardController {
     public void visualizarEscola(Context ctx) {
         org.thymeleaf.context.Context thymeleaf = novoContexto();
         thymeleaf.setVariable("content", "dashboard/escolas/visualizar");
+        ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
+    }
+
+    public void auditoria(Context ctx) {
+        org.thymeleaf.context.Context thymeleaf = novoContexto();
+        thymeleaf.setVariable("content", "dashboard/auditoria/index");
         ctx.html(templateEngine.process("layouts/master-admin", thymeleaf));
     }
 
